@@ -115,7 +115,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PXP Topic Modeling.')
     parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='../output/semeval-test/2016', help='output path, e.g., ../output/semeval2016')
+    parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016', help='output path, e.g., ../output/semeval2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 

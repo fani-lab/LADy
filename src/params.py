@@ -10,6 +10,6 @@ cores = 0
 
 
 train_ratio = 0.85 # 1 - train_ratio goes to test
-nfolds = 10 # on the train, nfold x-valid
+nfolds = 5 # on the train, nfold x-valid
 
 topk = 10
