@@ -1,4 +1,4 @@
-name: PXPTopicModeling
+name: lad
 channels:
   - conda-forge
   - anaconda
