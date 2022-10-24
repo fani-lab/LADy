@@ -5,15 +5,13 @@ import matplotlib.pyplot as plt
 from gensim.models.callbacks import PerplexityMetric, ConvergenceMetric, CoherenceMetric
 from gensim.models.coherencemodel import CoherenceModel
 import nltk
+from . import aspectmodeling
 stop_words = nltk.corpus.stopwords.words('english')
 
 
-class AspectModel:
+class GensimModel(aspectmodeling.AbstractAspectModel):
     def __init__(self, reviews, naspects, no_extremes, output):
-        self.reviews = reviews
-        self.naspects = naspects
-        self.no_extremes = no_extremes
-        self.path = output
+        super().__init__(reviews, naspects, no_extremes, output)
 
     def load(self):
         self.mdl = gensim.models.LdaModel.load(f'{self.path}model')
@@ -22,7 +20,7 @@ class AspectModel:
         with open(f'{self.path}model.perf', 'rb') as f: self.cas = pickle.load(f)
 
     def train(self, doctype, cores, iter, seed):
-        reviews_ = AspectModel.preprocess(doctype, self.reviews)
+        reviews_ = super().preprocess(doctype, self.reviews)
         self.dict = gensim.corpora.Dictionary(reviews_)
         if self.no_extremes: self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'], keep_n=100000)
         self.dict.compactify()
@@ -62,27 +60,8 @@ class AspectModel:
 
     def infer(self, doctype, review):
         review_aspects = []
-        review_ = AspectModel.preprocess(doctype, [review])
+        review_ = super().preprocess(doctype, [review])
         for r in review_: review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
         return review_aspects
-
-    @staticmethod
-    def preprocess(doctype, reviews):
-        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews]
-        else: reviews_ = [s for r in reviews for s in r.sentences]  # doctype = 'sentence'
-        return [[word for word in doc if word not in stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_]
-
-    @staticmethod
-    def plot_coherence(path, cas): # dict of coherences for different naspects, e.g., {'2': [0.3, 0.5], '3': [0.3, 0.5, 0.7]}.
-        # np.mean(row wise)
-        # np.std(row wise)
-
-        # plt.plot(x, mean, '-or', label='mean')
-        # plt.xlim(start - 0.025, limit - 1 + 0.025)
-        plt.xlabel("#aspects")
-        plt.ylabel("coherence")
-        plt.legend(loc='best')
-        plt.savefig(f'{path}coherence.png')
-        plt.clf()
 
 

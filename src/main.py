@@ -47,20 +47,30 @@ def split(nsample, output):
     with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
-def train(reviews, naspects, output):
+def train(reviews, naspects, output, aml):
     print(f'\n2. Aspect modeling ...')
     print('#' * 50)
     t_s = time()
-    from aml.lda import AspectModel
     try:
         print(f'2.1. Loading saved aspect model from {output} ...')
-        am = AspectModel(reviews, naspects, params.no_extremes, output)
-        am.load()
+        print("aml: ", aml)
+        if "lda" in aml:
+            # print("lda")
+            from aml.lda import GensimModel
+            am = GensimModel(reviews, naspects, params.no_extremes, output)
+            am.load()
+        elif "btm" in aml:
+            # print("btm")
+            am = ""
     except (FileNotFoundError, EOFError) as e:
         print(f'2.1. Loading saved aspect model failed! Training a model for {naspects} of aspects. See {output}model.train.log for training logs ...')
         am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter, params.seed)
     print(f'2.2. Quality of aspects ...')
-    print(f'(Coherence: {np.mean(am.cas)}\u00B1{np.std(am.cas)})')
+    if "lda" in aml:
+        print(f'(Coherence: {np.mean(am.cas)}\u00B1{np.std(am.cas)})')
+    elif "btm" in aml:
+        # print(f'(Coherence: {np.mean(am.coherence_)}\u00B1{np.std(am.coherence_)})')
+        pass
     print(f'Time elapsed: {(time() - t_s)}')
     return am
 
@@ -106,7 +116,7 @@ def main(args):
     output = f'{args.output}/{args.naspects}'
     for f in splits['folds'].keys():
         output_ = f'{output}/f{f}.'
-        am = train(np.array(reviews)[splits['folds'][f]['train']].tolist(), args.naspects, output_)
+        am = train(np.array(reviews)[splits['folds'][f]['train']].tolist(), args.naspects, output_, args.aml)
         _, df_mean = evaluate(am, test)
         df_mean.to_csv(f'{output_}pred.eval.mean.csv')
         fold_mean = pd.concat([fold_mean, df_mean], axis=1)
@@ -114,8 +124,11 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PXP Topic Modeling.')
+    # parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    # parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016SB5', help='output path, e.g., ../output/2016SB5')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of topic modeling methods (eg. -t LDA)')
     parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016', help='output path, e.g., ../output/semeval2016')
+    parser.add_argument('--output', dest='output', type=str, default='../output/semeval-2/2016-2', help='output path, e.g., ../output/semeval2016-2')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 
