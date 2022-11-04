@@ -62,9 +62,9 @@ def evaluate(am, am_type, test):
         r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
         r_ = r.hide_aspects()
         r_pred_aspects = am.infer(params.doctype, r_)
-        if "btm" in am_type:
+        if am_type == "btm":
             pass
-        elif "rnd" in am_type:
+        elif am_type == "rnd":
             for i in range(len(r_aspects)):
                 pairs.append((r_aspects[i], r_pred_aspects))
         else:  # "lda" in am_type:
@@ -100,44 +100,56 @@ def evaluate(am, am_type, test):
 
 
 def main(args):
+    am_type = args.aml
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
-
+    # output = f'{args.output}/{args.naspects}'
     reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
     fold_mean = pd.DataFrame()
-    output = f'{args.output}/{args.naspects}'
-    for f in splits['folds'].keys():
-        output_ = f'{output}/f{f}.'
-        am_type = args.aml
-        model_review = np.array(reviews)[splits['folds'][f]['train']].tolist()
-        if "btm" in am_type:
-            am = Btm(model_review, args.naspects, params.no_extremes, output)
-        elif "rnd" in am_type:
-            am = Rnd(model_review, args.naspects, params.no_extremes, output)
+    print(am_type)
+    for a in am_type:
+        output = f'{args.output}/{args.naspects}'
+        print(a)
+        if a == "btm":
+            output = f'{output}/btm/'
+            if not os.path.isdir(output): os.makedirs(output)
+        elif a == "rnd":
+            output = f'{output}/rnd/'
+            if not os.path.isdir(output): os.makedirs(output)
         else:  # if am_type == "lda"
-            am = Lda(model_review, args.naspects, params.no_extremes, output)
+            output = f'{output}/lda/'
+            if not os.path.isdir(output): os.makedirs(output)
+        for f in splits['folds'].keys():
+            output_ = f'{output}f{f}.'
+            model_review = np.array(reviews)[splits['folds'][f]['train']].tolist()
+            if a == "btm":
+                am = Btm(model_review, args.naspects, params.no_extremes, output)
+            elif a == "rnd":
+                am = Rnd(model_review, args.naspects, params.no_extremes, output)
+            else:  # if am_type == "lda"
+                am = Lda(model_review, args.naspects, params.no_extremes, output)
 
-        # training
-        print(f'\n2. Aspect modeling ...')
-        print('#' * 50)
-        t_s = time()
-        try:
-            print(f'2.1. Loading saved aspect model from {output} ...')
-            am.load()
-        except (FileNotFoundError, EOFError) as e:
-            print(
-                f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
-            am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
-                     params.seed)
-        print(f'2.2. Quality of aspects ...')
-        for q in params.qualities:
-            print(f'({q}: {AbstractAspectModel.quality(am, q)})')
-        print(f'Time elapsed: {(time() - t_s)}')
-        df_mean = evaluate(am, am_type, test)
-        df_mean.to_csv(f'{output_}pred.eval.mean.csv')
-        fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-    fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.csv')
+            # training
+            print(f'\n2. Aspect modeling ...')
+            print('#' * 50)
+            t_s = time()
+            try:
+                print(f'2.1. Loading saved aspect model from {output} ...')
+                am.load()
+            except (FileNotFoundError, EOFError) as e:
+                print(
+                    f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
+                am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
+                         params.seed)
+            print(f'2.2. Quality of aspects ...')
+            for q in params.qualities:
+                print(f'({q}: {AbstractAspectModel.quality(am, q)})')
+            print(f'Time elapsed: {(time() - t_s)}')
+            df_mean = evaluate(am, a, test)
+            df_mean.to_csv(f'{output_}pred.eval.mean.csv')
+            fold_mean = pd.concat([fold_mean, df_mean], axis=1)
+        fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.csv')
 
 
 if __name__ == '__main__':
