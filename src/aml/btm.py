@@ -65,11 +65,7 @@ class Btm(AbstractAspectModel):
         review_ = super().preprocess(doctype, [review])
         t_t = 'Text'
         for r in review_:
-            print(r)
-            # print("x", self.dict.doc2bow(r))
             _, vocabulary, _ = btm.get_words_freqs([' '.join(r)])
-            # print(btm.get_vectorized_docs([' '.join(r)], vocabulary))
-            # print("transform", self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], vocabulary)))
             review_aspects.append(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], vocabulary)))
         print("*"*10)
         return review_aspects
