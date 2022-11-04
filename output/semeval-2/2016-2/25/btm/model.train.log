@@ -1,0 +1,72 @@
+2022-11-04 02:00:45,390:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:00:45,400:INFO:built Dictionary<1977 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5954 corpus positions)
+2022-11-04 02:00:45,400:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:00:45,400:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1977 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5954 corpus positions)", 'datetime': '2022-11-04T02:00:45.400261', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:00:45,402:INFO:discarding 1888 tokens: [('patsy', 1), ('true', 1), ('crowded', 7), ('date', 5), ('friends', 7), ('intimate', 5), ('occassion', 1), ('cake', 2), ('incredible', 9), ('lava', 1)]...
+2022-11-04 02:00:45,402:INFO:keeping 89 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:00:45,403:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:00:45,403:INFO:resulting dictionary: Dictionary<89 unique tokens: ['love', 'pizza', 'excellent', 'feel', 'great']...>
+2022-11-04 02:00:45,403:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:04,945:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:01:04,955:INFO:built Dictionary<1946 unique tokens: ['crowded', 'date', 'excellent', 'feel', 'friends']...> from 947 documents (total 5900 corpus positions)
+2022-11-04 02:01:04,955:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:01:04,955:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1946 unique tokens: ['crowded', 'date', 'excellent', 'feel', 'friends']...> from 947 documents (total 5900 corpus positions)", 'datetime': '2022-11-04T02:01:04.955812', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:01:04,957:INFO:discarding 1863 tokens: [('crowded', 5), ('date', 6), ('feel', 9), ('friends', 9), ('intimate', 3), ('occassion', 1), ('although', 6), ('anything', 2), ('home', 4), ('margaritas', 2)]...
+2022-11-04 02:01:04,957:INFO:keeping 83 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:01:04,958:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:04,958:INFO:resulting dictionary: Dictionary<83 unique tokens: ['excellent', 'great', 'little', 'place', 'romantic']...>
+2022-11-04 02:01:04,958:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:24,635:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:01:24,645:INFO:built Dictionary<1981 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5940 corpus positions)
+2022-11-04 02:01:24,646:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:01:24,646:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1981 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5940 corpus positions)", 'datetime': '2022-11-04T02:01:24.645007', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:01:24,647:INFO:discarding 1892 tokens: [('patsy', 1), ('true', 1), ('crowded', 5), ('date', 5), ('feel', 9), ('friends', 7), ('intimate', 4), ('occassion', 1), ('although', 6), ('anything', 2)]...
+2022-11-04 02:01:24,647:INFO:keeping 89 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:01:24,647:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:24,647:INFO:resulting dictionary: Dictionary<89 unique tokens: ['love', 'pizza', 'excellent', 'great', 'little']...>
+2022-11-04 02:01:24,647:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:43,897:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:01:43,907:INFO:built Dictionary<1953 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 948 documents (total 5888 corpus positions)
+2022-11-04 02:01:43,907:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:01:43,908:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1953 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 948 documents (total 5888 corpus positions)", 'datetime': '2022-11-04T02:01:43.907539', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:01:43,909:INFO:discarding 1870 tokens: [('patsy', 1), ('true', 1), ('crowded', 6), ('date', 6), ('feel', 9), ('friends', 7), ('intimate', 4), ('occassion', 1), ('romantic', 9), ('although', 7)]...
+2022-11-04 02:01:43,909:INFO:keeping 83 tokens which were in no less than 10 and no more than 853 (=90.0%) documents
+2022-11-04 02:01:43,910:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:01:43,910:INFO:resulting dictionary: Dictionary<83 unique tokens: ['love', 'pizza', 'excellent', 'great', 'little']...>
+2022-11-04 02:01:43,910:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:05,992:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:13:06,004:INFO:built Dictionary<1977 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5954 corpus positions)
+2022-11-04 02:13:06,004:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:13:06,004:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1977 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5954 corpus positions)", 'datetime': '2022-11-04T02:13:06.004965', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:13:06,007:INFO:discarding 1888 tokens: [('patsy', 1), ('true', 1), ('crowded', 7), ('date', 5), ('friends', 7), ('intimate', 5), ('occassion', 1), ('cake', 2), ('incredible', 9), ('lava', 1)]...
+2022-11-04 02:13:06,007:INFO:keeping 89 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:13:06,008:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:06,008:INFO:resulting dictionary: Dictionary<89 unique tokens: ['love', 'pizza', 'excellent', 'feel', 'great']...>
+2022-11-04 02:13:06,009:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:24,001:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:13:24,011:INFO:built Dictionary<1946 unique tokens: ['crowded', 'date', 'excellent', 'feel', 'friends']...> from 947 documents (total 5900 corpus positions)
+2022-11-04 02:13:24,012:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:13:24,012:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1946 unique tokens: ['crowded', 'date', 'excellent', 'feel', 'friends']...> from 947 documents (total 5900 corpus positions)", 'datetime': '2022-11-04T02:13:24.012054', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:13:24,013:INFO:discarding 1863 tokens: [('crowded', 5), ('date', 6), ('feel', 9), ('friends', 9), ('intimate', 3), ('occassion', 1), ('although', 6), ('anything', 2), ('home', 4), ('margaritas', 2)]...
+2022-11-04 02:13:24,013:INFO:keeping 83 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:13:24,014:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:24,014:INFO:resulting dictionary: Dictionary<83 unique tokens: ['excellent', 'great', 'little', 'place', 'romantic']...>
+2022-11-04 02:13:24,014:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:42,209:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:13:42,219:INFO:built Dictionary<1981 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5940 corpus positions)
+2022-11-04 02:13:42,220:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:13:42,220:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1981 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 947 documents (total 5940 corpus positions)", 'datetime': '2022-11-04T02:13:42.219522', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:13:42,221:INFO:discarding 1892 tokens: [('patsy', 1), ('true', 1), ('crowded', 5), ('date', 5), ('feel', 9), ('friends', 7), ('intimate', 4), ('occassion', 1), ('although', 6), ('anything', 2)]...
+2022-11-04 02:13:42,221:INFO:keeping 89 tokens which were in no less than 10 and no more than 852 (=90.0%) documents
+2022-11-04 02:13:42,222:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:13:42,222:INFO:resulting dictionary: Dictionary<89 unique tokens: ['love', 'pizza', 'excellent', 'great', 'little']...>
+2022-11-04 02:13:42,222:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:14:00,056:INFO:adding document #0 to Dictionary<0 unique tokens: []>
+2022-11-04 02:14:00,066:INFO:built Dictionary<1953 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 948 documents (total 5888 corpus positions)
+2022-11-04 02:14:00,066:DEBUG:starting a new internal lifecycle event log for Dictionary
+2022-11-04 02:14:00,066:INFO:Dictionary lifecycle event {'msg': "built Dictionary<1953 unique tokens: ['love', 'patsy', 'pizza', 'true', 'crowded']...> from 948 documents (total 5888 corpus positions)", 'datetime': '2022-11-04T02:14:00.066591', 'gensim': '4.2.0', 'python': '3.8.12 | packaged by conda-forge | (default, Oct 12 2021, 21:22:46) [MSC v.1916 64 bit (AMD64)]', 'platform': 'Windows-10-10.0.19044-SP0', 'event': 'created'}
+2022-11-04 02:14:00,068:INFO:discarding 1870 tokens: [('patsy', 1), ('true', 1), ('crowded', 6), ('date', 6), ('feel', 9), ('friends', 7), ('intimate', 4), ('occassion', 1), ('romantic', 9), ('although', 7)]...
+2022-11-04 02:14:00,068:INFO:keeping 83 tokens which were in no less than 10 and no more than 853 (=90.0%) documents
+2022-11-04 02:14:00,068:DEBUG:rebuilding dictionary, shrinking gaps
+2022-11-04 02:14:00,069:INFO:resulting dictionary: Dictionary<83 unique tokens: ['love', 'pizza', 'excellent', 'great', 'little']...>
+2022-11-04 02:14:00,069:DEBUG:rebuilding dictionary, shrinking gaps
