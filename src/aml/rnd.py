@@ -39,12 +39,6 @@ class Rnd(AbstractAspectModel):
         with open(f'{self.path}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def infer(self, doctype, review):
-        # review_aspects = []
-        # review_ = super().preprocess(doctype, [review])
-        # for r in review_:
-        # dict_list = list(self.dict.doc2bow(r))
-        # random.shuffle(dict_list)
-        # review_aspects.append(dict_list)
         review_aspects = list(self.dict.token2id.keys())
         random.shuffle(review_aspects)
         return review_aspects
