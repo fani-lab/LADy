@@ -63,6 +63,10 @@ def evaluate(am, am_type, test):
         r_ = r.hide_aspects()
         r_pred_aspects = am.infer(params.doctype, r_)
         if am_type == "btm":
+            for i, subr_pred_aspects in enumerate(r_pred_aspects):
+                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, 100)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
+                pairs.append((r_aspects[i], subr_pred_aspects_words))
             pass
         elif am_type == "rnd":
             for i in range(len(r_aspects)):
