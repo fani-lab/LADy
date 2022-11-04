@@ -55,17 +55,22 @@ class Btm(AbstractAspectModel):
         topic_range_idx = list(range(0, self.naspects))
         top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
         for i in topic_range_idx:
-            print()
             probs.append(sorted(self.mdl.matrix_topics_words_[i, :]))
             words.append(list(top_words[f'topic{i}']))
         return words, probs
 
+    def show_topic(self, topic_id, nwords):
+        topic_range_idx = list(range(0, self.naspects))
+        top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
+        probs = sorted(self.mdl.matrix_topics_words_[topic_id, :])
+        words = list(top_words[f'topic{topic_id}'])
+        return list(zip(words, probs))
     def infer(self, doctype, review):
         review_aspects = []
         review_ = super().preprocess(doctype, [review])
         t_t = 'Text'
         for r in review_:
             _, vocabulary, _ = btm.get_words_freqs([' '.join(r)])
-            review_aspects.append(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], vocabulary)))
+            review_aspects.append([(i, p) for i, p in enumerate(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], vocabulary))[0])])
         return review_aspects
 
