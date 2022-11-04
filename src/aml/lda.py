@@ -51,18 +51,16 @@ class Lda(AbstractAspectModel):
         with open(f'{self.path}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def get_aspects(self, nwords):
-        print("*")
         # self.model.get_topics() does not have words
         # self.model.show_topics() and model.show_topic()
-        words = []; probs = []
-        print("print_topics:/t", self.mdl.print_topics(-1, num_words=nwords))
+        words = []
+        probs = []
         for idx, aspect in self.mdl.print_topics(-1, num_words=nwords):
             words.append([]); probs.append([])
             words_probs = aspect.split('+')
             for word_prob in words_probs:
                 probs[-1].append(word_prob.split('*')[0])
                 words[-1].append(word_prob.split('*')[1].split('"')[1])
-        print("words", words)
         return words, probs
 
     def infer(self, doctype, review):
