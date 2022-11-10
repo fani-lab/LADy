@@ -22,6 +22,7 @@ class SemEvalReview(Review):
                 reviews.append(Review(id=i, sentences=[[str(t).lower() for t in sentences]], time=None, author=None, aos=[eval(aos)], lempos=[[(t.lemma_.lower(), t.pos_) for t in sentences]]))
         return reviews
 
+
 # if __name__ == '__main__':
 #     reviews = SemEvalReview.load(r'C:\Users\Administrator\Github\Fani-Lab\pxp-topicmodeling-working\data\raw\semeval-umass\sam_eval2016.txt', None, None)
 #     print(reviews[0].get_aos())
