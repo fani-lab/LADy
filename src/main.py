@@ -110,9 +110,8 @@ def main(args):
     reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
-    fold_mean = pd.DataFrame()
-    print(am_type)
     for a in am_type:
+        fold_mean = pd.DataFrame()
         output = f'{args.output}/{args.naspects}'
         print(a)
         if a == "btm":
@@ -128,11 +127,11 @@ def main(args):
             output_ = f'{output}f{f}.'
             model_review = np.array(reviews)[splits['folds'][f]['train']].tolist()
             if a == "btm":
-                am = Btm(model_review, args.naspects, params.no_extremes, output)
+                am = Btm(model_review, args.naspects, params.no_extremes, output_)
             elif a == "rnd":
-                am = Rnd(model_review, args.naspects, params.no_extremes, output)
+                am = Rnd(model_review, args.naspects, params.no_extremes, output_)
             else:  # if am_type == "lda"
-                am = Lda(model_review, args.naspects, params.no_extremes, output)
+                am = Lda(model_review, args.naspects, params.no_extremes, output_)
 
             # training
             print(f'\n2. Aspect modeling ...')
@@ -162,7 +161,7 @@ if __name__ == '__main__':
     # parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016SB5', help='output path, e.g., ../output/2016SB5')
     parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of topic modeling methods (eg. -t LDA)')
     parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='../output/semeval-2/2016-2', help='output path, e.g., ../output/semeval2016-2')
+    parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016', help='output path, e.g., ../output/semeval2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 
