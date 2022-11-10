@@ -60,6 +60,9 @@ class Btm(AbstractAspectModel):
         return words, probs
 
     def show_topic(self, topic_id, nwords):
+        dict_len = len(self.dict.token2id.keys())
+        if nwords > dict_len:
+            nwords = dict_len
         topic_range_idx = list(range(0, self.naspects))
         top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
         probs = sorted(self.mdl.matrix_topics_words_[topic_id, :])
