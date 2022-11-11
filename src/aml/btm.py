@@ -26,18 +26,15 @@ class Btm(AbstractAspectModel):
 
     def train(self, doctype, cores, iter, seed):
         reviews_ = super().preprocess(doctype, self.reviews)
-        self.dict = gensim.corpora.Dictionary(reviews_)
-        if self.no_extremes: self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'], keep_n=100000)
-        self.dict.compactify()
-        # corpus = [self.dict.doc2bow(doc) for doc in reviews_]
 
         logging.basicConfig(filename=f'{self.path}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
 
         reviews_ = [' '.join(text) for text in reviews_]
-        doc_word_frequency, dictionary, vocab_dict = btm.get_words_freqs(reviews_)
-        docs_vec = btm.get_vectorized_docs(reviews_, dictionary)
+        # doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_, vocabulary=self.dict.token2id)
+        doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_, max_df=self.no_extremes['no_above'])
+        docs_vec = btm.get_vectorized_docs(reviews_, self.dict)
         biterms = btm.get_biterms(docs_vec)
-        self.mdl = btm.BTM(doc_word_frequency, dictionary, seed=0, T=self.naspects, M=params.nwords, alpha=50/self.naspects, beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
+        self.mdl = btm.BTM(doc_word_frequency, self.dict, seed=params.seed, T=self.naspects, M=params.nwords, alpha=50/self.naspects, beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
         self.mdl.fit(biterms, iterations=params.iter_c, verbose=False)
 
         self.cas = self.mdl.coherence_
@@ -60,7 +57,7 @@ class Btm(AbstractAspectModel):
         return words, probs
 
     def show_topic(self, topic_id, nwords):
-        dict_len = len(self.dict.token2id.keys())
+        dict_len = len(self.dict)
         if nwords > dict_len:
             nwords = dict_len
         topic_range_idx = list(range(0, self.naspects))
@@ -73,7 +70,6 @@ class Btm(AbstractAspectModel):
         review_ = super().preprocess(doctype, [review])
         t_t = 'Text'
         for r in review_:
-            _, vocabulary, _ = btm.get_words_freqs([' '.join(r)])
-            review_aspects.append([(i, p) for i, p in enumerate(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], vocabulary))[0])])
+            review_aspects.append([(i, p) for i, p in enumerate(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], self.dict))[0])])
         return review_aspects
 
