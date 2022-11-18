@@ -116,7 +116,7 @@ Additionally, you need to install the following libraries from their source:
 
 We have semeval datasets for 2015 and 2016 at [`./data/raw/semeval`](./data/raw/semeval).
 
-For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.txt`](./data/raw/semeval).
+For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.txt`](./data/raw/semeval/toy.txt).
 
 
 ### Run
