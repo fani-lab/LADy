@@ -105,6 +105,11 @@ This command installs compatible versions of the following libraries:
 >* aml: ``gensim, nltk, pandas, requests, bitermplus``
 >* others: ``pyLDAvis, pytrec-eval-terrier, sklearn, numpy, scipy, matplotlib``
 
+
+Additionally, you need to install the following libraries from their source:
+- [``Microsoft C++ Build Tools``](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement in ``btm``.
+
+
 ## 4. Quickstart
 
 ### Data
