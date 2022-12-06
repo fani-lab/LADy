@@ -108,7 +108,17 @@ This command installs compatible versions of the following libraries:
 
 Additionally, you need to install the following libraries from their source:
 - [``Microsoft C++ Build Tools``](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement in ``btm``.
-
+- ``en_core_web_sm`` as a requirement in ``spaCy`` library with the following command:
+  
+  ```bash
+  python -m spacy download en_core_web_sm
+  ```
+  
+- ``stopwords`` as a requirement in ``nltk`` library with the following command:
+  
+  ```bash
+  python -m nltk.downloader stopwords
+  ```
 
 ## 4. Quickstart
 
@@ -116,18 +126,21 @@ Additionally, you need to install the following libraries from their source:
 
 We have semeval datasets for 2015 and 2016 at [`./data/raw/semeval`](./data/raw/semeval).
 
-For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.txt`](./data/raw/semeval).
+For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.txt`](./data/raw/semeval/toy.txt).
 
 
 ### Run
 You can run the framework via [`./src/main.py`](./src/main.py) with following command:
 ```bash
 cd ../src
-python main.py --aml lda rnd btm
+python main.py --aml lda rnd btm --data "../data/raw/semeval/2016.txt" --output "../output/semeval/2016" --naspects 25
 ```
 where the input arguements are:
 
-`-aml`: A list of topic modeling methods among {`lda`, `rnd`, `btm`}, required, case-insensitive.
+`aml`: A list of aspect modeling methods among {`lda`, `rnd`, `btm`}, required, case-insensitive.
+`data`: Raw dataset file path, required.
+`output`: Output path, required.
+`naspects`: number of aspects, required.
 
 A run will produce an output folder at `./output/semeval` and sub folders for each aspect modeling pair as baselines, e.g., `lda`, `rnd`, and `btm`. The final evaluation results are aggregated in `./output/semeval/2016/25/btm/pred.eval.mean.csv`,`./output/semeval/2016/25/lda/pred.eval.mean.csv`, and `./output/semeval/2016/25/rnd/pred.eval.mean.csv` . See an example run on semeval dataset at [`./output/semeval`](./output/semeval). 
 
