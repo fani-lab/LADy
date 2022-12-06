@@ -132,8 +132,7 @@ For quickstart purposes, a `toy` sample of reviews has been provided at [`./data
 ### Run
 You can run the framework via [`./src/main.py`](./src/main.py) with following command:
 ```bash
-cd ../src
-python main.py --aml lda rnd btm --data "../data/raw/semeval/2016.txt" --output "../output/semeval/2016" --naspects 25
+python src/main.py --aml lda rnd btm --data "data/raw/semeval/2016.txt" --output "output/semeval/2016" --naspects 25
 ```
 where the input arguements are:
 
