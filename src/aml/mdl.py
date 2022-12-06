@@ -1,9 +1,5 @@
-import gensim, logging, pickle, re
+import re
 import numpy as np
-import pyLDAvis.gensim_models
-import matplotlib.pyplot as plt
-from gensim.models.callbacks import PerplexityMetric, ConvergenceMetric, CoherenceMetric
-from gensim.models.coherencemodel import CoherenceModel
 import nltk
 stop_words = nltk.corpus.stopwords.words('english')
 

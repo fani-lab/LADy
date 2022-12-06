@@ -8,10 +8,10 @@ import pytrec_eval
 import params
 
 
-from src.aml.mdl import AbstractAspectModel
-from src.aml.lda import Lda
-from src.aml.btm import Btm
-from src.aml.rnd import Rnd
+from aml.mdl import AbstractAspectModel
+from aml.lda import Lda
+from aml.btm import Btm
+from aml.rnd import Rnd
 
 
 def load(input, output):
@@ -159,9 +159,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PXP Topic Modeling.')
     # parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     # parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016SB5', help='output path, e.g., ../output/2016SB5')
-    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of topic modeling methods (eg. -t LDA)')
-    parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016', help='output path, e.g., ../output/semeval2016')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. -t LDA)')
+    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
+    parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 

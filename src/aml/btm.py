@@ -1,15 +1,10 @@
-import gensim, logging, pickle, re
+import logging, pickle
 import pandas as pd
-import numpy as np
-import pyLDAvis.gensim_models
-import matplotlib.pyplot as plt
-from gensim.models.callbacks import PerplexityMetric, ConvergenceMetric, CoherenceMetric
-from gensim.models.coherencemodel import CoherenceModel
 import nltk
 stop_words = nltk.corpus.stopwords.words('english')
 import bitermplus as btm
 
-from src import params
+import params
 from .mdl import AbstractAspectModel
 
 
@@ -40,7 +35,6 @@ class Btm(AbstractAspectModel):
         self.cas = self.mdl.coherence_
         self.perplexity = self.mdl.perplexity_
         aspects, probs = self.get_aspects(params.nwords)
-
         pd.to_pickle(self.dict, f'{self.path}model.dict.pkl')
         pd.to_pickle(self.mdl, f'{self.path}model.pkl')
         with open(f'{self.path}model.perf.cas', 'wb') as f: pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
