@@ -85,7 +85,7 @@ Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen he
 
 ## 3. Setup
 
-`SEERa` has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
+It has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
 
 ```bash
 git clone https://github.com/fani-lab/latent_aspect_detection.git
