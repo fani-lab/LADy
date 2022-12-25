@@ -91,7 +91,7 @@ It has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
 git clone https://github.com/fani-lab/latent_aspect_detection.git
 cd latent_aspect_detection
 conda env create -f environment.yml
-conda activate seera
+conda activate lad
 ```
 
 ```bash
