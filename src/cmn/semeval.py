@@ -77,8 +77,7 @@ class SemEvalReview(Review):
                                 # opinion =
                                 # aos.append()
             reviews.append(Review(id=i, sentences=[[str(t).lower() for t in nlp(s)] for s in sentences_list], time=None,
-                                  author=None, aos=aos_list_list, lempos=[[(t.lemma_.lower(), t.pos_) for t in sentences]]))
-
+                                  author=None, aos=aos_list_list, lempos=[[(t.lemma_.lower(), t.pos_) for t in nlp(s)] for s in sentences_list]))
             # for the current datafile, each row is a review of single sentence!
         return reviews
 
