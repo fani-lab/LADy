@@ -24,7 +24,11 @@ def load(input, output):
     except (FileNotFoundError, EOFError) as e:
         print('\n1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
-        reviews = SemEvalReview.load(input)
+        # what is the type of input dataset?
+        if input.endswith('.xml'):
+            reviews = SemEvalReview.xmlloader(input)
+        else:
+            reviews = SemEvalReview.txtloader(input)
         print('\n1.2. Saving processed pickle file ...')
         with open(f'{output}/reviews.pkl', 'wb') as f: pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
     print(f'(#reviews: {len(reviews)})')
