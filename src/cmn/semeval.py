@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 
 from cmn.review import Review
 
+
 class SemEvalReview(Review):
     def __init__(self, id, sentences, time, author, aos):
         super().__init__(self, id, sentences, time, author, aos)
@@ -26,8 +27,8 @@ class SemEvalReview(Review):
     def xmlloader(path):
         reviews_list = []
         nlp = spacy.load("en_core_web_sm")  # en_core_web_trf for transformer-based
-        # ABSA16_Restaurants_Train_SB1_v2 True
-        tree = ET.parse("ABSA16_Restaurants_Train_SB1_v2")
+        # ABSA16_Restaurants_Train_SB1_v2
+        tree = ET.parse(path)
         reviews = tree.getroot()
         for review in reviews:
             i = review.attrib["rid"]
@@ -57,7 +58,7 @@ class SemEvalReview(Review):
                                 aspect = o.attrib["target"]
                                 aspect_list = aspect.split()
                                 opinion = []
-                                sentiment = o.attrib["polarity"].replace('\'negative\'', '+1').replace('\'polarity\'', '-1').replace('\'neutral\'', '0')
+                                sentiment = o.attrib["polarity"].replace('negative', '+1').replace('polarity', '-1').replace('neutral', '0')
                                 letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
 
                                 idx_of_from = [i for i in range(len(text)) if
@@ -76,7 +77,7 @@ class SemEvalReview(Review):
                                 #     continue
                                 # opinion =
                                 # aos.append()
-            reviews.append(Review(id=i, sentences=[[str(t).lower() for t in nlp(s)] for s in sentences_list], time=None,
+            reviews_list.append(Review(id=i, sentences=[[str(t).lower() for t in nlp(s)] for s in sentences_list], time=None,
                                   author=None, aos=aos_list_list, lempos=[[(t.lemma_.lower(), t.pos_) for t in nlp(s)] for s in sentences_list]))
             # for the current datafile, each row is a review of single sentence!
         return reviews
