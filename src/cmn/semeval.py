@@ -40,11 +40,8 @@ class SemEvalReview(Review):
                     text = ""
                     modified_text = ""
                     tokens = []
+                    has_opinion = False
                     for data in sentence:
-                        # opinions_tag = data.find('Opinions')
-                        # if opinions_tag is None:
-                        #     print("without opinion: ", data.text)
-                        #     break
 
                         if data.tag == 'text':
                             text = data.text
@@ -57,7 +54,7 @@ class SemEvalReview(Review):
                             sentences_list.append(modified_text)
 
                         if data.tag == "Opinions":
-                            aos = []  # then, it will be converted to tuple
+                            has_opinion = True
                             polarity_list = []
                             for o in data:
                                 aspect = o.attrib["target"]
@@ -67,9 +64,12 @@ class SemEvalReview(Review):
                                 aspect_list = modified_aspect.split()
                                 if text == "I've enjoyed 99% of the dishes we've ordered with the only exceptions being the occasional too-authentic-for-me dish (I'm a daring eater but not THAT daring).":
                                     continue
-                                if aspect == "NULL" or len(aspect_list) == 0:  # if we do not have aspect or it is NULL
-                                    print("aspect_list", aspect_list)
+                                if aspect == "NULL" or len(aspect_list) == 0:  # if aspect is NULL
                                     continue
+                                # if len(aspect_list) == 0:  # if we do not have aspect
+                                #     print("##############")
+                                #     print(sentences_list.pop())
+                                #     break
 
                                 opinion = []
                                 sentiment = o.attrib["polarity"].replace('positive', '+1').replace('negative', '-1').replace('neutral', '0')
@@ -81,18 +81,19 @@ class SemEvalReview(Review):
                                                                  aspect_list)] == aspect_list][idx_of_from]
                                 idx_aspect_list = list(
                                     range(idx_start_token_of_aspect, idx_start_token_of_aspect + len(aspect_list)))
-                                # print(tokens, idx_aspect)
-                                print("idx_aspect_list", idx_aspect_list)
+
                                 aos = (idx_aspect_list, opinion, eval(sentiment))
+                                print("text", text)
                                 print("aos", aos)
-                                if aos is not None:
-                                    print("not none", aos)
+                                if len(aos) != 0:
                                     aos_list.append(aos)
 
-                            if len(aos_list) == 0: # if all aspects were NULL
+                            if len(aos_list) == 0:  # if all aspects were NULL
                                 sentences_list.pop()
-                    if aos_list is not None:
-                        print(aos_list)
+                                break
+                    if not has_opinion:  # sentence did not have any opinion, so we remove it
+                        sentences_list.pop()
+                    if len(aos_list) != 0:
                         aos_list_list.append(aos_list)
             reviews_list.append(Review(id=i, sentences=[[str(t).lower() for t in s.split()] for s in sentences_list], time=None,
                                   author=None, aos=aos_list_list, lempos=""))
