@@ -41,46 +41,62 @@ class SemEvalReview(Review):
                     modified_text = ""
                     tokens = []
                     for data in sentence:
+                        # opinions_tag = data.find('Opinions')
+                        # if opinions_tag is None:
+                        #     print("without opinion: ", data.text)
+                        #     break
 
                         if data.tag == 'text':
                             text = data.text
                             modified_text = text
-                            for ch in "\'&;#$()*,-./:[]«»_!":
-                                modified_text = modified_text.replace(ch, f" {ch}")
+                            for ch in '&;#$()*,.[]«»_!()\':-\\/\"?%':
+                                modified_text = modified_text.replace(ch, f" {ch} ")
                             tokens = modified_text.split()
+                            # print("text", text)
+                            # print("modified_text", modified_text)
                             sentences_list.append(modified_text)
 
                         if data.tag == "Opinions":
                             aos = []  # then, it will be converted to tuple
                             polarity_list = []
-
                             for o in data:
                                 aspect = o.attrib["target"]
-                                aspect_list = aspect.split()
-                                opinion = []
-                                sentiment = o.attrib["polarity"].replace('negative', '+1').replace('polarity', '-1').replace('neutral', '0')
-                                letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
+                                modified_aspect = aspect
+                                for ch in '&;#$()*,.[]«»_!()\':-\\/\"?%':
+                                    modified_aspect = modified_aspect.replace(ch, f" {ch} ")
+                                aspect_list = modified_aspect.split()
+                                if text == "I've enjoyed 99% of the dishes we've ordered with the only exceptions being the occasional too-authentic-for-me dish (I'm a daring eater but not THAT daring).":
+                                    continue
+                                if aspect == "NULL" or len(aspect_list) == 0:  # if we do not have aspect or it is NULL
+                                    print("aspect_list", aspect_list)
+                                    continue
 
+                                opinion = []
+                                sentiment = o.attrib["polarity"].replace('positive', '+1').replace('negative', '-1').replace('neutral', '0')
+                                letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
                                 idx_of_from = [i for i in range(len(text)) if
                                                text.startswith(aspect, i)].index(letter_index_tuple[0])
-
                                 idx_start_token_of_aspect = [i for i in range(len(tokens)) if
-                                                             i + len(aspect_list) < len(tokens) and tokens[i:i + len(
+                                                             i + len(aspect_list) <= len(tokens) and tokens[i:i + len(
                                                                  aspect_list)] == aspect_list][idx_of_from]
                                 idx_aspect_list = list(
                                     range(idx_start_token_of_aspect, idx_start_token_of_aspect + len(aspect_list)))
                                 # print(tokens, idx_aspect)
+                                print("idx_aspect_list", idx_aspect_list)
                                 aos = (idx_aspect_list, opinion, eval(sentiment))
-                                aos_list.append(aos)
-                    aos_list_list.append(aos_list)
-                                # if aspect == "NULL":
-                                #     continue
-                                # opinion =
-                                # aos.append()
-            reviews_list.append(Review(id=i, sentences=[[str(t).lower() for t in nlp(s)] for s in sentences_list], time=None,
-                                  author=None, aos=aos_list_list, lempos=[[(t.lemma_.lower(), t.pos_) for t in nlp(s)] for s in sentences_list]))
-            # for the current datafile, each row is a review of single sentence!
-        return reviews
+                                print("aos", aos)
+                                if aos is not None:
+                                    print("not none", aos)
+                                    aos_list.append(aos)
+
+                            if len(aos_list) == 0: # if all aspects were NULL
+                                sentences_list.pop()
+                    if aos_list is not None:
+                        print(aos_list)
+                        aos_list_list.append(aos_list)
+            reviews_list.append(Review(id=i, sentences=[[str(t).lower() for t in s.split()] for s in sentences_list], time=None,
+                                  author=None, aos=aos_list_list, lempos=""))
+        return reviews_list
 
 
 # if __name__ == '__main__':
