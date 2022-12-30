@@ -38,37 +38,42 @@ class SemEvalReview(Review):
                 for sentence in sentences:
                     aos_list = []
                     text = ""
-                    modified_text = ""
                     tokens = []
                     has_opinion = False
                     for data in sentence:
 
                         if data.tag == 'text':
                             text = data.text
-                            modified_text = text
-                            for ch in '&;#$()*,.[]«»_!()\':-\\/\"?%':
-                                modified_text = modified_text.replace(ch, f" {ch} ")
-                            tokens = modified_text.split()
-                            sentences_list.append(modified_text)
+                            sentences_list.append(text)
 
                         if data.tag == "Opinions":
                             has_opinion = True
+                            current_text = sentences_list.pop()
                             for o in data:
                                 aspect = o.attrib["target"]
-                                modified_aspect = aspect
-                                for ch in '&;#$()*,.[]«»_!()\':-\\/\"?%':
-                                    modified_aspect = modified_aspect.replace(ch, f" {ch} ")
-                                aspect_list = modified_aspect.split()
-                                if text == "I've enjoyed 99% of the dishes we've ordered with the only exceptions being the occasional too-authentic-for-me dish (I'm a daring eater but not THAT daring).":
+                                aspect_list = aspect.split()
+                                if aspect == "NULL" or len(aspect_list) == 0:  # if aspect is NULL
                                     continue
+                                letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
+                                current_text = current_text[
+                                               0:letter_index_tuple[0]] + ' ' + aspect + ' ' + current_text[
+                                                                                               letter_index_tuple[1]:]
+                            sentences_list.append(current_text)
+                            tokens = current_text.split()
+                            for o in data:
+                                aspect = o.attrib["target"]
+                                letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
+                                aspect_list = aspect.split()
+                                if text == "I've enjoyed 99% of the dishes we've ordered with the only exceptions being the occasional too-authentic-for-me dish (I'm a daring eater but not THAT daring).":
+                                    break
                                 if aspect == "NULL" or len(aspect_list) == 0:  # if aspect is NULL
                                     continue
                                 sentiment = o.attrib["polarity"].replace('positive', '+1').replace('negative',
                                                                                                    '-1').replace(
                                     'neutral', '0')
-                                letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
                                 idx_of_from = [i for i in range(len(text)) if
                                                text.startswith(aspect, i)].index(letter_index_tuple[0])
+
                                 idx_start_token_of_aspect = [i for i in range(len(tokens)) if
                                                              i + len(aspect_list) <= len(tokens) and tokens[i:i + len(
                                                                  aspect_list)] == aspect_list][idx_of_from]
