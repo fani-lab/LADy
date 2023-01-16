@@ -182,7 +182,7 @@ if __name__ == '__main__':
         for naspects in range(5, 55, 5):
             args.naspects = naspects
             main(args)
-        visualization.plots()
+        visualization.plots(args.output)
     # for year in [2016, 2015, 2014]:
     #     for naspects in range(5, 55, 5):
     #         args.naspects = naspects

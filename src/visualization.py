@@ -6,7 +6,7 @@ import seaborn as sns
 import params
 
 
-def plots():
+def plots(path):
     metrics_list = []
     for m in params.metrics:
         metrics_list.append(f'{m}@k')
@@ -16,9 +16,9 @@ def plots():
     for naspects in range(5, 55, 5):
         merged = pd.DataFrame()
         metric_idx = 0
-        lda = pd.read_csv(f'../output/semeval-2016/txt-version/{naspects}/lda/pred.eval.mean.csv')
-        btm = pd.read_csv(f'../output/semeval-2016/txt-version/{naspects}/btm/pred.eval.mean.csv')
-        rnd = pd.read_csv(f'../output/semeval-2016/txt-version/{naspects}/rnd/pred.eval.mean.csv')
+        lda = pd.read_csv(f'{path}/{naspects}/lda/pred.eval.mean.csv')
+        btm = pd.read_csv(f'{path}/{naspects}/btm/pred.eval.mean.csv')
+        rnd = pd.read_csv(f'{path}/{naspects}/rnd/pred.eval.mean.csv')
         merged = pd.concat([lda, btm['mean'], rnd['mean']], axis=1)
         merged.columns = ['Metric', 'LDA', 'BTM', 'RND']
         for i in range(0, 25, 5):
@@ -27,13 +27,15 @@ def plots():
             melted_query = query.melt('Metric', var_name='aspect_models', value_name='Values')
             sns.lineplot(x='Metric', y='Values', hue='aspect_models', palette='Set2', linewidth=3, data=melted_query)
             plt.legend(loc='upper right')  # , title=f"{metric_name.upper()} for {naspects} Topics")
-            plt.savefig(f"../output/plots/results_{metric_name}_{naspects}topics.png")
+            plt.savefig(f"../output/plots/{path.replace('../output/', '').replace('/', '_')}_{metric_name}_{naspects}topics.png")
             plt.clf()
             metric_idx += 1
 
 
 if __name__ == '__main__':
-    visualization()
+    path = ['../output/semeval-2016/xml-version', '../output/semeval-2016/txt-version']
+    for p in path:
+        plots(p)
 
 # li = []
 # for filename in all_files:
