@@ -15,7 +15,7 @@ train_ratio = 0.85 # 1 - train_ratio goes to test
 nfolds = 5 # on the train, nfold x-valid
 
 # evaluation settings
-metrics = ['success', 'P', 'recall', 'ndcg_cut', 'map_cut']
+metrics = ['P', 'recall', 'ndcg_cut', 'map_cut', 'success']
 
 topkstr = '1,2,5,10,100'
 

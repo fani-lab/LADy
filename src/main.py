@@ -5,7 +5,7 @@ from json import JSONEncoder
 import pandas as pd
 import pytrec_eval
 
-import params
+import params, visualization
 
 
 from aml.mdl import AbstractAspectModel
@@ -161,16 +161,28 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PXP Topic Modeling.')
-    # parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
-    # parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016SB5', help='output path, e.g., ../output/2016SB5')
-    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. -t LDA)')
-    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
-    parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
+    # # parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    # # parser.add_argument('--output', dest='output', type=str, default='../output/semeval/2016SB5', help='output path, e.g., ../output/2016SB5')
+    # parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda)')
+    # parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
+    # parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
+    # parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 
-    main(args)
+    # main(args)
 
+    for p in ['../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
+        print("***")
+        args.aml = ['btm', 'lda', 'rnd']
+        args.data = p
+        if str(p).endswith('.xml'):
+            args.output = f'../output/semeval-2016/xml-version'
+        else:
+            args.output = f'../output/semeval-2016/txt-version'
+        for naspects in range(5, 55, 5):
+            args.naspects = naspects
+            main(args)
+        visualization.plots()
     # for year in [2016, 2015, 2014]:
     #     for naspects in range(5, 55, 5):
     #         args.naspects = naspects
