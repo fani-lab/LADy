@@ -96,12 +96,12 @@ def plots_3d(path, topic_range):
 
             # hiding labels for clarity that every 5th label is kept
             for ind, label in enumerate(h.get_xticklabels()):
-                if ind % 5 == 0 or ind == 0:
+                if ind % 5 == 0 or ind == 0 or ind == 99:
                     label.set_visible(True)
                 else:
                     label.set_visible(False)
             for ind, label in enumerate(h.get_yticklabels()):
-                if ind % 5 == 0 or ind == 0:
+                if ind % 5 == 0 or ind == 0 or ind == 49:
                     label.set_visible(True)
                 else:
                     label.set_visible(False)
