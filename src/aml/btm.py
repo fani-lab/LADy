@@ -17,7 +17,7 @@ class Btm(AbstractAspectModel):
     def load(self):
         self.mdl = pd.read_pickle(f'{self.path}model.pkl')
         assert self.mdl.topics_num_ == self.naspects
-        self.dict = pd.read_pickle(f'{self.path}model.dict')
+        self.dict = pd.read_pickle(f'{self.path}model.dict.pkl')
         with open(f'{self.path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{self.path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
