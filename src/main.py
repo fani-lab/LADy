@@ -145,10 +145,11 @@ def main(args):
                 print(f'2.1. Loading saved aspect model from {output} ...')
                 am.load()
             except (FileNotFoundError, EOFError) as e:
-                print(
-                    f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
-                am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
-                         params.seed)
+                raise e
+                # print(
+                #     f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
+                # am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
+                #          params.seed)
             print(f'2.2. Quality of aspects ...')
             for q in params.qualities:
                 print(f'({q}: {AbstractAspectModel.quality(am, q)})')
@@ -173,12 +174,13 @@ if __name__ == '__main__':
         args.aml = ['btm', 'lda', 'rnd']
         args.data = p
         if str(p).endswith('.xml'):
-            args.output = f'../output/semeval-2016-c/xml-version'
+            args.output = f'../output/semeval-2016-full/xml-version'
         else:
-            args.output = f'../output/semeval-2016-c/txt-version'
-        for naspects in range(5, 55, 5):
+            args.output = f'../output/semeval-2016-full/txt-version'
+        topic_range = range(1, 51, 1)
+        for naspects in topic_range:
             args.naspects = naspects
             main(args)
-        # visualization.plots_2d(args.output, 100, len(params.metrics))
-        visualization.plots_3d(args.output)
+        # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
+        visualization.plots_3d(args.output, topic_range)
 

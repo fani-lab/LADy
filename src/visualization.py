@@ -6,14 +6,14 @@ import seaborn as sns
 import params
 
 
-def plots_2d(path, len_topkstr, len_metrics):
+def plots_2d(path, len_topkstr, len_metrics, topic_range):
     metrics_list = []
     for m in params.metrics:
         metrics_list.append(f'{m}@k')
 
     if not os.path.isdir('../output/plots'): os.makedirs(f'../output/plots')
 
-    for naspects in range(5, 55, 5):
+    for naspects in topic_range:
         merged = pd.DataFrame()
         metric_idx = 0
         lda = pd.read_csv(f'{path}/{naspects}/lda/pred.eval.mean.csv')
@@ -33,13 +33,29 @@ def plots_2d(path, len_topkstr, len_metrics):
             metric_idx += 1
 
 
-def plots_3d(path):
+def plots_3d(path, topic_range):
+    metrics_dict = {}
+    metric_modified_names = {
+        "P": "Precision",
+        "recall": "Recall",
+        "ndcg_cut": "nDCG",
+        "map_cut": "MAP",
+        "success": "Success",
+    }
+    k_list = params.topkstr.split(',')
+    for m in params.metrics:
+        metric_set = []
+        for i in k_list:
+            metric_set.append(f'{m}_{i}')
+        metrics_dict[m] = metric_set
+
     if not os.path.isdir('../output/plots_3d'): os.makedirs(f'../output/plots_3d')
 
-    merged_lda = pd.DataFrame()
-    merged_btm = pd.DataFrame()
-    merged_rnd = pd.DataFrame()
-    for naspects in range(5, 55, 5):
+    merged_lda = merged_btm = merged_rnd = pd.DataFrame()
+    naspect_list = []
+
+    for naspects in topic_range:
+        naspect_list.append(naspects)
         lda = pd.read_csv(f'{path}/{naspects}/lda/pred.eval.mean.csv')
         btm = pd.read_csv(f'{path}/{naspects}/btm/pred.eval.mean.csv')
         rnd = pd.read_csv(f'{path}/{naspects}/rnd/pred.eval.mean.csv')
@@ -53,43 +69,51 @@ def plots_3d(path):
         merged_rnd = pd.concat([merged_rnd, rnd], axis=0)
 
     merged_lda.columns = merged_btm.columns = merged_rnd.columns = ['k', 'mean', 'aspects']
-
     models = {"LDA": merged_lda, "BTM": merged_btm, "RND": merged_rnd}
 
     for model_key, model_value in models.items():
         fig, ax = plt.subplots(figsize=(10, 10))
+
         metrics_df_dictionary = {
-            "Precision": model_value[model_value['k'].str.contains("P_")],
-            "Recall": model_value[model_value['k'].str.contains("recall")],
-            "Ndcg cut": model_value[model_value['k'].str.contains("ndcg_cut")],
-            "Map cut": model_value[model_value['k'].str.contains("map_cut")],
-            "Success": model_value[model_value['k'].str.contains("success")]}
-        for metric_key, metric_value in metrics_df_dictionary.items():
-            data = metric_value[['k', 'mean', 'aspects']]
+            "P": model_value[model_value['k'].str.contains("P_")],
+            "recall": model_value[model_value['k'].str.contains("recall")],
+            "ndcg_cut": model_value[model_value['k'].str.contains("ndcg_cut")],
+            "map_cut": model_value[model_value['k'].str.contains("map_cut")],
+            "success": model_value[model_value['k'].str.contains("success")]}
 
-            # y = data['k'].unique().tolist()
-            # order = []
-            # for index, row in data.iterrows():
-            #     order.append(y.index(row['k']))
-            # data['order'] = order
-            # data = data.sort_values(by=['order'])
-            # data = data.reset_index(drop=True)
-            # data = data.drop('order', axis=1)
+        for metric_key, metric_df in metrics_df_dictionary.items():
+            metric_df.reset_index(inplace=True, drop=True)
+            metric_df = metric_df.replace(f'{metric_key}_', '', regex=True)
+            metric_df = metric_df.astype({"k": int})
+            heatmap_pt = pd.pivot_table(metric_df, values='mean', index=['aspects'], columns='k')
+            h = sns.heatmap(heatmap_pt, cmap='BuPu', xticklabels=True, yticklabels=True)
+            h.invert_yaxis()  # order of aspects - yaxis
 
-            heatmap_pt = pd.pivot_table(data, values='mean', index=['aspects'], columns='k')
-            sns.set()
-            sns.heatmap(heatmap_pt, cmap='BuPu')
-            plt.xticks(rotation=15)
-            plt.title(f'{metric_key} for {model_key}', fontsize=30, pad=30)
-            plt.xlabel('Metrics', fontsize=20, labelpad=20)
+            plt.xticks(rotation=90)
+            plt.title(f'{metric_modified_names[metric_key]} for {model_key}', fontsize=30, pad=30)
+            plt.xlabel('Metrics @K', fontsize=20, labelpad=20)
             plt.ylabel('Number of Aspects', fontsize=20, labelpad=20)
+
+            # hiding labels for clarity that every 5th label is kept
+            for ind, label in enumerate(h.get_xticklabels()):
+                if ind % 5 == 0 or ind == 0:
+                    label.set_visible(True)
+                else:
+                    label.set_visible(False)
+            for ind, label in enumerate(h.get_yticklabels()):
+                if ind % 5 == 0 or ind == 0:
+                    label.set_visible(True)
+                else:
+                    label.set_visible(False)
             plt.savefig(
                 f"../output/plots_3d/{path.replace('../output/', '').replace('/', '_')}_{model_key}_{metric_key}.png")
             plt.clf()
 
 
 if __name__ == '__main__':
-    path = ['../output/semeval-2016/xml-version', '../output/semeval-2016/txt-version']
+    # path = ['../output/semeval-2016-11/xml-version', '../output/semeval-2016-11/txt-version']
+    path = ['../output/semeval-2016-full/xml-version']
     for p in path:
         # plots_2d(p, 100, 5)
-        plots_3d(p)
+        topic_range = range(1, 51, 1)
+        plots_3d(p, topic_range)
