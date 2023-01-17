@@ -145,11 +145,10 @@ def main(args):
                 print(f'2.1. Loading saved aspect model from {output} ...')
                 am.load()
             except (FileNotFoundError, EOFError) as e:
-                raise e
-                # print(
-                #     f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
-                # am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
-                #          params.seed)
+                print(
+                    f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
+                am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
+                         params.seed)
             print(f'2.2. Quality of aspects ...')
             for q in params.qualities:
                 print(f'({q}: {AbstractAspectModel.quality(am, q)})')
