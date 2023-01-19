@@ -1,5 +1,5 @@
-# LADy: A System for Latent Aspect Detection
-...
+# ``LADy``<sup>*</sup>: A System for Latent Aspect Detection
+<sup>*Suggested by [Christine!](https://github.com/Lillliant)
 
 1. [Colab Notebook](#1-Colab-Notebook)
 2. [Structure](#2-Structure)
