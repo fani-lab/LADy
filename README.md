@@ -1,4 +1,4 @@
-# Latent Aspect Detection
+# LADy: A System for Latent Aspect Detection
 ...
 
 1. [Colab Notebook](#1-Colab-Notebook)
