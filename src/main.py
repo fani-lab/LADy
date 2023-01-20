@@ -160,26 +160,26 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PXP Topic Modeling.')
-    # parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda)')
-    # parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    # parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
-    # parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
+    parser = argparse.ArgumentParser(description='Latent Aspect Detection')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda)')
+    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
+    parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
+    parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 
-    # main(args)
+    main(args)
 
-    for p in ['../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
-        args.aml = ['btm', 'lda', 'rnd']
-        args.data = p
-        if str(p).endswith('.xml'):
-            args.output = f'../output/semeval-2016-full/xml-version'
-        else:
-            args.output = f'../output/semeval-2016-full/txt-version'
-        topic_range = range(1, 51, 1)
-        for naspects in topic_range:
-            args.naspects = naspects
-            main(args)
-        # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
-        visualization.plots_3d(args.output, topic_range)
+    # for p in ['../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
+    #     args.aml = ['btm', 'lda', 'rnd']
+    #     args.data = p
+    #     if str(p).endswith('.xml'):
+    #         args.output = f'../output/semeval-2016-full/xml-version'
+    #     else:
+    #         args.output = f'../output/semeval-2016-full/txt-version'
+    #     topic_range = range(1, 51, 1)
+    #     for naspects in topic_range:
+    #         args.naspects = naspects
+    #         main(args)
+    #     # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
+    #     visualization.plots_3d(args.output, topic_range)
 
