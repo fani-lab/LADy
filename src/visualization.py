@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import params
+from matplotlib import rcParams
 
 
 def plots_2d(path, len_topkstr, len_metrics, topic_range):
@@ -72,8 +73,6 @@ def plots_3d(path, topic_range):
     models = {"LDA": merged_lda, "BTM": merged_btm, "RND": merged_rnd}
 
     for model_key, model_value in models.items():
-        fig, ax = plt.subplots(figsize=(10, 10))
-
         metrics_df_dictionary = {
             "P": model_value[model_value['k'].str.contains("P_")],
             "recall": model_value[model_value['k'].str.contains("recall")],
@@ -82,37 +81,41 @@ def plots_3d(path, topic_range):
             "success": model_value[model_value['k'].str.contains("success")]}
 
         for metric_key, metric_df in metrics_df_dictionary.items():
+            fig, ax = plt.subplots(figsize=(10, 10))
             metric_df.reset_index(inplace=True, drop=True)
             metric_df = metric_df.replace(f'{metric_key}_', '', regex=True)
             metric_df = metric_df.astype({"k": int})
-            heatmap_pt = pd.pivot_table(metric_df, values='mean', index=['aspects'], columns='k')
-            h = sns.heatmap(heatmap_pt, cmap='BuPu', xticklabels=True, yticklabels=True)
-            h.invert_yaxis()  # order of aspects - yaxis
 
-            plt.xticks(rotation=90)
-            plt.title(f'{metric_modified_names[metric_key]} for {model_key}', fontsize=30, pad=30)
-            plt.xlabel('Metrics @K', fontsize=20, labelpad=20)
-            plt.ylabel('Number of Aspects', fontsize=20, labelpad=20)
+            heatmap_pt = pd.pivot_table(metric_df, values='mean', index=['aspects'], columns='k')
+            sns.set(font_scale=2)
+            h = sns.heatmap(heatmap_pt, cmap='BuPu', xticklabels=True, yticklabels=True, cbar_kws={"shrink": .81})
+            h.invert_yaxis()  # change the order of aspects - yaxis
+            plt.xticks(rotation=90, fontsize=25)
+            plt.yticks(fontsize=25)
+            plt.title(f'{metric_modified_names[metric_key]} for {model_key}', fontsize=25, pad=20)
+            plt.xlabel('Metrics @K', fontsize=25, labelpad=10)
+            plt.ylabel('Number of Aspects', fontsize=25, labelpad=15)
 
             # hiding labels for clarity that every 5th label is kept
             for ind, label in enumerate(h.get_xticklabels()):
-                if ind % 5 == 0 or ind == 0 or ind == 99:
+                if (ind + 1) % 10 == 0 or ind == 0:
                     label.set_visible(True)
                 else:
                     label.set_visible(False)
             for ind, label in enumerate(h.get_yticklabels()):
-                if ind % 5 == 0 or ind == 0 or ind == 49:
+                if (ind + 1) % 5 == 0 or ind == 0:
                     label.set_visible(True)
                 else:
                     label.set_visible(False)
+            ax.set_box_aspect(1)
             plt.savefig(
                 f"../output/plots_3d/{path.replace('../output/', '').replace('/', '_')}_{model_key}_{metric_key}.png")
             plt.clf()
 
 
 if __name__ == '__main__':
-    # path = ['../output/semeval-2016-11/xml-version', '../output/semeval-2016-11/txt-version']
-    path = ['../output/semeval-2016-full/xml-version']
+    path = ['../output/semeval-2016-full/xml-version', '../output/semeval-2016-full/txt-version']
+    # path = ['../output/semeval-2016-full/xml-version']
     for p in path:
         # plots_2d(p, 100, 5)
         topic_range = range(1, 51, 1)
