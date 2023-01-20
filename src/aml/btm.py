@@ -26,23 +26,13 @@ class Btm(AbstractAspectModel):
 
         logging.basicConfig(filename=f'{self.path}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
 
-        # reviews_ = [' '.join(text) for text in reviews_]
-        # doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(r, max_df=self.no_extremes['no_above'])
-
         self.dict = gensim.corpora.Dictionary(reviews_)
         if self.no_extremes:
             self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'],
                                       keep_n=100000)
         self.dict.compactify()
-
-        tfidf_model = gensim.models.TfidfModel([self.dict.doc2bow(text) for text in reviews_], id2word=self.dict,
-                                               normalize=True)
-        tfidf = tfidf_model[[self.dict.doc2bow(text) for text in reviews_]]
-        doc_word_frequency = gensim.matutils.corpus2csc(tfidf, num_terms=len(self.dict)).T
-        self.dict = np.asarray(list(self.dict.token2id.keys()))
-        doc_word_frequency[doc_word_frequency > 0] = 1
         reviews_ = [' '.join(text) for text in reviews_]
-
+        doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_, **{'vocabulary': self.dict.token2id})
         docs_vec = btm.get_vectorized_docs(reviews_, self.dict)
         biterms = btm.get_biterms(docs_vec)
         self.mdl = btm.BTM(doc_word_frequency, self.dict, seed=params.seed, T=self.naspects, M=params.nwords, alpha=50/self.naspects, beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
