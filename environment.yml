@@ -1,4 +1,4 @@
-name: lad
+name: lady
 channels:
   - conda-forge
   - anaconda
