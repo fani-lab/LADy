@@ -88,15 +88,15 @@ Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen he
 It has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
 
 ```bash
-git clone https://github.com/fani-lab/latent_aspect_detection.git
-cd latent_aspect_detection
+git clone https://github.com/fani-lab/LADy.git
+cd LADy
 conda env create -f environment.yml
-conda activate lad
+conda activate lady
 ```
 
 ```bash
-git clone https://github.com/fani-lab/latent_aspect_detection.git
-cd latent_aspect_detection
+git clone https://github.com/fani-lab/LADy.git
+cd LADy
 pip install -r requirements.txt
 ```
 
