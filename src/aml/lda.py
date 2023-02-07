@@ -39,7 +39,7 @@ class Lda(AbstractAspectModel):
         # https://stackoverflow.com/questions/50607378/negative-values-evaluate-gensim-lda-with-topic-coherence
         # umass: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://aclanthology.org/D11-1024.pdf
         # [-inf, 0]: close to zero, the better
-        self.cas = CoherenceModel(model=self.mdl, topics=aspects, corpus=corpus, dictionary=self.dict, coherence='c_v', texts=reviews_).get_coherence_per_topic()
+        self.cas = CoherenceModel(model=self.mdl, topics=aspects, corpus=corpus, dictionary=self.dict, coherence='u_mass', texts=reviews_).get_coherence_per_topic()
         self.perplexity = self.mdl.log_perplexity(corpus)
         self.dict.save(f'{self.path}model.dict')
         self.mdl.save(f'{self.path}model')
