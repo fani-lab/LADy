@@ -161,9 +161,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
-    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda)')
-    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016.txt', help='raw dataset file path, e.g., ../data/raw/semeval-umass/2016.txt')
-    parser.add_argument('--output', dest='output', type=str, default='output/semeval/2016', help='output path, e.g., ../output/semeval/2016')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm)')
+    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
     args = parser.parse_args()
 
