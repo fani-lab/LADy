@@ -26,13 +26,14 @@ class Btm(AbstractAspectModel):
 
         logging.basicConfig(filename=f'{self.path}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
 
-        self.dict = gensim.corpora.Dictionary(reviews_)
-        if self.no_extremes:
-            self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'],
-                                      keep_n=100000)
-        self.dict.compactify()
+        # self.dict = gensim.corpora.Dictionary(reviews_)
+        # if self.no_extremes:
+        #     self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'],
+        #                               keep_n=100000)
+        # self.dict.compactify()
         reviews_ = [' '.join(text) for text in reviews_]
-        doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_, **{'vocabulary': self.dict.token2id})
+        doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_)
+        # doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_, **{'vocabulary': self.dict.token2id})
         docs_vec = btm.get_vectorized_docs(reviews_, self.dict)
         biterms = btm.get_biterms(docs_vec)
         self.mdl = btm.BTM(doc_word_frequency, self.dict, seed=params.seed, T=self.naspects, M=params.nwords, alpha=50/self.naspects, beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
