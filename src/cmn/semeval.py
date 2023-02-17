@@ -55,9 +55,10 @@ class SemEvalReview(Review):
                                 if aspect == "NULL" or len(aspect_list) == 0:  # if aspect is NULL
                                     continue
                                 letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
+                                current_text = current_text.replace('  ', ' ')
                                 current_text = current_text[
                                                0:letter_index_tuple[0]] + ' ' + aspect + ' ' + current_text[
-                                                                                               letter_index_tuple[1]:]
+                                                                                               letter_index_tuple[1]+1:]
                             sentences_list.append(current_text)
                             tokens = current_text.split()
                             for o in data:
