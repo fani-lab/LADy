@@ -35,6 +35,7 @@ class MAMSReview(Review):
                         letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
                         current_text = current_text.replace('  ', ' ')
                         current_text = current_text[0:letter_index_tuple[0]] + ' ' + aspect + ' ' + current_text[letter_index_tuple[1]+1:]
+                        #print("processing text:" + str(current_text))
                     tokens = current_text.split()
                 
                 if data.tag == "aspectTerms":
@@ -51,18 +52,29 @@ class MAMSReview(Review):
                         letter_index_tuple = (int(o.attrib['from']), int(o.attrib['to']))
 
                         # find the aspect instance of all text instances of the phrase
-                        text_incidences = [i for i in range(len(raw_text)) if raw_text.startswith(aspect, i)]
+                        #print(tokens)
+
+                        text_incidences = [i for i in range(len(raw_text)) 
+                                            if raw_text.startswith(aspect, i) 
+                                            and not raw_text[i-1].isalpha()
+                                            and not raw_text[i+len(aspect)].isalpha()]
+                        #print("text incidences: " + str(text_incidences))
                         idx_of_from = text_incidences.index(letter_index_tuple[0])
+                        #print("index of from: " + str(idx_of_from))
 
                         # find the location of the aspect token
                         start_token_of_aspect = [i for i in range(len(tokens)) 
                                                 if i + len(aspect_list) <= len(tokens) 
                                                 and tokens[i:i + len(aspect_list)] == aspect_list]
+        
+                        #print("start token of aspect: " + str(start_token_of_aspect))
+
                         idx_start_token_of_aspect = start_token_of_aspect[idx_of_from]
 
                         idx_aspect_list = list(
                                             range(idx_start_token_of_aspect, idx_start_token_of_aspect + len(aspect_list)))
                                             
+                        # compile the final aos 3-tuple for each aspect
                         aos = (idx_aspect_list, [], eval(sentiment))
 
                         if len(aos) != 0:
@@ -71,7 +83,7 @@ class MAMSReview(Review):
                     if len(aos_list) != 0:
                         aos_list_list.append(aos_list)
 
-            if len(aos_list_list) == 0:  # if all aspects were NULL, we remove sentence
+            if len(aos_list_list) == 0:  # if no aspect in the sentence, it is not added
                 continue 
 
             reviews_list.append(
@@ -79,37 +91,3 @@ class MAMSReview(Review):
                             author=None, aos=aos_list_list, lempos=""))
 
         return reviews_list
-
-"""
-{'id': 0, 'sentences': [['the', 'food', 'is', 'very', 'average', '...', 'the', 'thai', 'fusion', 'stuff', 'is', 'a', 'bit', 'too', 'sweet', ',', 'every', 'thing', 'they', 'serve', 'is', 'too', 'sweet', 'here', '.']], 
-'aos': [[(['food'], ['average'], -1), (['thai', 'fusion', 'stuff'], ['too', 'sweet'], -1)]]}
-
-[[
-    (['food'], ['average'], -1), 
-    (['thai', 'fusion', 'stuff'], ['too', 'sweet'], -1)
-    ]]
-
-<text>The food is very average...the Thai fusion stuff is a bit too sweet, every thing they serve is too sweet here.</text>
-<Opinions>
-    <Opinion target="food" category="FOOD#QUALITY" polarity="negative" from="4" to="8"/>
-    <Opinion target="Thai fusion stuff" category="FOOD#QUALITY" polarity="negative" from="31" to="48"/>
-    <Opinion target="NULL" category="FOOD#QUALITY" polarity="negative" from="0" to="0"/>
-</Opinions>
-
-
-        id                                          sentences                                                aos
-0        0  [[the, food, is, very, average, ..., the, thai...  [[(['food'], ['average'], -1), (['thai', 'fusi...
-1        1  [[we, went, around, 9:30, on, a, friday, and, ...                    [[(['service'], ['great'], 1)]]
-2        2                    [[we, love, th, pink, pony, .]]                [[(['pink', 'pony'], ['love'], 1)]]
-3        3                       [[the, food, is, decent, .]]                      [[(['food'], ['decent'], 0)]]
-4        4  [[however, ,, it, 's, the, service, that, leav...            [[(['service'], ['bad', 'taste'], -1)]]
-...    ...                                                ...                                                ...
-1388  1388                                     [[bad, staff]]                       [[(['staff'], ['bad'], -1)]]
-1389  1389             [[i, generally, like, this, place, .]]                       [[(['place'], ['like'], 1)]]
-1390  1390                         [[the, food, is, good, .]]                        [[(['food'], ['good'], 1)]]
-1391  1391       [[the, design, of, the, space, is, good, .]]                       [[(['space'], ['good'], 1)]]
-1392  1392               [[but, the, service, is, horrid, !]]                  [[(['service'], ['horrid'], -1)]]
-
-[1393 rows x 3 columns]
-lda
-"""
