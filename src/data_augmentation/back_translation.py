@@ -61,7 +61,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Latent Aspect Detection')
+    parser = argparse.ArgumentParser(description='Back-translation')
     parser.add_argument('--mt',  nargs='+', type=str.lower, required=True, default=['nllb'], help='a list of translator models')
     parser.add_argument('--lan',  nargs='+', type=str, required=True, default=['deu_Latn'], help='a list of desired languages')
     parser.add_argument('--data', dest='data', type=str, default='../../data/raw/semeval/reviews.csv', help='dataset file path, e.g., ..data/raw/semeval/reviews.csv')
