@@ -4,7 +4,7 @@ import numpy as np
 from json import JSONEncoder
 import pandas as pd
 import pytrec_eval
-
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 import params, visualization
 
 
@@ -113,11 +113,41 @@ def evaluate(am, am_type, test):
     return df_mean
 
 
+def translate(review, translator, back_translator):
+    output = translator(review)
+    translated_text = output[0]["translation_text"]
+    print("Translated:\t", translated_text)
+    second_output = back_translator(translated_text)
+    back_translated_text = second_output[0]["translation_text"]
+    return back_translated_text
+
+
 def main(args):
     am_type = args.aml
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     # output = f'{args.output}/{args.naspects}'
     reviews = load(args.data, args.output)
+
+    checkpoint = "facebook/nllb-200-distilled-600M"
+    model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+    for m in args.mt:
+        if m == "nllb":
+            for language in args.lan:
+                target_lang = language
+                source_lang = "eng_Latn"
+                translator = pipeline("translation", model=model, tokenizer=tokenizer, src_lang=source_lang,
+                                      tgt_lang=target_lang, max_length=400)
+                back_translator = pipeline("translation", model=model, tokenizer=tokenizer, src_lang=target_lang,
+                                           tgt_lang=source_lang, max_length=400)
+                for r in reviews:
+                    for sent in r.sentences:
+                        text = ' '.join(sent)
+                        print("Original:\t", text)
+                        bt_review = translate(text, translator, back_translator)
+                        print("B-translated:\t", bt_review)
+
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
     for a in am_type:
@@ -168,6 +198,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
     parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm)')
+    parser.add_argument('--mt',  nargs='+', type=str.lower, required=True, default=['nllb'], help='a list of translator models')
+    parser.add_argument('--lan',  nargs='+', type=str, required=True, default=['deu_Latn'], help='a list of desired languages')
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
