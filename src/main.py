@@ -28,8 +28,8 @@ def load(input, output):
         # what is the type of input dataset?
         if input.endswith('.xml'):
             if "mams" in input.lower():
-                reviews = MAMSReview.xmlloader(input)
                 print("mams")
+                reviews = MAMSReview.xmlloader(input)
             else:
                 print("semeval")
                 reviews = SemEvalReview.xmlloader(input)
