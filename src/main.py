@@ -24,9 +24,15 @@ def load(input, output):
     except (FileNotFoundError, EOFError) as e:
         print('\n1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
+        from cmn.mams import MAMSReview
         # what is the type of input dataset?
         if input.endswith('.xml'):
-            reviews = SemEvalReview.xmlloader(input)
+            if "mams" in input.lower():
+                reviews = MAMSReview.xmlloader(input)
+                print("mams")
+            else:
+                print("semeval")
+                reviews = SemEvalReview.xmlloader(input)
         else:
             reviews = SemEvalReview.txtloader(input)
         print('\n1.2. Saving processed pickle file ...')
