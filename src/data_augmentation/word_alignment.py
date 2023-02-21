@@ -17,13 +17,10 @@ def word_alignment(dataset1, dataset2):
     alignment_list = []
     myaligner = SentenceAligner(model="bert", token_type="bpe", matching_methods="i")
 
-    # The source and target sentences should be tokenized to words.
-    # Each method has a list of pairs indicating the indexes of aligned words (The alignments are zero-indexed).
+    # input texts should be tokenized
     for i in tqdm(range(len(dataset1))):
         alignments = myaligner.get_word_aligns(word_tokenize(dataset1[i]), word_tokenize(dataset2[i]))
-        # for matching_method in alignments:
         alignment_list.append(alignments['itermax'])
-    print(alignment_list)
     return alignment_list
 
 
@@ -35,7 +32,6 @@ def main(args):
     a_df = pd.DataFrame(columns=['alignments'])
     for i in range(len(alignments)):
         a_df.at[i, 'alignments'] = alignments[i]
-    print(a_df)
     data1_name = str(args.data1)[str(args.data1).rindex('/') + 1:str(args.data1).rindex('.')]
     data2_name = str(args.data2)[str(args.data2).rindex('/') + 1:str(args.data2).rindex('.')]
     a_df.to_csv(f'{path}/{data1_name}.{data2_name}.alignments.csv', index=False)
