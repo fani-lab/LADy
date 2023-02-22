@@ -10,6 +10,7 @@ def load(path1, path2):
     df2 = pd.read_csv(f'{path2}')
     dataset1 = df1['sentences'].tolist()
     dataset2 = df2['sentences'].tolist()
+    assert len(dataset1) == len(dataset2), "Datasets should have the same length"
     return dataset1, dataset2
 
 
