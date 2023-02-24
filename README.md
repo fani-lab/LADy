@@ -114,10 +114,11 @@ Additionally, you need to install the following libraries from their source:
   python -m spacy download en_core_web_sm
   ```
   
-- ``stopwords`` as a requirement in ``nltk`` library with the following command:
+- ``stopwords`` and 'punkt' as a requirement in ``nltk`` library with the following command:
   
   ```bash
   python -m nltk.downloader stopwords
+  python -m nltk.downloader punkt
   ```
 
 ## 4. Quickstart
