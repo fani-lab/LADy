@@ -6,7 +6,6 @@
 3. [Setup](#3-Setup)
 4. [Quickstart](#4-Quickstart)
 5. [Experiment](#5-Experiment)
-6. [License](#6-License)
 
 ## 1. Colab Notebook
 ...
