@@ -103,7 +103,8 @@ pip install -r requirements.txt
 This command installs compatible versions of the following libraries:
 
 >* aml: ``gensim, nltk, pandas, requests, bitermplus``
->* others: ``pyLDAvis, pytrec-eval-terrier, sklearn, numpy, scipy, matplotlib``
+>* dal: ``transformers, sentence_transformers, scipy, simalign, nltk``
+>* others: ``pyLDAvis, pytrec-eval-terrier, sklearn, numpy, scipy, matplotlib, seaborn, tqdm``
 
 
 Additionally, you need to install the following libraries from their source:
@@ -114,7 +115,7 @@ Additionally, you need to install the following libraries from their source:
   python -m spacy download en_core_web_sm
   ```
   
-- ``stopwords`` and 'punkt' as a requirement in ``nltk`` library with the following command:
+- ``stopwords`` and ``punkt`` as a requirement in ``nltk`` library with the following command:
   
   ```bash
   python -m nltk.downloader stopwords
@@ -138,21 +139,23 @@ python src/main.py --aml lda rnd btm --data "data/raw/semeval/2016SB5/ABSA16_Res
 where the input arguements are:
 
 `aml`: A list of aspect modeling methods among {`lda`, `rnd`, `btm`}, required, case-insensitive.
+  
 `data`: Raw dataset file path, required.
+  
 `output`: Output path, required.
-`naspects`: number of aspects, required.
+  
+`naspects`: Number of aspects, required.
+ 
 
-A run will produce an output folder at `./output/semeval` and sub folders for each aspect modeling pair as baselines, e.g., `lda`, `rnd`, and `btm`. The final evaluation results are aggregated in `./output/semeval/2016/25/btm/pred.eval.mean.csv`,`./output/semeval/2016/25/lda/pred.eval.mean.csv`, and `./output/semeval/2016/25/rnd/pred.eval.mean.csv` . See an example run on semeval dataset at [`./output/semeval`](./output/semeval). 
+A run will produce an output folder at `./output/semeval` and sub folders for each aspect modeling pair as baselines, e.g., `lda`, `rnd`, and `btm`. The final evaluation results are aggregated in `/btm/pred.eval.mean.csv`,`lda/pred.eval.mean.csv`, and `rnd/pred.eval.mean.csv` . See an example run on semeval dataset at [`./output/semeval`](./output/semeval). 
 
 
 ## 5. Experiment
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
-## 6. License
-©2021. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ### Authors
-Farinam Hemmati Zadeh <sup>1,2</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,3</sup>
+Farinam Hemmatizadeh <sup>1,2</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,3</sup>
 
 <sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
 
@@ -160,7 +163,7 @@ Farinam Hemmati Zadeh <sup>1,2</sup>, [Hossein Fani](https://hosseinfani.github.
 <sup><sup>3</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
 
 ### Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are highly encouraged and welcomed. However, for significant modifications, please initiate a discussion by opening an issue beforehand to clarify what modifications you intend to make.
 
 ### Acknowledgments
-In this work, we use [``bitermplus``](https://github.com/maximtrp/bitermplus), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), and other libraries. We would like to thank the authors of these libraries.
+In this work, we use [``LDA``](https://radimrehurek.com/gensim/models/ldamodel.html), [``bitermplus``](https://github.com/maximtrp/bitermplus), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``SimAlign``](https://github.com/cisnlp/simalign), [``DeCLUTR``](https://github.com/JohnGiorgi/DeCLUTR), [``No Language Left Behind (NLLB)``](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We would like to thank the authors of these works.
