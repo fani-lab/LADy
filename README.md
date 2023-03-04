@@ -19,7 +19,7 @@ Here is the link for the quickstart script: [Colab Notebook](https://colab.resea
 
 ### Framework Structure
 
-Sample outputs for data augmentation for a [``sample dataset``](./data/raw/semeval/reviews.csv) can be seen here:
+Sample outputs for data augmentation for a [``sample dataset``](./data/raw/semeval/reviews.csv) can be seen here  [``./output/augmentation``](./output/augmentation):
 #### [``augmentation``](./output/augmentation)
 ```
 ├── augmentation                                 -> Directory for augmentation results
