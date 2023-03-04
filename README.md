@@ -23,9 +23,9 @@ Sample outputs for data augmentation for a [``sample dataset``](./data/raw/semev
 #### [``augmentation``](./output/augmentation)
 ```
 ├── augmentation                                 -> Directory for augmentation results
-|   ├── back-translation                         -> list of original reviews as D and list of back-translated reviews for each language
-|   ├── semantic-similarity                      -> List of semantic similarity difference between the original and back-translated reviews for each language
-|   ├── word-alignment                           -> List of alignmnts between the original and back-translated reviews for each language
+|   ├── back-translation                         -> Directory for list of original reviews as D and list of back-translated reviews for each language
+|   ├── semantic-similarity                      -> Directory for list of semantic similarity difference between the original and back-translated reviews for each language
+|   ├── word-alignment                           -> Directory for list of alignmnts between the original and back-translated reviews for each language
 ```
 
 Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen here [``./output/semeval``](./output/semeval):
