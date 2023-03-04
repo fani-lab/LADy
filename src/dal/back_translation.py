@@ -7,7 +7,7 @@ from tqdm import tqdm
 # sys.path.insert(1, 'src/cmn')
 # import review
 
-from src.cmn.review import Review
+# from src.cmn.review import Review
 
 
 def load(input, output):
