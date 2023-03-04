@@ -5,7 +5,7 @@ LADy is a system that is designed for detecting ``latent aspects`` in ``online r
 One of the key advantages of LADy is that it outperforms the state-of-the-art techniques in aspect detection. To achieve this, LADy uses a ``data augmentation`` technique in its first phase, which involves a ``back-translation`` strategy. This technique helps to increase the size of the benchmark datasets by using different interlanguages with English datasets.
 Overall, LADy is a powerful and reliable system that provides an efficient and effective way of analyzing online reviews. It is an ideal platform for researchers, businesses, and individuals who want to gain insights into customer feedback and improve their products or services accordingly.
 
-1. [Colab Notebook](#1-Quickstart-Script)
+1. [Quickstart Script](#1-Quickstart-Script)
 2. [Structure](#2-Structure)
 3. [Setup](#3-Setup)
 4. [Quickstart](#4-Quickstart)
