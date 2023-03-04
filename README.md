@@ -1,22 +1,37 @@
 # ``LADy``<sup>*</sup>: A System for Latent Aspect Detection
 <sup>*Suggested by [Christine!](https://github.com/Lillliant)
 
-1. [Colab Notebook](#1-Colab-Notebook)
+LADy is a system that is designed for detecting ``latent aspects`` in ``online reviews``. It is an open-source platform that provides a standard and reproducible way of analyzing unsolicited online reviews. LADy is specifically focused on ``Latent Aspect Detection`` and is equipped with a wide range of ``topic modeling`` methods, as well as three ``SemEval`` training datasets.
+One of the key advantages of LADy is that it outperforms the state-of-the-art techniques in aspect detection. To achieve this, LADy uses a ``data augmentation`` technique in its first phase, which involves a ``back-translation`` strategy. This technique helps to increase the size of the benchmark datasets by using different interlanguages with English datasets.
+Overall, LADy is a powerful and reliable system that provides an efficient and effective way of analyzing online reviews. It is an ideal platform for researchers, businesses, and individuals who want to gain insights into customer feedback and improve their products or services accordingly.
+
+1. [Quickstart Script](#1-Quickstart-Script)
 2. [Structure](#2-Structure)
 3. [Setup](#3-Setup)
 4. [Quickstart](#4-Quickstart)
 5. [Experiment](#5-Experiment)
+6. [License](#6-License)
 
-## 1. Colab Notebook
-...
+## 1. Quickstart Script
+Here is the link for the quickstart script: [Colab Notebook](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
+
 ## 2. Structure
 
 ### Framework Structure
 
+Sample outputs for data augmentation for a [``sample dataset``](./data/raw/semeval/reviews.csv) can be seen here:
+#### [``augmentation``](./output/augmentation)
+```
+├── augmentation                                 -> Directory for augmentation results
+|   ├── back-translation                         -> list of original reviews as D and list of back-translated reviews for each language
+|   ├── semantic-similarity                      -> List of semantic similarity difference between the original and back-translated reviews for each language
+|   ├── word-alignment                           -> List of alignmnts between the original and back-translated reviews for each language
+```
+
 Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen here [``./output/semeval``](./output/semeval):
 #### [``Year{K}``](./output/semeval/2016)
 ```
-├── #Topics                                 -> Directory for aspect models with this number of aspects
+├── #aspects                                 -> Directory for aspect models with this number of aspects
 |   ├── BTM                                 -> Directory for BTM model
 |   ├── LDA                                 -> Directory for LDA model
 |   ├── RND                                 -> Directory for Random model
@@ -53,16 +68,12 @@ Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen he
 
 ### Code Structure
 ```
-+---data
-|   \---raw
-|       \---semeval
-|           |   2016.txt
-|           |   toy.txt
-|                       
++---data                       
 +---output                 
 +---src
 |    |   main.py
 |    |   params.py
+|    |   visualization.py
 |    |   __init__.py
 |    |   
 |    +---aml
@@ -70,7 +81,13 @@ Sample outputs on [``semeval``](./data/raw/semeval/2016.txt) data can be seen he
 |    |   |   lda.py
 |    |   |   mdl.py
 |    |   |   rnd.py
-|    |           
+|    |
+|    +---dal
+|    |   |   back_translation.py
+|    |   |   plots.py
+|    |   |   semantic_comparison.py
+|    |   |   word_alignment.py
+|    |  
 |    +---cmn
 |    |   |   review.py
 |    |   |   semeval.py 
@@ -152,6 +169,8 @@ A run will produce an output folder at `./output/semeval` and sub folders for ea
 ## 5. Experiment
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
+## 6. License
+©2021. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ### Authors
 Farinam Hemmatizadeh <sup>1,2</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,3</sup>
