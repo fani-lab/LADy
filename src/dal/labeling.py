@@ -42,13 +42,15 @@ def labeling(dataset, alignments, original_aos, similarities):
 
 
 def main(args):
-    path = f'{args.output}/augmentation/'
+    path = f'{args.output}/augmentation'
     if not os.path.isdir(path): os.makedirs(path)
     dataset, alignments, original_aos, similarities = load(args.dataset, args.alignment, args.original, args.semantic)
     augmented_reviews, augmented_reviews_labels = labeling(dataset, alignments, original_aos, similarities)
     a_df = pd.DataFrame(augmented_reviews, columns=['sentences'])
     a_df['labels'] = augmented_reviews_labels
-    a_df.to_csv(f'{path}/{args.language}.back-translated.with-labels.csv', index=False)
+    language = args.language.capitalize()
+
+    a_df.to_csv(f'{path}/{language}.back-translated.with-labels.csv', index=False)
 
 
 if __name__ == '__main__':
