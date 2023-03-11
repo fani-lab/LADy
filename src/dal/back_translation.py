@@ -40,15 +40,13 @@ def main(args):
     path = f'{args.output}/augmentation/back-translation'
     if not os.path.isdir(path): os.makedirs(path)
     corpus = load(args.data, args.output)
-
-    checkpoint = "facebook/nllb-200-distilled-600M"
-    model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
-    tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-
     # Review.save_sentences(reviews, path)
 
     for m in args.mt:
         if m == "nllb":
+            checkpoint = "facebook/nllb-200-distilled-600M"
+            model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
+            tokenizer = AutoTokenizer.from_pretrained(checkpoint)
             for language in args.lan:
                 target_lang = language
                 source_lang = "eng_Latn"
