@@ -19,12 +19,17 @@ class Review(object):
     @staticmethod
     def save_sentences(reviews, path):
         reviews_list = []
+        aos_list = []
         for r in reviews:
+            for aos_instance in r.aos:
+                aos_list.append(aos_instance)
             for sent in r.sentences:
                 text = ' '.join(sent)
                 reviews_list.append(text)
         df = pd.DataFrame(reviews_list, columns=["sentences"])
-        df.to_csv(f'{path}/reviews.csv', index=False)
+        df['aos'] = aos_list
+        df.to_csv(f'{path}/reviews_list.csv', index=False)
+        return df
 
     def to_dict(self): return {'id': self.id, 'sentences': self.sentences, 'aos': self.get_aos()}
 
