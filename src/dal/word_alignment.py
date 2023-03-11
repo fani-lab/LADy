@@ -20,7 +20,8 @@ def word_alignment(dataset1, dataset2):
 
     # input texts should be tokenized
     for i in tqdm(range(len(dataset1))):
-        alignments = myaligner.get_word_aligns(word_tokenize(dataset1[i]), word_tokenize(dataset2[i]))
+        # alignments = myaligner.get_word_aligns(word_tokenize(dataset1[i]), word_tokenize(dataset2[i]))
+        alignments = myaligner.get_word_aligns(dataset1[i].split(), dataset2[i].split())
         alignment_list.append(alignments['itermax'])
     return alignment_list
 
@@ -40,10 +41,10 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Word Alignment')
-    parser.add_argument('--data1', dest='data1', type=str, default='../../output/back-translation/word-alignment/D.csv',
+    parser.add_argument('--data1', dest='data1', type=str, default='../../output/augmentation/back-translation/D.csv',
                         help='First dataset1 file path')
     parser.add_argument('--data2', dest='data2', type=str,
-                        default='../../output/back-translation/word-alignment/D_deu.csv',
+                        default='../../output/augmentation/back-translation/D_deu.csv',
                         help='Second dataset file path')
     parser.add_argument('--output', dest='output', type=str, default='../../output',
                         help='output path, e.g., ../output')
