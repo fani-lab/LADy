@@ -13,6 +13,8 @@ from aml.lda import Lda
 from aml.btm import Btm
 from aml.rnd import Rnd
 
+from cmn.review import Review
+
 
 def load(input, output):
     print('\n1. Loading reviews and preprocessing ...')
@@ -107,12 +109,31 @@ def evaluate(am, am_type, test):
     return df_mean
 
 
+def load_bt(dataset_path):
+    # df = Review.save_sentences(reviews, path)
+    dataset_df = pd.read_csv(f'{dataset_path}')
+    bt_reviews = dataset_df['sentences'].tolist()
+    bt_labels = dataset_df['labels'].tolist()
+    reviews_list = []
+    for i in range(len(bt_reviews)):
+        reviews_list.append(
+            Review(id=i, sentences=[[str(t).lower() for t in bt_reviews[i].split()]], time=None,
+                   author=None, aos=[[(label, [], 0) for label in eval(bt_labels[i])]], lempos=""))
+        
+    return reviews_list
+
+
 def main(args):
     am_type = args.aml
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     # output = f'{args.output}/{args.naspects}'
-    reviews = load(args.data, args.output)
 
+    # org_reviews = load(args.data, args.output)
+    # bt_reviews = load_bt(args.btdata)
+    # reviews = org_reviews + bt_reviews
+
+    reviews = load_bt(args.btdata)
+    # reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
     for a in am_type:
@@ -166,11 +187,12 @@ if __name__ == '__main__':
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
+    parser.add_argument('--btdata', dest='btdata', type=str, default='../output/augmentation/German.back-translated.with-labels.csv', help='Back-translated dataset file path')
     args = parser.parse_args()
 
     main(args)
 
-    # for p in ['../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
+    # for p in ['../data/raw/semeval/2016SB5/`ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
     #     args.aml = ['btm', 'lda', 'rnd']
     #     args.data = p
     #     if str(p).endswith('.xml'):
