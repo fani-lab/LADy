@@ -27,13 +27,11 @@ The only thing I enjoyed was her chicken-grilled special with Edamame puree .,"[
 We love the pink pony.,"[[3, 4]]"
 The perfect place.,[[2]]
 The food is great.,[[1]]
-Kind and thoughtful.,[[]]
 The ambience is relaxed and stylish.,[[1]]
 "Don't judge this place at first glance, you have to try to believe it, a home away from home for the alphabetic heart.",[[3]]
 The food is decent.,[[1]]
 But it's the service that makes me taste bad.,[[3]]
 "I have a policy that comes with a little self-esteem, which involves not being intimidated by a waiter, so I feel bad about asking for trivial things like water or checks.",[[17]]
-This must be the best Japanese restaurant in New York.,[[]]
 The food is great.,[[1]]
 The service is top notch.,[[1]]
 "I tend to judge a sushi restaurant by its seafood, which was heavenly at Sushi Rose.","[[9, 9]]"
@@ -46,12 +44,11 @@ The price-fixed menu is worth every penny and you get more than enough (both in 
 "Six bucks and there's plenty of delicious food, all fresh and refilled all the time.","[[7], [7], [7]]"
 "I'm not a vegetarian, but almost all the dishes were great.",[[8]]
 "The food here is pretty good, but only if you want to wait.",[[1]]
-"I like the C-Chai and Chole cans, but the cans and Dahl were pretty disappointing.","[[], [3], [5], [6], [11]]"
+"I like the C-Chai and Chole cans, but the cans and Dahl were pretty disappointing.","[[3], [5], [6], [11]]"
 "The service varies from day to day, sometimes they're very nice, sometimes they're not.",[[1]]
 "The kitchen is almost always slow, though.",[[1]]
 "Also, indicate whether you like your food spicy. It's more sloppy if you don't like it.",[[6]]
 "The ambiance is nice and nice to talk about, so a casual lunch here would probably be the best.",[[1]]
-"If you've ever been to Weehawken, you've got an idea of the angle.",[[]]
 "If you add that good service and good food to a reasonable price, you'll have a good evening.","[[5], [8], [8]]"
 "The lavender cake dessert was incredible, and I recommend it.","[[1, 2, 3]]"
 "Once you get into Cosette, you're in a wonderful little unconquered Paris bistro.",[[4]]
@@ -68,8 +65,7 @@ This is the best pastrami I've ever had and a great serving without being ridicu
 "My wife had the fried shrimp, they're huge, and they loved it.","[[4, 5], [4, 5]]"
 "As a Japanese birthday girl, I've lived in the Tristate region for over eight years, but I was just so surprised by this place.",[[23]]
 This is the most Japanese place you can ever get.,[[5]]
-The special menu signs and even the entire waiting room are all Japanese.,"[[3], [1, 2], [9], []]"
-It's worth an hour's drive.,[[]]
+The special menu signs and even the entire waiting room are all Japanese.,"[[3], [1, 2], [9]]"
 "Leon is a gem of the East Village: casual but hip, with a well-prepared base cost for French bistros, good specialities, warm and lively atmosphere.","[[0], [0], [20], [24], [17, 18, 15]]"
 "My wife and I enjoy the young, not always well-educated, yet friendly staff, all of whom have a history.",[[12]]
 decent wine at decent prices.,"[[1], [1]]"
@@ -85,7 +81,6 @@ We've been here many times and we always have good food with wine and service.,"
 "As usual, we had a great glass of wine while we waited.","[[6, 7, 8]]"
 We had a quick service.,[[4]]
 The people who work there are always so friendly that sometimes you can forget you're in New York.,[[1]]
-Try it as often as you can.,[[]]
 This is a fun place.,[[4]]
 The pizza is delicious and I like the atmosphere.,"[[1], [8]]"
 But the pizza is too expensive.,[[2]]
@@ -99,7 +94,7 @@ Great pizza and great service .,"[[1], [4]]"
 "It was a short wait, but shorter than I expected.",[[4]]
 At the end of a beautiful block,[[6]]
 This is the best sushi in New York City.,[[4]]
-"It's small and tight, but the food is fantastic.","[[], [6]]"
+"It's small and tight, but the food is fantastic.",[[6]]
 Get the tuna from Gari,"[[2, 3, 4]]"
 "Thailand has always been a hit for me , I usually go there for sushi , which is great , and the Thai food is great too .","[[14], [22, 23], [0]]"
 "With the variety on the menu , I often eat here and never get bored .",[[5]]
@@ -113,7 +108,7 @@ They were here first to enjoy their garden terrace.,"[[7, 8]]"
 "The food was amazing, the service was quick and helpful, but not overblown or rushed.","[[1], [5]]"
 "The steak tartar is a great bet, they'll make it for you at the table.","[[1, 2]]"
 "Although some nights at the restaurant were pretty warm, the open kitchen is part of the charm.","[[10, 11], [5]]"
-"The gigondas are worth the price, and the champagne is a great deal.","[[], [1], [8]]"
+"The gigondas are worth the price, and the champagne is a great deal.","[[1], [8]]"
 "It's a little crowded on the weekends, but the atmosphere is good and it's the best French food you can find in the area.","[[9], [16, 17]]"
 "I recommended the place to friends, always get a good answer.",[[3]]
 - the only pizza in New York that shouldn't have any extra toppings - the crust tastes like the best freshly baked bread!,"[[15], [3]]"
@@ -135,7 +130,7 @@ The staff is incredibly helpful and attentive.,[[1]]
 The bar is very well equipped with interesting beers and well-priced wines.,"[[1], [8], [11]]"
 "When we came across Leon, we thought we'd found the jewel, but we were wrong.",[[4]]
 "The waitress practically put our table in the bathroom, and when we were about to cancel our dinner orders because we didn't want to eat in the bathroom, we were told, no...",[[1]]
-There are many restaurants in New York.,"[[], [6]]"
+There are many restaurants in New York.,[[6]]
 I was looking forward to Jekyll and Hyde.,"[[5, 6, 7]]"
 "I loved everything about it , especially the shows and the actors .","[[8], [11]]"
 Our server was very helpful and friendly.,[[1]]
@@ -164,7 +159,6 @@ The wine list is good and the wine-by-the-glass was generously filled to the top
 "The traditional French decor was pleasant, although the hall was quite noisy - the restaurant was full and we had to raise our voices to keep a conversation going.","[[0, 2, 3], [8]]"
 "I've probably been to Cafe Spice five or eight times, it's probably still the best Indian restaurant around Union Square.","[[4, 5]]"
 "In summary: The service varies from good to average, depending on the waiter you get; generally, it's only average.",[[2]]
-"It's always quick when you sit down, even though the restaurant is full in the evening.",[[]]
 "The food is usually very good, although I have occasionally wondered about the fresh mess of raw vegetables in side orders.","[[0], [16, 17, 18, 19, 20]]"
 "The decor is lively and striking with several semi-private two on the right side of the dining hall, ideal for a date.","[[1], [8, 9]]"
 I'm never disappointed in the red eye.,"[[5, 6]]"
@@ -249,13 +243,11 @@ It's a nice little restaurant.,[[4]]
 I absolutely love this place !,[[4]]
 "I like the ambiance, it's very dark and original.",[[3]]
 The sushi is fantastic!!!,[[1]]
-Very affordable and excellent,[[]]
 "We ordered beef and noodles from the Thai menu, but nothing we got was Thai.","[[2, 3, 4, 4, 2]]"
 We're not coming back here to eat well.,[[6]]
 I think this is a good place.,[[6]]
 My girlfriend and I ran into this jumping-off point and had a great time.,[[8]]
 "The pizza and the wine were great, the service was great, but what really made this place great was the dining room in the backyard.","[[1], [4], [8], [24, 20, 21]]"
-Look at this!,[[]]
 "First of all, this place isn't romantic, as Citysearch's editorial review claims.",[[4]]
 "The tables are too tight, the menu is typical of every Italian restaurant, and the wine list is just too expensive.","[[1], [6], [15, 16]]"
 A little above average wines start at $ 70 + with just one selection listed at $ 30 + .,"[[4], [4]]"
@@ -266,9 +258,8 @@ There was too much fish.,[[4]]
 "Nice place to wait, but I'd never go back there.","[[3, 3], [1], [1]]"
 Someone recommended the dessert.,[[3]]
 One of us really liked the espresso.,[[6]]
-This is a big disappointment.,[[]]
 "Myagi is one of my favorite restaurants in town, where the negative reviews describe sounds like somewhere else.",[[0]]
-I've never served badly and the fish is fresh and delicious.,"[[], [6]]"
+I've never served badly and the fish is fresh and delicious.,[[6]]
 Your tuna-tatar appetite is dying.,"[[1, 1, 2]]"
 "I come from a family of pizzeria owners, and I'm almost ashamed to say that the pizza in Forvinos is knocking out my family's receipts.",[[16]]
 The store is so cool and the service is quick and polite.,"[[7], [1]]"
@@ -277,7 +268,7 @@ A restaurant that tries nothing more than to serve good food with good service i
 No tricks here - the food speaks for itself in its freshness and preparation.,[[5]]
 "The dining room is quietly elegant, without shouting music.","[[1, 2]]"
 "The service was impeccable and unflinching - the staff knew what to do - to know their menu, present their meals and take care of their needs.","[[1], [8]]"
-"I looked around and saw a room full of New Yorkers enjoying a real meal, not a fairy tale clubhouse trying to see.","[[14], []]"
+"I looked around and saw a room full of New Yorkers enjoying a real meal, not a fairy tale clubhouse trying to see.",[[14]]
 "The view is breathtaking, the service is top-notch, the ambiance is wonderful.","[[1], [5], [9]]"
 The staff provides a flawless service.,[[1]]
 "I had lobster beef, it's got two ounces of Maine lobster in it.","[[2, 3]]"
@@ -297,14 +288,12 @@ The menu is very limited - I think we've counted four or five entries.,[[1]]
 "We ordered the special, grilled branzino, which was so full of bones that it was hard to eat.","[[4, 5]]"
 "The decor of this place is very similar to a restaurant and the kind of place you'd expect in the East Village -- not romantic, just simple, small and sparse.",[[1]]
 The problem is that nothing is particularly memorable about plums.,[[9]]
-This is so funny.,[[]]
 Our family never expected such an incredible conversation to take place in a restaurant.,[[13]]
 The food was great too!,[[1]]
 And really big portions.,[[3]]
 The staff was the nicest thing I've ever seen in New York.,[[1]]
 "If you really want something different than Jekyll and Hyde, try it.","[[7, 8, 9]]"
 "The food was quite traditional, but it was hot and good with large portions.","[[1], [13]]"
-This is fun.,[[]]
 The characters are a really pleasant experience.,[[1]]
 But the food is what you might expect.,[[2]]
 I think Jackl and Hyde T is one of those places where you get to have fun.,"[[2, 3, 4]]"
@@ -324,7 +313,6 @@ You have a wide selection of different cream cheeses and all their salads are gr
 Lox is always fresh.,[[0]]
 Not impressed by the food,[[4]]
 Too high prices for this tight and unattractive restaurant,"[[8], [8]]"
-There's no atmosphere.,[[]]
 I thought this place was totally overrated.,[[3]]
 "The ambience was nice, but the service wasn't so good.","[[1], [6]]"
 This is the best Shabu Shaba restaurant in the Tri-State area.,"[[4, 6]]"
@@ -377,7 +365,7 @@ This is the worst sushi I've ever tasted.,[[4]]
 "Honestly, the worst sushi my husband and I have ever had in our entire lives.",[[3]]
 I don't know why this restaurant is so rated.,[[5]]
 The all-you-can-eat sushi is definitely in very poor quality.,"[[1, 2]]"
-limited menu of ingredients not as fresh,"[[1], [3], [], [6]]"
+limited menu of ingredients not as fresh,"[[1], [3], [6]]"
 "The only things you could really try were the highly salty soy sauce (also low in sodium), the sour rice and the shah on the fish.","[[11, 12], [19]]"
 The waiters are nice.,[[1]]
 I've been to Ruth twice and both times were very disappointing.,[[0]]
@@ -392,7 +380,6 @@ The planet Thai is great!,"[[1, 2]]"
 "Try the Pad Thai, it's fantastic and the prices are so cheap.","[[2, 3]]"
 "Just because it's cheap doesn't mean the portions are small or the food is bad, it's great!","[[7], [12]]"
 "Besides, the sandwiches (almost $7) were not with chips or a side.","[[2], [2]]"
-"It's a very disappointing experience, but at your desk.",[[]]
 Chennai Garden is my favorite restaurant in the city.,"[[0, 1]]"
 You have authentic Indians at Amazon prices.,"[[3], [3]]"
 This restaurant is vegetarian; there are no meat dishes at all.,[[8]]
@@ -420,7 +407,7 @@ That's really the sign of a careful waiter.,[[7]]
 "I highly recommend the restaurant, based on our experience last night.",[[4]]
 "We ate at this Thai restaurant after the ratings, but very unhappy with the food.",[[14]]
 We thought there was too much msg in the food.,[[9]]
-I recommend jellyfish d. drunk chicken and the soup cakes sure s.,"[[2, 2], [4, 5], [8, 9], []]"
+I recommend jellyfish d. drunk chicken and the soup cakes sure s.,"[[2, 2], [4, 5], [8, 9]]"
 The food is so cheap and the waiters are nice.,"[[1], [7]]"
 "I've done it a lot for a few years now, and the food is still excellent.",[[12]]
 Cheese is a diverse pleasure and a great deal for $10.,"[[0, 0], [0, 0], [0, 0]]"
@@ -451,7 +438,7 @@ I was here a few weeks ago and we had the worst customer service experience in a
 I absolutely loved this place.,[[4]]
 "Excellent atmosphere, delicious dishes and friendly service.","[[1], [3], [6]]"
 The wine list is really nice too.,"[[1, 2]]"
-"Everything was wonderful , food and drinks .","[[4], [6], [], [7]]"
+"Everything was wonderful , food and drinks .","[[4], [6], [7]]"
 I would highly recommend this place.,[[5]]
 I've been to Casimir more than five times and I've always enjoyed myself there.,[[3]]
 The food is good and cheap.,"[[1], [1]]"
@@ -467,10 +454,9 @@ A friendly staff who will let you enjoy the food and the company.,[[2]]
 "I thought the food was excellent, especially the laughter device I had.","[[3], [8, 9]]"
 "I also ordered the Mojito change, which was from this world.","[[5, 4]]"
 "My friends made up their minds about the rice dishes, but the next day we came back to try the Dim Sum, which was good... not excellent, but good.","[[20, 21]]"
-"We ate outside in the backyard, which is worth it, because it's cool and the music sounds good there.","[[5, 5], []]"
+"We ate outside in the backyard, which is worth it, because it's cool and the music sounds good there.","[[5, 5]]"
 - This is a great restaurant.,[[5]]
 The food was good.,[[1]]
-It was nice and quiet.,[[]]
 But the service was a little slow.,[[2]]
 The buffet had a nice selection.,[[1]]
 "The food was average or higher, including some surprisingly delicious dishes.","[[1], [10]]"
@@ -480,7 +466,6 @@ I have an excellent piece of cheese and we had some other nice pastries.,"[[6], 
 My son and his girlfriend both wanted cheeseburgers and they were huge!,[[7]]
 "As a result, their burger fell apart in their hands and caused so much chaos that they didn't feel like ending it.",[[4]]
 I had a huge pastrami sandwich on a roll.,"[[4, 5, 6, 7, 8]]"
-"It's a trend, but they forgot the most important part of a restaurant.","[[], []]"
 "The last two times I ordered here, my food was so spicy that I could barely eat it, and the spices were also out of the taste of the plate.","[[8], [20]]"
 And the Tom Kha soup was pathetic.,"[[2, 3, 4]]"
 "If you want good authentic Thai, this is not the place.",[[5]]
@@ -548,15 +533,13 @@ I like the shells and the Mahi Mahi (on saffron risotto yum!).,"[[3], [6, 7, 8, 
 My girlfriend ate her chicken and potatoes.,"[[4, 5, 6]]"
 - And some delicious crab cakes.,"[[4, 5]]"
 "Even if the food wasn't so good, the garden is a great place to relax outside.","[[8], [3]]"
-Large neighbourhood,[[]]
 This is a nice pizza place with a good selection of thin crustal pizza including basil cheese.,"[[9, 10, 11, 12, 13], [9, 10, 11, 12, 13], [4, 5], [15, 16]]"
 "Your calzones are terrible, bad, causing vomiting, junk.",[[1]]
 Customer service is bad.,"[[0, 1]]"
 No pizza 33 for me!,"[[1, 2]]"
 "The cans are narrow, unattractive and greasy, and I personally would drink popcorn topping before I eat another one of them.","[[1], [1]]"
 "The sandwiches are dry, tasteless and far too expensive.","[[1], [1]]"
-"Hampton Chutney warns that these people offer more style than substance, but in this unattractive space with helpless employees, there was also a lack of first class.","[[], [15], [18]]"
-This is a real asshole.,[[]]
+"Hampton Chutney warns that these people offer more style than substance, but in this unattractive space with helpless employees, there was also a lack of first class.","[[15], [18]]"
 "The atmosphere is unheard of, the service is unheard of, and the food is great.","[[1], [6], [12]]"
 The best Italian food I've ever eaten (and being Italian means a lot).,"[[2, 3]]"
 "It's such a beautiful, peaceful place to eat out.",[[5]]
@@ -599,7 +582,6 @@ Try the Pad Thai or try anything on the starter menu.,"[[2, 3], [9, 10]]"
 Everything at this restaurant was special.,[[3]]
 "The service was attentive, but discreet.",[[1]]
 The brioches and lollies as party favorites are a sweet and sweet touch to an unforgettable meal.,"[[1, 2, 3]]"
-It was quiet and charming.,[[]]
 The service was good and the food was wonderful.,"[[1], [6]]"
 "I haven't tried caviar, but I've tried salmon and crab salad (they're all good).","[[7], [9, 10]]"
 It's definitely a good place for snacks and conversations.,[[4]]
@@ -607,7 +589,7 @@ It's definitely a good place for snacks and conversations.,[[4]]
 "The waiting area is pleasant, fun and usually beautiful (in the wonderful aesthetic display, not in the way it is more beautiful than I am).","[[1, 2]]"
 "The food is delicious, especially its cooked to perfect shells in a spicy tomato sauce and its crispy, sticky fries","[[1], [9, 10, 12, 13, 14], [19]]"
 But the best thing about LS is the nighttime atmosphere that's free of BTS.,"[[8, 8, 9]]"
-You can have a perfectly flawed Martini in a glass (that's about 2 1/2 drinks) for $8.50 (I recommend the vanilla shade mmmm!) in a big house with great music.,"[[6], [6], [6], [20, 21], [], [29]]"
+You can have a perfectly flawed Martini in a glass (that's about 2 1/2 drinks) for $8.50 (I recommend the vanilla shade mmmm!) in a big house with great music.,"[[6], [6], [6], [20, 21], [29]]"
 The DJ on Saturday night has a great musical flavor and also accepts requests.,[[1]]
 You can't go wrong.,[[3]]
 Suan is a great place to take my friends.,[[0]]
@@ -659,7 +641,7 @@ The food was absolutely fantastic!!,[[1]]
 The baked shells we shared as a starter were the best we ever had!!,"[[1, 1, 2]]"
 "The lamb was so tender and full of flavor, the dessert was divine!!","[[1], [10]]"
 The waiter was attentive.,[[1]]
-The place itself is beautiful.,"[[1], []]"
+The place itself is beautiful.,[[1]]
 "Dinner in the city center 2002 - Price: Preparations were fine, waiter gave me a bad suggestion..try the potato stuff Kanish Best.","[[8], [11], [18, 19, 20]]"
 Small portions to the main entrance I had salmon (which was not impressed) girlfriend had chicken it was good.,"[[8], [15], [1, 2, 4, 5]]"
 The dessert is a joke.,[[1]]
@@ -689,7 +671,7 @@ But that wasn't the ice cream on the cake. It was a tiramisu that never looked l
 I really liked this place.,[[4]]
 I also recommend the rice dishes or the different types of congee (Risspoh),"[[4, 5], [11, 4, 12]]"
 It's definitely not a place to go if you want to impress someone.,[[4]]
-"But if you want good food at a good price and you don't mind, you can't beat this place.","[[5], [], [5]]"
+"But if you want good food at a good price and you don't mind, you can't beat this place.","[[5], [5]]"
 Fast and friendly service,[[3]]
 "If you sit in their main dining room (which has a spectacular, hand-painted high ceiling), you never know there's a world out there.","[[5, 6, 7], [14]]"
 "The food is wonderful, delicious and filling, and the service is professional and friendly.","[[1], [1], [9]]"
@@ -703,7 +685,7 @@ I've never had a cheesecake like this before.,[[4]]
 "It's a great place, whether you're looking for a few drinks or a quiet dinner.","[[3], [3]]"
 Warm and friendly in winter and great outdoor seating in the warmer months.,"[[7, 8]]"
 The food is good and the wines are well chosen.,"[[1], [6], [6]]"
-"While the atmosphere was great, the food and service could have been much better.","[[], [2], [6], [8]]"
+"While the atmosphere was great, the food and service could have been much better.","[[2], [6], [8]]"
 "We ordered the chicken food, but we had a few small pieces of chicken food, all dark meat and on the bone.","[[3, 4], [3, 4]]"
 "I've been to Sapphire twice and both times the food was good, if not good.",[[9]]
 Stitch with chicken b Beef and lamb,"[[2], [4], [6]]"
@@ -719,7 +701,6 @@ The pizza was a little wet.,[[0]]
 Not enough wine in the glass.,"[[2, 3, 4, 5]]"
 But the service was excellent... and I really liked the atmosphere.,"[[2], [10]]"
 "The food was just average... if they cut prices just a little bit, it would be a bigger payout.","[[1], [1]]"
-This is a great deal.,[[]]
 authentic Pakistani food,"[[1, 2]]"
 People are always friendly.,[[0]]
 Don't waste money on setting up,[[4]]
@@ -733,7 +714,7 @@ The food was really amazing.,[[1]]
 "The atmosphere was nice, the service very pleasant and the desert was good.","[[1], [5], [10]]"
 The jukebox plays everything from the Italian opera to the beat.,[[1]]
 "The food is amazing, rich pasta and fresh pasta pizza","[[1], [5], [9]]"
-The best part is the warm atmosphere of the owner and the service is quick.,"[[], [], [12]]"
+The best part is the warm atmosphere of the owner and the service is quick.,[[12]]
 Come here and get the drinks .,[[5]]
 The drinks are fantastic and half past eight.,"[[1], [1]]"
 "I want to meet Usha, the nice bartender from Manhattan.",[[4]]
@@ -789,7 +770,7 @@ The price and quality of the fish alone will prevent us from making a return vis
 "Fabulous décor - makes you feel like you're in a trendy Manhattan restaurant, very good food, cheap, generally friendly staff and if you're a Manhattan resident, or spend most of your time in Manhattan, Rice Avenue will make you feel at home... very Soho/village/upperwest side minus the expensive prices and pretentious customers... all on Roosevelt Avenue!","[[1], [15], [15], [19], [34, 35], [34, 35], [34, 35]]"
 We were sitting outside and the waiter was spitting red wine and hot tea on me and my date.,[[6]]
 "You'd think we'd apologize or get free drinks -- instead, we had a snobby waiter who wouldn't even take our order for 15 minutes and give us lip service when we asked him to.",[[14]]
-"With so many good restaurants at UW, I don't need overpriced food. Absurd arrogant Watt staff. Ho doesn't realize they work in a glorified restaurant.","[[11], [15], [], []]"
+"With so many good restaurants at UW, I don't need overpriced food. Absurd arrogant Watt staff. Ho doesn't realize they work in a glorified restaurant.","[[11], [15]]"
 "I'm relatively new to the area and I tried to pick a bell on the second, was disappointed with the service and thought the food was excess and on the expensive side.","[[20], [24], [24]]"
 The food is fine and the prices here are average.,[[1]]
 Balushi has solid food and a nice decor at reasonable prices.,"[[3], [7], [0]]"
@@ -807,7 +788,7 @@ The food is great.,[[1]]
 Personal pans are the perfect size for a hungry night.,"[[0, 1]]"
 There is a disadvantage to ordering - suppliers have a big attitude.,"[[7, 7]]"
 I've never had such dramatic supplier connoisseurs (many who shout and breathe) who always seem disappointed with their tips.,"[[5, 6]]"
-"I love the scene first, the place has a character and a beautiful light.","[[3], [6], []]"
+"I love the scene first, the place has a character and a beautiful light.","[[3], [6]]"
 The pizza was pretty good and huge.,"[[1], [1]]"
 "We were four and we had the family's Penny a la vodka, which was a huge serving.","[[9, 10, 11]]"
 "The pasta pen was pretty extra buttery, creamy, which means it's a big job digging... tasty first, but I'd say I count to a piece of pizza and seven, pen...","[[1, 2], [1, 2]]"
@@ -840,7 +821,7 @@ Super tasty pizza .,[[2]]
 I was in New York City with a friend and we discovered this really warm and inviting restaurant.,[[17]]
 I love her strawberry pizza and her pasta.,"[[3, 4], [7]]"
 "We had half a pizza, mine was an eggplant, my friend had a buffalo.","[[2, 4]]"
-"The food is excellent, but I need help.","[[1], []]"
+"The food is excellent, but I need help.",[[1]]
 The room feels like an Alice in Wonderland without him trying to be that.,[[1]]
 I only paid $60 for a good meal.,"[[7], [7]]"
 Big Sake,[[1]]
@@ -852,7 +833,6 @@ The delivery guy gets upset sometimes when you don't tip more than 10%.,"[[1, 2]
 - The best of luck.,[[4]]
 This place ruined me for neighborhood sushi.,[[6]]
 The Sashimi and the M-Millennium Rolls are delicious.,"[[1], [4]]"
-"It's a little hidden, but when you're there, it's worth it.","[[], []]"
 Not just the food,[[3]]
 "The waiter was attentive, the food was delicious and the view of the city was great.","[[1], [5], [10, 11, 12, 13]]"
 A Great Place to Relax and Eat,[[2]]
@@ -895,7 +875,6 @@ My favorite sushi in New York,[[2]]
 "In the summer months, the backyard is really nice.","[[5, 5]]"
 The roles are creative and I have to find another sushi place to serve more inventive yet delicious Japanese food,"[[1], [18, 19], [18, 19]]"
 "The dance, the White River and the Millennium Rolls are must-have.","[[1, 3, 4, 5, 7, 6]]"
-I can eat here every day .,[[]]
 I can't stand the food.,[[4]]
 I can't remember the last time I ate so badly.,[[7]]
 My quesadilla tasted like it was made by a three-year-old without any sense of proportion or taste.,"[[1], [1]]"
@@ -931,7 +910,6 @@ This little Astoria Souvlaki spot does what many consider the best Gyros in New 
 "What really shines is the food, which is aggressively flavored with zirconium spices and everything is made in-house (including the G-Gyro meat and sausage, and from much higher quality ingredients that would otherwise be expected.","[[5], [20, 21], [23], [29]]"
 "All the different Greek and Cypriot dishes are excellent, but the Giro is the reason to come - if you didn't eat, your trip was wasted.","[[3, 4, 5, 6], [11]]"
 Best restaurant in Brooklyn,[[1]]
-It's a classic act.,"[[], [], []]"
 The beef was incredible last night.,[[1]]
 It's a must!,[[0]]
 Most stalls allow you to sit next to each other without looking like a couple.,[[1]]
@@ -941,7 +919,6 @@ My daughter's wedding at the waterfront received the highest compliments from ou
 The service was wonderful .,[[1]]
 Paul the Master D. was professional and always at the top.,[[0]]
 Thank you to everyone at the water's edge.,"[[5, 7]]"
-"- Okay, but unfriendly, dirty.","[[], []]"
 "The high prices you're gonna pay are for the view, not the food.","[[9], [12]]"
 "The drinks were good, to put it this way.",[[1]]
 That Tilapia thing was terrible... taste like cardboard.,"[[2, 1]]"
@@ -955,8 +932,6 @@ The afternoon break (we had a pear cake) was good - but again the staff could no
 "When we ask about ports, the waitress lists several but doesn't know what the change of taste or the cost is.",[[6]]
 Not what I would expect for the price and prestige of this place.,"[[12], [12]]"
 "All in all, I'd go back because it was a beautiful restaurant, but I hope the staff will pay more attention to the little details in the future.","[[11], [11], [16]]"
-"It's short and sweet, it's great, it's romantic, it's cozy, it's private.",[[]]
-"They're not as small as some of the ratings make them look, they're perfect for two people.",[[]]
 "The service was extremely quick and attentive, thanks to the service button on your desk, but I barely understood a word when the waiter took our order.","[[1], [10, 11], [23]]"
 "The food was good and fair, nothing to make you crazy.",[[1]]
 Everywhere the look of the place goes beyond the actual meals,"[[2], [10]]"
@@ -1012,13 +987,13 @@ I was speechless because of the terrible food,[[7]]
 This place only survives on reputation.,[[1]]
 "This is the most wonderful restaurant in New York City, not just in Brooklyn.",[[5]]
 "You've been making the best, most delicious food for seven years and keeping it that way.",[[7]]
-"Never swing, never eat badly, never serve badly.","[[], [6]]"
+"Never swing, never eat badly, never serve badly.",[[6]]
 "Great food , great wine list , great service in a great neighborhood .","[[1], [4, 5], [8], [12]]"
 Patsy's Pizza is true love.,"[[0, 1]]"
 The best pizza on the planet.,[[2]]
 - Very good hot dogs .,"[[3, 4]]"
 The hot dogs were clean and tender on the inside and had a lot of crunch and snap on the outside.,"[[1, 2]]"
-A place to look for a nighttime meal or a lunchtime boost!,"[[], [1]]"
+A place to look for a nighttime meal or a lunchtime boost!,[[1]]
 "I think the food is a little greasy, but the food is good.",[[3]]
 Ready to help and average price per plate is $10.,"[[0], [7]]"
 The only thing that impresses you is the decor .,[[8]]
@@ -1052,7 +1027,6 @@ You'd think they'd make it up to you with service.,[[9]]
 I agree that eating at Casa la femme is like no other experience!,"[[5, 6, 7]]"
 I just got home from visiting Casa La Femme and was so offended by my visit that I felt compelled to warn other hosts who value their money and their time.,"[[6, 7, 8], [6, 7, 8]]"
 "We're late for our reservation, so I can't complain too much about the waiting time for a table.",[[13]]
-This is beautiful!,[[]]
 The hostess was very pleasant.,[[1]]
 But our drinks were terrible.,"[[2], [2]]"
 We also asked for hookah six times and the waiter told us about a minute and never came back with the hookah.,[[9]]
@@ -1072,7 +1046,6 @@ I think there were two shrimp in the salt cramp appetite.,"[[8, 9, 10]]"
 "I had Thai-style fried sea bass, which was very good.","[[2, 2, 3, 4, 5]]"
 "Everyone was satisfied with their food except my brother, who had the G-grill Mahi Mahi, who was apparently soaked in grapefruit juice!","[[5], [12, 13, 14], [12, 13, 14]]"
 I heard the lobster roll was excellent.,"[[3, 4]]"
-"Everything was fine - a little on the expensive side, but fresh.","[[], []]"
 "The service is not the most friendly for our ""big party""!",[[1]]
 Large Indian dishes,"[[1, 2]]"
 "The food was fantastic - I love Indian food and eat it regularly, but I can say that this is one of the best I've ever eaten.",[[1]]
@@ -1199,7 +1172,6 @@ To take hot dogs to the next level .,"[[2, 3]]"
 Here the hotdog is raised to the level of a real entry with numerous variations.,"[[2, 2], [2, 2]]"
 It's a great atmosphere.,[[3]]
 "I recommend the fish tacos, everything else was fine.","[[3, 4]]"
-The cold is in the cold.,"[[], []]"
 Poor service and poor management,"[[1], [4]]"
 Don't go to this place.,[[4]]
 I had a terrible experience at the Casa la femme on Saturday night.,"[[7, 8, 9]]"

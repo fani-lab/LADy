@@ -1,4 +1,5 @@
 import argparse, os, pickle, multiprocessing, json
+import sys
 from time import time
 import numpy as np
 from json import JSONEncoder
@@ -103,7 +104,7 @@ def evaluate(am, am_type, test):
                 # print(pair[1][j])
                 run['q' + str(i)][pair[1][j]] = len(pair[1]) - j
     print(f'3.2. Calling pytrec_eval for {metrics_set} ...')
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run)) # qrel should not have empty entry otherwise get exception
     print(f'3.3. Averaging ...')
     df_mean = df.mean(axis=1).to_frame('mean')
     return df_mean
@@ -128,11 +129,11 @@ def main(args):
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     # output = f'{args.output}/{args.naspects}'
 
-    # org_reviews = load(args.data, args.output)
-    # bt_reviews = load_bt(args.btdata)
-    # reviews = org_reviews + bt_reviews
+    org_reviews = load(args.data, args.output)
+    bt_reviews = load_bt(args.btdata)
+    reviews = org_reviews + bt_reviews
 
-    reviews = load_bt(args.btdata)
+    # reviews = load_bt(args.btdata)
     # reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
@@ -182,6 +183,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+    # sys.setrecursionlimit(10 ** 6)
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
     parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm)')
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')

@@ -27,7 +27,6 @@ def labeling(dataset, alignments, original_aos, similarities):
             continue
         else:
             label_indices.append(i)
-            augmented_reviews.append(dataset[i])
             labels_list_per_instance = []
             for aos_instance in eval(original_aos[i]):
                 label_list_per_aspect = []
@@ -36,8 +35,15 @@ def labeling(dataset, alignments, original_aos, similarities):
                         if a == alignment_instance[0]:
                             label_list_per_aspect.append(alignment_instance[1])
                             break
-                labels_list_per_instance.append(label_list_per_aspect)
-            augmented_reviews_labels.append(labels_list_per_instance)
+                if not label_list_per_aspect:
+                    continue
+                else:
+                    labels_list_per_instance.append(label_list_per_aspect)
+            if not labels_list_per_instance:
+                continue
+            else:
+                augmented_reviews.append(dataset[i])
+                augmented_reviews_labels.append(labels_list_per_instance)
     return augmented_reviews, augmented_reviews_labels
 
 
