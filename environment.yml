@@ -22,3 +22,5 @@ dependencies:
     - torch==1.13.1
     - torchaudio==0.13.1
     - torchvision==0.14.1
+    - simalign==0.3
+    - scipy==1.9.3
