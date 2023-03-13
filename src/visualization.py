@@ -113,10 +113,36 @@ def plots_3d(path, topic_range):
             plt.clf()
 
 
+def plots_2d_v2(path, len_topkstr, len_metrics, topic_range):
+    metrics_list = []
+    for m in params.metrics:
+        metrics_list.append(f'{m}@k')
+    if not os.path.isdir(f'{path}/new-plots'): os.makedirs(f'{path}/new-plots')
+
+    for naspects in topic_range:
+        merged = pd.DataFrame()
+        metric_idx = 0
+        lda = pd.read_csv(f'../output/5/xml-2016/{naspects}/lda/pred.eval.mean.csv')
+        lda2 = pd.read_csv(f'{path}/{naspects}/lda/pred.eval.mean.csv')
+        merged = pd.concat([lda, lda2['mean']], axis=1)
+        merged.columns = ['Metric', 'LDA-before-backtranslation', 'LDA-after-backtranslation']
+        for i in range(0, len_metrics * len_metrics, len_topkstr):
+            metric_name = metrics_list[metric_idx]
+            query = merged.loc[i:i + len_topkstr - 1]
+            melted_query = query.melt('Metric', var_name='aspect_models', value_name='Values')
+            sns.lineplot(x='Metric', y='Values', hue='aspect_models', palette='Set2', linewidth=3, data=melted_query)
+            plt.legend(loc='upper right')
+            plt.savefig(
+                f"{path}/new-plots/{path.replace('../output/', '').replace('/', '_')}_{metric_name}_{naspects}topics.png")
+            plt.clf()
+            metric_idx += 1
+
+
 if __name__ == '__main__':
-    path = ['../output/semeval-2016-full/xml-version', '../output/semeval-2016-full/txt-version']
-    # path = ['../output/semeval-2016-full/xml-version']
-    for p in path:
-        # plots_2d(p, 100, 5)
-        topic_range = range(1, 51, 1)
-        plots_3d(p, topic_range)
+    # path = ['../output/semeval-2016-full/xml-version', '../output/semeval-2016-full/txt-version']
+    # # path = ['../output/semeval-2016-full/xml-version']
+    # for p in path:
+    #     # plots_2d(p, 100, 5)
+    #     topic_range = range(1, 51, 1)
+    #     plots_3d(p, topic_range)
+    plots_2d_v2('../output/6/xml-2016', 5, len(params.metrics), range(25, 30, 5))
