@@ -7,6 +7,7 @@ import pandas as pd
 import pytrec_eval
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 import params, visualization
+from nltk.corpus import wordnet as wn
 
 
 from aml.mdl import AbstractAspectModel
@@ -61,13 +62,14 @@ def split(nsample, output):
     return splits
 
 
-def evaluate(am, am_type, test):
+def evaluate(am, am_type, test, syn):
     print(f'\n3. Evaluating on test set ...')
     print('#' * 50)
     pairs = []
     for r in test:
         r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
         r_ = r.hide_aspects()
+        # r_ = r
         r_pred_aspects = am.infer(params.doctype, r_)
         if am_type == "btm":
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
@@ -91,7 +93,16 @@ def evaluate(am, am_type, test):
     qrel = dict(); run = dict()
     print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
-        qrel['q' + str(i)] = {w: 1 for w in pair[0]}
+        if syn == 'yes':
+            syn_list = set()
+            for p_instance in pair[0]:
+                syn_list.add(p_instance)
+                for syn in wn.synsets(p_instance):
+                    for lemma in syn.lemmas():
+                        syn_list.add(lemma.name())
+            qrel['q' + str(i)] = {w: 1 for w in syn_list}
+        else:
+            qrel['q' + str(i)] = {w: 1 for w in pair[0]}
         # the prediction list may have duplicates
         run['q' + str(i)] = {}
         if "btm" in am_type or "lda" in am_type:
@@ -176,7 +187,7 @@ def main(args):
             for q in params.qualities:
                 print(f'({q}: {AbstractAspectModel.quality(am, q)})')
             print(f'Time elapsed: {(time() - t_s)}')
-            df_mean = evaluate(am, a, test)
+            df_mean = evaluate(am, a, test, args.syn)
             df_mean.to_csv(f'{output_}pred.eval.mean.csv')
             fold_mean = pd.concat([fold_mean, df_mean], axis=1)
         fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.csv')
@@ -189,7 +200,8 @@ if __name__ == '__main__':
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
-    parser.add_argument('--btdata', dest='btdata', type=str, default='../output/augmentation/German.back-translated.with-labels.csv', help='Back-translated dataset file path')
+    parser.add_argument('--btdata', dest='btdata', type=str, default='../output/augmentation/French.back-translated.with-labels.csv', help='Back-translated dataset file path')
+    parser.add_argument('--syn', dest='syn', type=str, default='yes', help='Synonyms be added to evaluation or not (1. yes 2. no')
     args = parser.parse_args()
 
     main(args)
