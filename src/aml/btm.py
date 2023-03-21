@@ -28,8 +28,9 @@ class Btm(AbstractAspectModel):
 
         # self.dict = gensim.corpora.Dictionary(reviews_)
         # if self.no_extremes:
-        #     self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'],
-        #                               keep_n=100000)
+            # self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'],
+            #                           keep_n=100000)
+            # self.dict.filter_extremes(keep_n=100000)
         # self.dict.compactify()
         reviews_ = [' '.join(text) for text in reviews_]
         doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(reviews_)

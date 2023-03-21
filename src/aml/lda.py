@@ -22,8 +22,9 @@ class Lda(AbstractAspectModel):
     def train(self, doctype, cores, iter, seed):
         reviews_ = super().preprocess(doctype, self.reviews)
         self.dict = gensim.corpora.Dictionary(reviews_)
-        if self.no_extremes: self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'], keep_n=100000)
-        self.dict.compactify()
+        # if self.no_extremes: self.dict.filter_extremes(no_below=self.no_extremes['no_below'], no_above=self.no_extremes['no_above'], keep_n=100000)
+        # if self.no_extremes: self.dict.filter_extremes(keep_n=100000)
+        # self.dict.compactify()
         corpus = [self.dict.doc2bow(doc) for doc in reviews_]
 
         logging.basicConfig(filename=f'{self.path}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
