@@ -14,6 +14,7 @@ from aml.mdl import AbstractAspectModel
 from aml.lda import Lda
 from aml.btm import Btm
 from aml.rnd import Rnd
+from aml.neural import Neural
 
 from cmn.review import Review
 
@@ -62,7 +63,7 @@ def split(nsample, output):
     return splits
 
 
-def evaluate(am, am_type, test, syn):
+def evaluate(am, am_type, test, syn_status):
     print(f'\n3. Evaluating on test set ...')
     print('#' * 50)
     pairs = []
@@ -71,9 +72,9 @@ def evaluate(am, am_type, test, syn):
         r_ = r.hide_aspects()
         # r_ = r
         r_pred_aspects = am.infer(params.doctype, r_)
-        if am_type == "btm":
+        if am_type == "btm" or am_type == "neural":
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, 100)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
             pass
@@ -82,7 +83,7 @@ def evaluate(am, am_type, test, syn):
                 pairs.append((r_aspects[i], r_pred_aspects))
         else:  # "lda" in am_type:
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.mdl.show_topic(a, topn=100)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.mdl.show_topic(a, topn=params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 # removing duplicate aspect words ==> handled in metrics()
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
@@ -93,7 +94,7 @@ def evaluate(am, am_type, test, syn):
     qrel = dict(); run = dict()
     print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
-        if syn == 'yes':
+        if syn_status == 'yes':
             syn_list = set()
             for p_instance in pair[0]:
                 syn_list.add(p_instance)
@@ -105,7 +106,7 @@ def evaluate(am, am_type, test, syn):
             qrel['q' + str(i)] = {w: 1 for w in pair[0]}
         # the prediction list may have duplicates
         run['q' + str(i)] = {}
-        if "btm" in am_type or "lda" in am_type:
+        if "btm" in am_type or "lda" in am_type or "neural" in am_type:
             # print(pair[1])
             for j, (w, p) in enumerate(pair[1]):
                 if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
@@ -158,8 +159,11 @@ def main(args):
         elif a == "rnd":
             output = f'{output}/rnd/'
             if not os.path.isdir(output): os.makedirs(output)
-        else:  # if am_type == "lda"
+        elif a == "lda":
             output = f'{output}/lda/'
+            if not os.path.isdir(output): os.makedirs(output)
+        else:  # if am_type == "neural"
+            output = f'{output}/neural/'
             if not os.path.isdir(output): os.makedirs(output)
         for f in splits['folds'].keys():
             output_ = f'{output}f{f}.'
@@ -168,9 +172,10 @@ def main(args):
                 am = Btm(model_review, args.naspects, params.no_extremes, output_)
             elif a == "rnd":
                 am = Rnd(model_review, args.naspects, params.no_extremes, output_)
-            else:  # if am_type == "lda"
+            elif a == "lda":
                 am = Lda(model_review, args.naspects, params.no_extremes, output_)
-
+            else:  # if am_type == "neural"
+                am = Neural(model_review, args.naspects, params.no_extremes, output_)
             # training
             print(f'\n2. Aspect modeling ...')
             print('#' * 50)
@@ -196,7 +201,7 @@ def main(args):
 if __name__ == '__main__':
     # sys.setrecursionlimit(10 ** 6)
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
-    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm)')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm neural)')
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
