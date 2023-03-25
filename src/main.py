@@ -155,6 +155,36 @@ def load_bt(dataset_path):
     return reviews_list
 
 
+def aggregate(path, save_path, naspects):
+    if os.path.isdir(path):
+        # given a root folder, we can crawl the folder to find pred files
+        files = list()
+        for dirpath, dirnames, filenames in os.walk(path): files += [
+            os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if
+            file.startswith("pred")]
+
+    column_names = []
+    for i in range(len(files)):
+        p = ".".join(files[i]).replace('.csv', '').replace('...output.', '')
+        column_names.append(p)
+    column_names.insert(0, 'metric')
+
+    f_path = []
+    all_results = pd.DataFrame()
+    for i in range(len(files)):
+        p = "\\".join(files[i])
+        f_path.append(p)
+        df = pd.read_csv(p)
+        if i == 0:
+            all_results = df
+        else:
+            all_results = pd.concat([all_results, df['mean']], axis=1)
+
+    all_results.columns = column_names
+    all_results.to_csv(f'{save_path}/{naspects}aspects.agg.pred.eval.mean.csv')
+    return all_results
+
+
 def main(args):
     am_type = args.aml
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
@@ -240,6 +270,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
+    aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
 
     # for p in ['../data/raw/semeval/2016SB5/`ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
     #     args.aml = ['btm', 'lda', 'rnd', 'ctm']
