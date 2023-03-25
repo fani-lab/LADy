@@ -1,20 +1,19 @@
 import argparse, os, pickle, multiprocessing, json
-import sys
 from time import time
 import numpy as np
 from json import JSONEncoder
 import pandas as pd
 import pytrec_eval
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 import params, visualization
 from nltk.corpus import wordnet as wn
-
+import random
 
 from aml.mdl import AbstractAspectModel
 from aml.lda import Lda
 from aml.btm import Btm
 from aml.rnd import Rnd
 from aml.neural import Neural
+from aml.ctm import CTM
 
 from cmn.review import Review
 
@@ -63,14 +62,22 @@ def split(nsample, output):
     return splits
 
 
-def evaluate(am, am_type, test, syn_status):
+def inference(am, am_type, test, hide_percentage):
     print(f'\n3. Evaluating on test set ...')
     print('#' * 50)
     pairs = []
+    r_list = []
+    r_aspect_list = []
     for r in test:
         r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
-        r_ = r.hide_aspects()
-        # r_ = r
+        if random.random() < hide_percentage:
+            r_ = r.hide_aspects()
+        else:
+            r_ = r
+        r_list.append(r_)
+        r_aspect_list.append(r_aspects)
+        if am_type == "ctm":
+            continue
         r_pred_aspects = am.infer(params.doctype, r_)
         if am_type == "btm" or am_type == "neural":
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
@@ -87,7 +94,19 @@ def evaluate(am, am_type, test, syn_status):
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 # removing duplicate aspect words ==> handled in metrics()
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
+    if am_type == "ctm":
+        r_pred_aspects = am.infer(params.doctype, r_list)
+        r_aspect_list_extended = []
+        for r in r_aspect_list:
+            r_aspect_list_extended.extend(r)
+        for i, subr_pred_aspects in enumerate(r_pred_aspects):
+            subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+            subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
+            pairs.append((r_aspect_list_extended[i], subr_pred_aspects_words))
+    return pairs
 
+
+def evaluate(am_type, syn_status, pairs):
     metrics_set = set()
     for m in params.metrics:
         metrics_set.add(f'{m}_{params.topkstr}')
@@ -106,7 +125,7 @@ def evaluate(am, am_type, test, syn_status):
             qrel['q' + str(i)] = {w: 1 for w in pair[0]}
         # the prediction list may have duplicates
         run['q' + str(i)] = {}
-        if "btm" in am_type or "lda" in am_type or "neural" in am_type:
+        if "btm" in am_type or "lda" in am_type or "neural" in am_type or "ctm" in am_type:
             # print(pair[1])
             for j, (w, p) in enumerate(pair[1]):
                 if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
@@ -141,16 +160,16 @@ def main(args):
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     # output = f'{args.output}/{args.naspects}'
 
-    org_reviews = load(args.data, args.output)
-    bt_reviews = load_bt(args.btdata)
-    reviews = org_reviews + bt_reviews
+    # org_reviews = load(args.data, args.output)
+    # bt_reviews = load_bt(args.btdata)
+    # reviews = org_reviews + bt_reviews
 
     # reviews = load_bt(args.btdata)
-    # reviews = load(args.data, args.output)
+    reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
     for a in am_type:
-        fold_mean = pd.DataFrame()
+        fold_mean_list = [pd.DataFrame() for i in range(0, 11)]
         output = f'{args.output}/{args.naspects}'
         print(a)
         if a == "btm":
@@ -161,6 +180,9 @@ def main(args):
             if not os.path.isdir(output): os.makedirs(output)
         elif a == "lda":
             output = f'{output}/lda/'
+            if not os.path.isdir(output): os.makedirs(output)
+        elif a == "ctm":
+            output = f'{output}/ctm/'
             if not os.path.isdir(output): os.makedirs(output)
         else:  # if am_type == "neural"
             output = f'{output}/neural/'
@@ -174,6 +196,8 @@ def main(args):
                 am = Rnd(model_review, args.naspects, params.no_extremes, output_)
             elif a == "lda":
                 am = Lda(model_review, args.naspects, params.no_extremes, output_)
+            elif a == "ctm":
+                am = CTM(model_review, args.naspects, params.no_extremes, output_)
             else:  # if am_type == "neural"
                 am = Neural(model_review, args.naspects, params.no_extremes, output_)
             # training
@@ -192,16 +216,22 @@ def main(args):
             for q in params.qualities:
                 print(f'({q}: {AbstractAspectModel.quality(am, q)})')
             print(f'Time elapsed: {(time() - t_s)}')
-            df_mean = evaluate(am, a, test, args.syn)
-            df_mean.to_csv(f'{output_}pred.eval.mean.csv')
-            fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-        fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.csv')
+
+            for i in range(0, 11):
+                hide_percentage = i * 10
+                hp = i / 10
+                pairs = inference(am, a, test, hp)
+                df_mean = evaluate(a, args.syn, pairs)
+                df_mean.to_csv(f'{output_}pred.eval.mean.{hide_percentage}.csv')
+                fold_mean_list[i] = pd.concat([fold_mean_list[i], df_mean], axis=1)
+        for i in range(0, 11):
+            hide_percentage = i * 10
+            fold_mean_list[i].mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.{hide_percentage}.csv')
 
 
 if __name__ == '__main__':
-    # sys.setrecursionlimit(10 ** 6)
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
-    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm neural)')
+    parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm neural ctm)')
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
@@ -212,7 +242,7 @@ if __name__ == '__main__':
     main(args)
 
     # for p in ['../data/raw/semeval/2016SB5/`ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
-    #     args.aml = ['btm', 'lda', 'rnd']
+    #     args.aml = ['btm', 'lda', 'rnd', 'ctm']
     #     args.data = p
     #     if str(p).endswith('.xml'):
     #         args.output = f'../output/semeval-2016-full/xml-version'
