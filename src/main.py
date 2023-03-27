@@ -190,12 +190,12 @@ def main(args):
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     # output = f'{args.output}/{args.naspects}'
 
-    # org_reviews = load(args.data, args.output)
-    # bt_reviews = load_bt(args.btdata)
-    # reviews = org_reviews + bt_reviews
+    org_reviews = load(args.data, args.output)
+    bt_reviews = load_bt(args.btdata)
+    reviews = org_reviews + bt_reviews
 
     # reviews = load_bt(args.btdata)
-    reviews = load(args.data, args.output)
+    # reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
     for a in am_type:
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
-    parser.add_argument('--btdata', dest='btdata', type=str, default='../output/augmentation/French.back-translated.with-labels.csv', help='Back-translated dataset file path')
+    parser.add_argument('--btdata', dest='btdata', type=str, default='../data/augmentation/French.back-translated.with-labels.csv', help='Back-translated dataset file path')
     parser.add_argument('--syn', dest='syn', type=str, default='yes', help='Synonyms be added to evaluation or not (1. yes 2. no')
     args = parser.parse_args()
 
