@@ -189,4 +189,4 @@ In this work, we use [``LDA``](https://radimrehurek.com/gensim/models/ldamodel.h
 
 ## 7. Awards
 
-> [CAD$150, Silver medalist, UWill Discover, 2023](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
+> [CAD$150, Silver Medalist, UWill Discover, 2023](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
