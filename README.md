@@ -11,6 +11,7 @@ Overall, LADy is a powerful and reliable system that provides an efficient and e
 4. [Quickstart](#4-Quickstart)
 5. [Experiment](#5-Experiment)
 6. [License](#6-License)
+7. [Awards](#7-Awards)
 
 ## 1. Quickstart Script
 Here is the link for the quickstart script: [Colab Notebook](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
@@ -185,3 +186,7 @@ Pull requests are highly encouraged and welcomed. However, for significant modif
 
 ### Acknowledgments
 In this work, we use [``LDA``](https://radimrehurek.com/gensim/models/ldamodel.html), [``bitermplus``](https://github.com/maximtrp/bitermplus), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``SimAlign``](https://github.com/cisnlp/simalign), [``DeCLUTR``](https://github.com/JohnGiorgi/DeCLUTR), [``No Language Left Behind (NLLB)``](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We would like to thank the authors of these works.
+
+## 7. Awards
+
+> [CAD$150, Silver medalist, UWill Discover, 2023](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
