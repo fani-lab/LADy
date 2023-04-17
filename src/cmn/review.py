@@ -21,14 +21,15 @@ class Review(object):
         reviews_list = []
         aos_list = []
         for r in reviews:
-            for aos_instance in r.aos:
-                aos_list.append(aos_instance)
-            for sent in r.sentences:
+            # if len(r.sentences) == 0:
+            #     print("@")
+            for i, sent in enumerate(r.sentences):
                 text = ' '.join(sent)
                 reviews_list.append(text)
+                aos_list.append(r.aos[i])
         df = pd.DataFrame(reviews_list, columns=["sentences"])
         df['aos'] = aos_list
-        df.to_csv(f'{path}/reviews_list.csv', index=False)
+        df.to_csv(f'{path}/D.csv', index=False)
         return df
 
     def to_dict(self): return {'id': self.id, 'sentences': self.sentences, 'aos': self.get_aos()}
