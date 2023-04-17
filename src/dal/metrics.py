@@ -38,6 +38,10 @@ def calculate_rouge(ref_path, can_path):
     score = rouge.get_scores(can_corpus, ref_corpus, avg=True)
     print(score)
 
+def calculate_em(ref_path, can_path):
+    ref_corpus, can_corpus = load(ref_path, can_path, False, False, False)
+    score = accuracy_score(ref_corpus, can_corpus)
+    print(score)
 
 
 def main(args):
@@ -55,6 +59,10 @@ def main(args):
         calculate_rouge(og_data, trans_data)
         calculate_rouge(trans_data, back_trans_data)
         calculate_rouge(og_data, back_trans_data)
+
+        calculate_em(og_data, trans_data)
+        calculate_em(trans_data, back_trans_data)
+        calculate_em(og_data, back_trans_data)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Back-translation Metrics')
