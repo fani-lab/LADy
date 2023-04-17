@@ -64,16 +64,28 @@ def main(args):
         trans_data = f'../../data/augmentation/back-translation/D.{l}.csv' # Translated Dataset
         back_trans_data = f'../../data/augmentation/back-translation/D_{l}.csv' # Back-translated Dataset
 
+        print("BLEU score:\n========")
+        print(f"D vs. D.{l}")
         calculate_bleu(og_data, trans_data)
+        print(f"D.{l} vs. D_{l}")
         calculate_bleu(trans_data, back_trans_data)
+        print(f"D vs. D_{l}")
         calculate_bleu(og_data, back_trans_data)
 
+        print("ROUGE-L score:\n========")
+        print(f"D vs. D.{l}")
         calculate_rouge(og_data, trans_data)
+        print(f"D.{l} vs. D_{l}")
         calculate_rouge(trans_data, back_trans_data)
+        print(f"D vs. D_{l}")
         calculate_rouge(og_data, back_trans_data)
 
+        print("Exact Match score:\n========")
+        print(f"D vs. D.{l}")
         calculate_em(og_data, trans_data)
+        print(f"D.{l} vs. D_{l}")
         calculate_em(trans_data, back_trans_data)
+        print(f"D vs. D_{l}")
         calculate_em(og_data, back_trans_data)
 
 if __name__ == '__main__':
