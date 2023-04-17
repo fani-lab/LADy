@@ -35,7 +35,7 @@ def calculate_bleu(ref_path, can_path):
 def calculate_rouge(ref_path, can_path):
     rouge = Rouge()
     ref_corpus, can_corpus = load(ref_path, can_path, False, False, False)
-    scores = rouge.get_scores(can_corpus, ref_corpus, avg=True)['rouge-l']['f'] # uses the ROUGE-L metric
+    score = rouge.get_scores(can_corpus, ref_corpus, avg=True)['rouge-l']['f'] # uses the ROUGE-L metric
     print(score)
     
 def calculate_em(ref_path, can_path):
