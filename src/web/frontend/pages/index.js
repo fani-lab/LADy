@@ -13,11 +13,19 @@ import {
   VStack,
 } from "@chakra-ui/layout";
 import { Textarea } from "@chakra-ui/textarea";
-import { SmallCloseIcon } from "@chakra-ui/icons";
+import { InfoOutlineIcon, RepeatIcon, SmallCloseIcon } from "@chakra-ui/icons";
 
 import Footer from "./Components/Footer";
 import { useState } from "react";
 import { Button } from "@chakra-ui/button";
+import Example from "./Components/Chart";
+import {
+  Select,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+} from "@chakra-ui/react";
 const inter = Inter({ subsets: ["latin"] });
 //use state to store textarea value
 export default function Home() {
@@ -30,6 +38,7 @@ export default function Home() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: formval,
+        model: "ree",
       }),
     };
 
@@ -41,6 +50,7 @@ export default function Home() {
     let inputValue = e.target.value;
     setformval(inputValue);
   };
+  const isError = formval === "";
   return (
     <>
       <Head>
@@ -50,23 +60,41 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container minWidth={"container.lg"} p="5">
-        <Heading>Latent Aspect Detection</Heading>
-        <HStack>
+        <Heading mb="10">Latent Aspect Detection</Heading>
+        <FormControl isInvalid={isError}>
+          <HStack mb="5" spacing={4}>
+            <Button
+              leftIcon={<InfoOutlineIcon />}
+              colorScheme="teal"
+              variant="outline"
+            >
+              Info
+            </Button>{" "}
+            <Button
+              leftIcon={<RepeatIcon />}
+              colorScheme="teal"
+              variant="outline"
+            >
+              Random review
+            </Button>
+            <FormLabel>Model: </FormLabel>
+            <Select maxWidth={"200px"} borderColor={"teal"}>
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </Select>
+          </HStack>
           <Textarea
+            mb="5"
             placeholder="Here is a sample placeholder"
             onChange={handleInputChange}
             value={formval}
           />
-          <Box>
-            <UnorderedList>
-              <ListItem>Lorem ipsum dolor sit amet</ListItem>
-              <ListItem>Consectetur adipiscing elit</ListItem>
-              <ListItem>Integer molestie lorem at massa</ListItem>
-              <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-            </UnorderedList>
-          </Box>
-        </HStack>
-        <Button onClick={handleSubmit}>Submit</Button>
+          <Button colorScheme="teal" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </FormControl>
+        <Example />
 
         <Footer />
       </Container>
