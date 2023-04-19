@@ -18,7 +18,7 @@ import { InfoOutlineIcon, RepeatIcon, SmallCloseIcon } from "@chakra-ui/icons";
 import Footer from "./Components/Footer";
 import { useState } from "react";
 import { Button } from "@chakra-ui/button";
-import Example from "./Components/Chart";
+import Chart from "./Components/Chart";
 import {
   Select,
   FormControl,
@@ -27,30 +27,67 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 const inter = Inter({ subsets: ["latin"] });
+
 //use state to store textarea value
 export default function Home() {
-  const [formval, setformval] = useState("");
-  function handleSubmit(e) {
+  const [formval, setformval] = useState(
+    "The food was fresh and delicious, and the best part was that the chef sent us a dessert they had created that day."
+  );
+  const [selectedModel, setSelectedModel] = useState("btm");
+  const [data, setData] = useState("");
+
+  const getRandomReview = async () => {
+    const response = await fetch("http://localhost:5000/random");
+    const json = await response.json();
+    setformval(json);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formval);
+
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: formval,
-        model: "ree",
+        model: selectedModel,
       }),
     };
 
-    fetch("http://localhost:5000/api", requestOptions).then((response) =>
-      response.json().then((data) => console.log(data))
-    );
-  }
+    const response = await fetch("http://localhost:5000/api", requestOptions);
+    const json = await response.json();
+
+    setData(json);
+  };
   let handleInputChange = (e) => {
     let inputValue = e.target.value;
     setformval(inputValue);
   };
   const isError = formval === "";
+
+  const labels = Object.keys(data);
+  const values = Object.values(data);
+  values.sort(function (a, b) {
+    return b - a;
+  });
+
+  const output = {
+    labels,
+    datasets: [
+      {
+        label: "ree",
+        data: values,
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgb(53, 162, 235)",
+      } /*
+      {
+        label: "Dataset 2",
+        data: [20, 30, 20, 10, 10, 5, 0],
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
+      },*/,
+    ],
+  };
   return (
     <>
       <Head>
@@ -74,14 +111,20 @@ export default function Home() {
               leftIcon={<RepeatIcon />}
               colorScheme="teal"
               variant="outline"
+              onClick={getRandomReview}
             >
               Random review
             </Button>
             <FormLabel>Model: </FormLabel>
-            <Select maxWidth={"200px"} borderColor={"teal"}>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+            <Select
+              maxWidth={"200px"}
+              borderColor={"teal"}
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+            >
+              <option value="btm">BTM</option>
+              <option value="lda">LDA</option>
+              <option value="random">Random</option>
             </Select>
           </HStack>
           <Textarea
@@ -90,11 +133,11 @@ export default function Home() {
             onChange={handleInputChange}
             value={formval}
           />
-          <Button colorScheme="teal" onClick={handleSubmit}>
+          <Button colorScheme="teal" type="submit" onClick={handleSubmit}>
             Submit
           </Button>
         </FormControl>
-        <Example />
+        {data ? <Chart output={output} /> : null}
 
         <Footer />
       </Container>
