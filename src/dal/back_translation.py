@@ -1,18 +1,35 @@
-import argparse, os, pickle
-from time import time
+import argparse, os
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
-import sys
 import pandas as pd
 from tqdm import tqdm
-# sys.path.insert(1, 'src/cmn')
+from src.cmn.semeval import SemEvalReview
+from src.cmn.review import Review
+
 # import review
 
 # from src.cmn.review import Review
 
 
-def load(input, output):
-    df = pd.read_csv(f'{input}')
-    corpus = df['sentences'].tolist()
+def dataset_save(input, output):
+    if input.endswith('.xml'):
+        if '14' in str(input):
+            print("*")
+            reviews = SemEvalReview.xmlloader2014(input)
+        else:
+            reviews = SemEvalReview.xmlloader(input)
+    else:
+        reviews = SemEvalReview.txtloader(input)
+    review_dataframe = Review.save_sentences(reviews, f'{output}')
+    return review_dataframe
+
+
+def dataset_load(input):
+    review_dataframe = pd.read_csv(f'{input}')
+    return review_dataframe
+
+
+def corpus_load(r_df):
+    corpus = r_df['sentences'].tolist()
     return corpus
 
 
@@ -24,23 +41,19 @@ def translate(model, tokenizer, corpus, source_lang, target_lang):
     translated = []
     back_translated = []
     for c in tqdm(corpus):
-        # print(c)
         translated_text = translator(c)[0]["translation_text"]
         translated.append(translated_text)
-        # print("Translated:\t", output[0]["translation_text"])
         back_translated_text = back_translator(translated_text)[0]["translation_text"]
         back_translated.append(back_translated_text)
-
-        # translated_text.append(translator(c)[0]["translation_text"])
-        # back_translated_text.append(back_translator(translated_text)[0]["translation_text"])
     return translated, back_translated
 
 
 def main(args):
-    path = f'{args.output}/augmentation/back-translation'
+    path = f'{args.output}/augmentation-R-14/back-translation'
     if not os.path.isdir(path): os.makedirs(path)
-    corpus = load(args.data, args.output)
-    # Review.save_sentences(reviews, path)
+    reviews = dataset_load(args.data)
+    # reviews = dataset_save(args.data, path)
+    corpus = corpus_load(reviews)
 
     for m in args.mt:
         if m == "nllb":
@@ -60,9 +73,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Back-translation')
-    parser.add_argument('--mt',  nargs='+', type=str.lower, required=True, default=['nllb'], help='a list of translator models')
-    parser.add_argument('--lan',  nargs='+', type=str, required=True, default=['deu_Latn'], help='a list of desired languages')
-    parser.add_argument('--data', dest='data', type=str, default='../../data/raw/semeval/reviews.csv', help='dataset file path, e.g., ..data/raw/semeval/reviews.csv')
+    parser.add_argument('--mt',  nargs='+', type=str.lower, default=['nllb'], help='a list of translator models')
+    parser.add_argument('--lan',  nargs='+', type=str, default=['deu_Latn', 'spa_Latn', 'arb_Arab'], help='a list of desired languages')
+    parser.add_argument('--data', dest='data', type=str, default='../../data/raw/semeval/SemEval-14/Restaurants_Train_v2.xml', help='dataset file path, e.g., ..data/raw/semeval/reviews.csv')
     parser.add_argument('--output', dest='output', type=str, default='../../output', help='output path, e.g., ../output')
     args = parser.parse_args()
 
