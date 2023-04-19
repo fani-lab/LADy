@@ -35,7 +35,7 @@ def avg_sentence_tokens(name, path):
     for sentence in corpus:
         sum_tokens += len(sentence.split())
     
-    return [name, num_sentences, sum_tokens / num_sentences]
+    return [name, num_sentences, sum_tokens, sum_tokens / num_sentences]
 
 def calculate_bleu(ref_path, can_path):
     ref_corpus, can_corpus = load(ref_path, can_path, True, True, False)
@@ -93,10 +93,10 @@ def main(args):
             averageMetrics.append(avg_sentence_tokens(f'R-{d} D_{l}', back_trans_data))
         
         df = pd.DataFrame(all_results, columns=["Name", "BLEU", "ROUGE-L", "EM"])
-        df.to_csv(f'back-translation-metrics-R-{d}.csv', index=None)
+        df.to_csv(f'../../output/back-translation-metrics/back-translation-metrics-R-{d}.csv', index=None)
     
-    avg_df = pd.DataFrame(averageMetrics, columns=["Name", "# Sentences", "# Tokens"])
-    avg_df.to_csv(f'average-sentences-tokens-R-{args.data}.csv', index=None)
+    avg_df = pd.DataFrame(averageMetrics, columns=["Name", "Total Sentences", "Total Tokens", "Avg Tokens"])
+    avg_df.to_csv(f'../../output/back-translation-metrics/average-sentences-tokens-R-{args.data}.csv', index=None)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Back-translation Metrics')
