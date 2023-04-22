@@ -24,17 +24,23 @@ def load(input, output):
     t_s = time()
     try:
         print('\n1.1. Loading existing processed reviews file ...')
-        with open(f'{output}/reviews.pkl', 'rb') as f: reviews = pickle.load(f)
+        with open(f'{output}/reviews.pkl', 'rb') as f:
+            reviews = pickle.load(f)
     except (FileNotFoundError, EOFError) as e:
         print('\n1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
         # what is the type of input dataset?
-        if input.endswith('.xml'):
-            reviews = SemEvalReview.xmlloader(input)
+        if str(input).endswith('.xml'):
+            if '14' in str(input):
+                print("*")
+                reviews = SemEvalReview.xmlloader2014(input)
+            else:
+                reviews = SemEvalReview.xmlloader(input)
         else:
             reviews = SemEvalReview.txtloader(input)
         print('\n1.2. Saving processed pickle file ...')
-        with open(f'{output}/reviews.pkl', 'wb') as f: pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'{output}/reviews.pkl', 'wb') as f:
+            pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
     print(f'(#reviews: {len(reviews)})')
     print(f'Time elapsed: {(time() - t_s)}')
     return reviews
@@ -42,7 +48,8 @@ def load(input, output):
 
 def split(nsample, output):
     from sklearn.model_selection import KFold, train_test_split
-    train, test = train_test_split(np.arange(nsample), train_size=params.train_ratio, random_state=params.seed, shuffle=True)
+    train, test = train_test_split(np.arange(nsample), train_size=params.train_ratio, random_state=params.seed,
+                                   shuffle=True)
 
     splits = dict()
     splits['test'] = test
@@ -58,18 +65,26 @@ def split(nsample, output):
             if isinstance(obj, np.ndarray): return obj.tolist()
             return JSONEncoder.default(self, obj)
 
-    with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
+    with open(f'{output}/splits.json', 'w') as f:
+        json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
 
-def inference(am, am_type, test, hide_percentage):
+def inference(am, am_type, test, hide_percentage, output_):
+    if am_type == 'neural':
+        with open(f'{output_}ridx.pkl', 'rb') as f:
+            ridx = pickle.load(f)
     print(f'\n3. Evaluating on test set ...')
     print('#' * 50)
     pairs = []
     r_list = []
     r_aspect_list = []
-    for r in test:
-        r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+    idx = 0
+    for r_idx, r in enumerate(test):
+        r_aspects = [[w for a, o, s in sent for w in a] for sent in
+                     r.get_aos()]  # [['service', 'food'], ['service'], ...]
+        if len(r_aspects[0]) == 0:
+            continue
         if random.random() < hide_percentage:
             r_ = r.hide_aspects()
         else:
@@ -78,10 +93,18 @@ def inference(am, am_type, test, hide_percentage):
         r_aspect_list.append(r_aspects)
         if am_type == "ctm":
             continue
-        r_pred_aspects = am.infer(params.doctype, r_)
+        elif am_type == 'neural':
+            if r_idx in ridx:
+                continue
+            r_pred_aspects = am.infer(params.doctype, r_, idx)
+        else:
+            r_pred_aspects = am.infer(params.doctype, r_)
+
         if am_type == "btm" or am_type == "neural":
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = [w_p for l in
+                                           [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in
+                                            subr_pred_aspects] for w_p in l]
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
             pass
@@ -90,17 +113,23 @@ def inference(am, am_type, test, hide_percentage):
                 pairs.append((r_aspects[i], r_pred_aspects))
         else:  # "lda" in am_type:
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.mdl.show_topic(a, topn=params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = [w_p for l in
+                                           [[(w, a_p * w_p) for w, w_p in am.mdl.show_topic(a, topn=params.nwords)] for
+                                            a, a_p in subr_pred_aspects] for w_p in l]
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 # removing duplicate aspect words ==> handled in metrics()
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
+        idx += 1
+
     if am_type == "ctm":
         r_pred_aspects = am.infer(params.doctype, r_list)
         r_aspect_list_extended = []
         for r in r_aspect_list:
             r_aspect_list_extended.extend(r)
         for i, subr_pred_aspects in enumerate(r_pred_aspects):
-            subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+            subr_pred_aspects_words = [w_p for l in
+                                       [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in
+                                        subr_pred_aspects] for w_p in l]
             subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
             pairs.append((r_aspect_list_extended[i], subr_pred_aspects_words))
     return pairs
@@ -110,7 +139,8 @@ def evaluate(am_type, syn_status, pairs):
     metrics_set = set()
     for m in params.metrics:
         metrics_set.add(f'{m}_{params.topkstr}')
-    qrel = dict(); run = dict()
+    qrel = dict();
+    run = dict()
     print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
         if syn_status == 'yes':
@@ -135,7 +165,8 @@ def evaluate(am_type, syn_status, pairs):
                 # print(pair[1][j])
                 run['q' + str(i)][pair[1][j]] = len(pair[1]) - j
     print(f'3.2. Calling pytrec_eval for {metrics_set} ...')
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run)) # qrel should not have empty entry otherwise get exception
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(
+        run))  # qrel should not have empty entry otherwise get exception
     print(f'3.3. Averaging ...')
     df_mean = df.mean(axis=1).to_frame('mean')
     return df_mean
@@ -151,7 +182,7 @@ def load_bt(dataset_path):
         reviews_list.append(
             Review(id=i, sentences=[[str(t).lower() for t in bt_reviews[i].split()]], time=None,
                    author=None, aos=[[(label, [], 0) for label in eval(bt_labels[i])]], lempos=""))
-        
+
     return reviews_list
 
 
@@ -188,13 +219,11 @@ def aggregate(path, save_path, naspects):
 def main(args):
     am_type = args.aml
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
-    # output = f'{args.output}/{args.naspects}'
 
     org_reviews = load(args.data, args.output)
     bt_reviews = load_bt(args.btdata)
     reviews = org_reviews + bt_reviews
 
-    # reviews = load_bt(args.btdata)
     # reviews = load(args.data, args.output)
     splits = split(len(reviews), args.output)
     test = np.array(reviews)[splits['test']].tolist()
@@ -240,8 +269,12 @@ def main(args):
             except (FileNotFoundError, EOFError) as e:
                 print(
                     f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
-                am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores, params.iter_c,
-                         params.seed)
+                if a == 'neural':
+                    am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores,
+                             params.iter_c, params.seed, test)
+                else:
+                    am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores,
+                             params.iter_c, params.seed)
             print(f'2.2. Quality of aspects ...')
             for q in params.qualities:
                 print(f'({q}: {AbstractAspectModel.quality(am, q)})')
@@ -250,7 +283,7 @@ def main(args):
             for i in range(0, 11):
                 hide_percentage = i * 10
                 hp = i / 10
-                pairs = inference(am, a, test, hp)
+                pairs = inference(am, a, test, hp, output_)
                 df_mean = evaluate(a, args.syn, pairs)
                 df_mean.to_csv(f'{output_}pred.eval.mean.{hide_percentage}.csv')
                 fold_mean_list[i] = pd.concat([fold_mean_list[i], df_mean], axis=1)
@@ -262,15 +295,40 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
     parser.add_argument('--aml', '--aml-method-list', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm neural ctm)')
-    parser.add_argument('--data', dest='data', type=str, default='data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
-    parser.add_argument('--output', dest='output', type=str, default='output/semeval/xml-2016', help='output path, e.g., ../output/semeval/xml-2016')
+    parser.add_argument('--data', dest='data', type=str, default='../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', help='raw dataset file path, e.g., ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    parser.add_argument('--output', dest='output', type=str, default='../output/English2/Semeval-2016', help='output path, e.g., ../output/semeval/xml-2016')
     parser.add_argument('--naspects', dest='naspects', type=int, default=25, help='user defined number of aspects.')
-    parser.add_argument('--btdata', dest='btdata', type=str, default='../data/augmentation/French.back-translated.with-labels.csv', help='Back-translated dataset file path')
-    parser.add_argument('--syn', dest='syn', type=str, default='yes', help='Synonyms be added to evaluation or not (1. yes 2. no')
+    parser.add_argument('--btdata', dest='btdata', type=str, default='../data/augmentation/All.back-translated.with-labels.csv', help='Back-translated dataset file path')
+    parser.add_argument('--syn', dest='syn', type=str, default='no', help='Synonyms be added to evaluation or not (1. yes 2. no')
     args = parser.parse_args()
 
-    main(args)
-    aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
+    # main(args)
+    # aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
+
+    for lang in ['Chinese', 'German', 'Arabic', 'French', 'Spanish', 'All']:
+        if lang == 'Chinese':
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/Chinese.back-translated.with-labels.csv'
+        elif lang == 'German':
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/German.back-translated.with-labels.csv'
+        elif lang == 'Arabic':
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/Arabic.back-translated.with-labels.csv'
+        elif lang == 'French':
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/French.back-translated.with-labels.csv'
+        elif lang == 'Spanish':
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/Spanish.back-translated.with-labels.csv'
+        else:  # 'All'
+            args.btdata = '../output/augmentation-R-16/augmented-with-labels/All.back-translated.with-labels.csv'
+        args.aml = ['rnd', 'btm', 'lda', 'neural']
+        args.data = '../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'
+        args.output = f'../output/{lang}/Semeval-2016+'
+        args.syn = 'yes'
+        topic_range = range(0, 51, 5)
+        for naspects in topic_range:
+            if naspects == 0:
+                naspects = 1
+            args.naspects = naspects
+            main(args)
+            aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
 
     # for p in ['../data/raw/semeval/2016SB5/`ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
     #     args.aml = ['btm', 'lda', 'rnd', 'ctm']
