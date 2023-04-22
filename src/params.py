@@ -6,7 +6,7 @@ no_extremes = {
     'no_above': 0.9,    # happen in no_above percent of reviews
 }
 doctype = 'snt' # 'rvw' ==> if 'rvw': review = [[review]] else if 'snt': review = [[subreview1], [subreview2], ...]
-iter_c = 100
+iter_c = 500
 cores = 0
 nwords = 20
 qualities = ['Coherence', 'Perplexity']

@@ -56,8 +56,12 @@ class Lda(AbstractAspectModel):
             words.append([]); probs.append([])
             words_probs = aspect.split('+')
             for word_prob in words_probs:
-                probs[-1].append(word_prob.split('*')[0])
-                words[-1].append(word_prob.split('*')[1].split('"')[1])
+                if any(char.isdigit() for char in word_prob):
+                    probs[-1].append(word_prob.split('*')[0])
+                    words[-1].append(word_prob.split('*')[1].split('"')[1])
+                else:
+                    probs[-1].append(0.0)
+                    words[-1].append(word_prob.replace('"', ''))
         return words, probs
 
     def infer(self, doctype, review):

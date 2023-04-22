@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import torch
+import random
 from contextualized_topic_models.models.ctm import CombinedTM
 from contextualized_topic_models.utils.data_preparation import TopicModelDataPreparation
 from contextualized_topic_models.utils.preprocessing import WhiteSpacePreprocessingStopwords
@@ -23,28 +24,46 @@ class CTM(AbstractAspectModel):
     def load(self):
         self.tp = pd.read_pickle(f'{self.path}model.tp.pkl')
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=768, n_components=self.naspects,
-                              num_epochs=10)
+                              num_epochs=100)
         self.model_path = pd.read_pickle(f'{self.path}model.path.pkl')
-        self.mdl.load(f'{self.path[:-1]}/{self.model_path}', epoch=9)
+        self.mdl.load(f'{self.path[:-1]}/{self.model_path}', epoch=99)
         # self.mdl.model.load_state_dict(torch.load(f'{self.path}model.pth'))
         self.dict = pd.read_pickle(f'{self.path}model.dict.pkl')
         with open(f'{self.path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{self.path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
+        torch.manual_seed(params.seed)
+        torch.cuda.manual_seed(params.seed)
+        np.random.seed(params.seed)
+        random.seed(params.seed)
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.deterministic = True
+
     def train(self, doctype, cores, iter, seed):
-        epoch = 10
+
+        torch.manual_seed(params.seed)
+        torch.cuda.manual_seed(params.seed)
+        np.random.seed(params.seed)
+        random.seed(params.seed)
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.deterministic = True
+
+        epoch = 100
         preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices = self.preprocess(doctype, self.reviews)
         self.tp = TopicModelDataPreparation("all-mpnet-base-v2")
 
         training_dataset = self.tp.fit(text_for_contextual=unpreprocessed_corpus, text_for_bow=preprocessed_documents)
         self.dict = self.tp.vocab
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=768, n_components=self.naspects,
-                              num_epochs=epoch)
+                              num_epochs=epoch, num_data_loader_workers=0)
         self.mdl.fit(training_dataset)
 
         cas = CoherenceUMASS(texts=[doc.split() for doc in preprocessed_documents],
                              topics=self.mdl.get_topic_lists(self.naspects))
-        self.cas = cas.score()
+        if len(cas.topics[0]) < 10:
+            self.cas = 0
+        else:
+            self.cas = cas.score()
 
         # self.mdl.get_doc_topic_distribution(training_dataset, n_samples=20)
 
@@ -65,6 +84,13 @@ class CTM(AbstractAspectModel):
             pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def preprocess(self, doctype, reviews):
+        torch.manual_seed(params.seed)
+        torch.cuda.manual_seed(params.seed)
+        np.random.seed(params.seed)
+        random.seed(params.seed)
+        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.deterministic = True
+
         reviews_ = [s for r in reviews for s in r.sentences]
         docs = [' '.join(text) for text in reviews_]
         stopwords = list(stop_words.words("english"))
