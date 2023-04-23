@@ -2,8 +2,7 @@ import os, spacy
 from tqdm import tqdm
 import xml.etree.ElementTree as ET
 
-from src.cmn.review import Review
-
+from cmn.review import Review
 
 class SemEvalReview(Review):
     def __init__(self, id, sentences, time, author, aos):
@@ -12,7 +11,7 @@ class SemEvalReview(Review):
     @staticmethod
     def txtloader(path):
         reviews = []
-        nlp = spacy.load("en_core_web_sm")  # en_core_web_trf for transformer-based
+        nlp = spacy.load("en_core_web_sm")  # en_core_web_trf for transformer-based; error ==> python -m spacy download en_core_web_sm
         with tqdm(total=os.path.getsize(path)) as pbar, open(path, "r", encoding='utf-8') as f:
             for i, line in enumerate(f.readlines()):
                 pbar.update(len(line))
@@ -22,7 +21,8 @@ class SemEvalReview(Review):
                 # for the current datafile, each row is a review of single sentence!
                 sentences = nlp(sentences)
                 reviews.append(Review(id=i, sentences=[[str(t).lower() for t in sentences]], time=None, author=None,
-                                      aos=[eval(aos)], lempos=[[(t.lemma_.lower(), t.pos_) for t in sentences]]))
+                                      aos=[eval(aos)], lempos=[[(t.lemma_.lower(), t.pos_) for t in sentences]],
+                                      parent=None, lang='eng_Latn'))
         return reviews
 
     def xmlloader(path):

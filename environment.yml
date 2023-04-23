@@ -6,11 +6,12 @@ channels:
 dependencies:
   - pandas==1.4.4
   - spacy==3.3.1 
-  - tqdm
     #spacy-transformers
     #python -m spacy download en_core_web_trf
     #python -m spacy download en_core_web_sm
-  - gensim==4.* 
+  - tqdm
+  - transformers==4.26.1 #needed if augmentation via backtranslation
+  - gensim==4.*
   - matplotlib
   - nltk==3.7
   - pip:
@@ -18,9 +19,5 @@ dependencies:
     - pytrec-eval-terrier==0.5.2
     - bitermplus==0.6.10 #install it if you want to use btm model in the topic modeling layer
     - seaborn==0.12.2
-    - transformers==4.26.1
     - torch==1.13.1
-    - torchaudio==0.13.1
-    - torchvision==0.14.1
     - simalign==0.3
-    - scipy==1.9.3

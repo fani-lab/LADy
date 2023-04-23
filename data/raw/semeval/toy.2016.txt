@@ -1,0 +1,5 @@
+The food is very average .####[([1], [4], 'NEG')]
+The food is reliable.####[([1], [3], 'POS')]
+Best Taiwanese food in NY !####[([1, 2], [0], 'POS')]
+the food is always fresh ...####[([1], [4], 'POS')]
+The staff is incredibly accomodating .####[([1], [4], 'POS')]
