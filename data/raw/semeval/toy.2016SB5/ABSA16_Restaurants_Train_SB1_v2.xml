@@ -144,32 +144,48 @@
             </sentence>
         </sentences>
     </Review>
-    <Review rid="1032695">
+    <Review rid="1058221">
         <sentences>
-            <sentence id="1032695:0">
-                <text>Every time in New York I make it a point to visit Restaurant Saul on Smith Street.</text>
+            <sentence id="1058221:0">
+                <text>i have eaten here a handful of times, for no reason besides sheer convenience.</text>
+            </sentence>
+            <sentence id="1058221:1">
+                <text>(i hang out, and live, in the neighborhood..) </text>
+            </sentence>
+            <sentence id="1058221:2">
+                <text>the food is decent.</text>
                 <Opinions>
-                    <Opinion target="Restaurant Saul" category="RESTAURANT#GENERAL" polarity="positive" from="50" to="65"/>
+                    <Opinion target="food" category="FOOD#QUALITY" polarity="neutral" from="4" to="8"/>
                 </Opinions>
             </sentence>
-            <sentence id="1032695:1">
-                <text>Everything is always cooked to perfection, the service is excellent, the decor cool and understated.</text>
+            <sentence id="1058221:3">
+                <text>however, it's the service that leaves a bad taste in my mouth.</text>
                 <Opinions>
-                    <Opinion target="NULL" category="FOOD#QUALITY" polarity="positive" from="0" to="0"/>
-                    <Opinion target="service" category="SERVICE#GENERAL" polarity="positive" from="47" to="54"/>
-                    <Opinion target="decor" category="AMBIENCE#GENERAL" polarity="positive" from="73" to="78"/>
+                    <Opinion target="service" category="SERVICE#GENERAL" polarity="negative" from="18" to="25"/>
                 </Opinions>
             </sentence>
-            <sentence id="1032695:2">
-                <text>I had the duck breast special on my last visit and it was incredible.</text>
+            <sentence id="1058221:4">
+                <text>i happen to have a policy that goes along with a little bit of self-respect, which includes not letting a waiter intimidate me, i.e. make me feel bad asking for trivialities like water, or the check.</text>
                 <Opinions>
-                    <Opinion target="duck breast special" category="FOOD#QUALITY" polarity="positive" from="10" to="29"/>
+                    <Opinion target="waiter" category="SERVICE#GENERAL" polarity="negative" from="106" to="112"/>
                 </Opinions>
             </sentence>
-            <sentence id="1032695:3">
-                <text>Can't wait wait for my next visit.</text>
+            <sentence id="1058221:5">
+                <text>i know, you were too busy showing off your vintage tee shirt and looking bored, but my agenda is i'm here to eat and enjoy the company of friends, seeking a pleasant experience.</text>
                 <Opinions>
-                    <Opinion target="NULL" category="RESTAURANT#GENERAL" polarity="positive" from="0" to="0"/>
+                    <Opinion target="NULL" category="SERVICE#GENERAL" polarity="negative" from="0" to="0"/>
+                </Opinions>
+            </sentence>
+            <sentence id="1058221:6">
+                <text>well, i didn't find it there, and trust, i have told everyone i can think of about my experience. </text>
+                <Opinions>
+                    <Opinion target="NULL" category="RESTAURANT#GENERAL" polarity="negative" from="0" to="0"/>
+                </Opinions>
+            </sentence>
+            <sentence id="1058221:7">
+                <text>the last time i walked by it looked pretty empty. hmmm.</text>
+                <Opinions>
+                    <Opinion target="NULL" category="RESTAURANT#MISCELLANEOUS" polarity="negative" from="0" to="0"/>
                 </Opinions>
             </sentence>
         </sentences>
