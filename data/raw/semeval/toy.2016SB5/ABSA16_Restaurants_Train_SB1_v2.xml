@@ -3,9 +3,11 @@
     <Review rid="1004293">
         <sentences>
             <sentence id="1004293:0">
-                <text>Judging from previous posts this used to be a good place, but not any longer.</text>
+                <text>Judging from previous ,posts of test, this used to be a good place, but not any longer.</text>
                 <Opinions>
-                    <Opinion target="place" category="RESTAURANT#GENERAL" polarity="negative" from="51" to="56"/>
+                    <Opinion target="place" category="RESTAURANT#GENERAL" polarity="negative" from="61" to="67"/>
+                    <Opinion target="posts of test" category="RESTAURANT#GENERAL" polarity="negative" from="22" to="35"/>
+
                 </Opinions>
             </sentence>
             <sentence id="1004293:1">
