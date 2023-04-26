@@ -1,0 +1,15 @@
+What's the difference between train_V2 and the train files in semeval folders?
+
+Next: train
+
+
+We can consider ,aspect, category as ,latent, since no where they occurre?!
+
+
+
+python -u main.py -aml lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25 &
+python -u main.py -aml lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25 &
+python -u main.py -aml lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -naspect 25 &
+python -u main.py -aml lda -data ../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml -output ../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml -naspect 25 &
+python -u main.py -aml lda -data ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -naspect 25 &
+python -u main.py -aml lda -data ../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml -output ../output/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml -naspect 25 &

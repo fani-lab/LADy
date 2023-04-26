@@ -12,7 +12,7 @@ settings = {
         # list of nllb language keys to augment via backtranslation from https://github.com/facebookresearch/flores/tree/main/flores200#languages-in-flores-200
         # pes_Arab (Farsi), 'zho_Hans' for Chinese (Simplified), deu_Latn (Germany), spa_Latn (Spanish), arb_Arab (Modern Standard Arabic), fra_Latn (French), ...
         'nllb': 'facebook/nllb-200-distilled-600M',
-        'max_l': 400,
+        'max_l': 1024,
         'device': int(os.environ['CUDA_VISIBLE_DEVICES']), #gpu card index
         'batch': False,
         },
