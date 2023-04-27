@@ -98,7 +98,3 @@ class SemEvalReview(Review):
                       aos=aos, lempos=None,
                       parent=None, lang='eng_Latn') if aos else None
 
-    # if __name__ == '__main__':
-#     reviews = SemEvalReview.load(r'C:\Users\Administrator\Github\Fani-Lab\pxp-topicmodeling-working\data\raw\semeval-umass\sam_eval2016.txt', None, None)
-#     print(reviews[0].get_aos())
-#     print(Review.to_df(reviews))
