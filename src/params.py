@@ -1,7 +1,7 @@
 import random, os, multiprocessing
 
 random.seed(0)
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 settings = {
     'cmd': ['prep'],                  # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
@@ -14,7 +14,7 @@ settings = {
         'nllb': 'facebook/nllb-200-distilled-600M',
         'max_l': 1024,
         'device': int(os.environ['CUDA_VISIBLE_DEVICES']), #gpu card index
-        'batch': False,
+        'batch': True,
         },
     'train': {
         'train_ratio': 0.85, # 1 - train_ratio goes to test

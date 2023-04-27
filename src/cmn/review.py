@@ -84,3 +84,5 @@ class Review(object):
             r.augs[tgt] = (
                 Review(r.id, [[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], None, None, None, None, r, tgt),
                 Review(r.id, [[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], None, None, None, None, r, src))
+
+

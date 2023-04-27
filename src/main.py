@@ -1,4 +1,4 @@
-import argparse, os, pickle, multiprocessing, json
+import argparse, os, pickle, multiprocessing, json, time
 from tqdm import tqdm
 # import numpy as np
 # from json import JSONEncoder
@@ -29,10 +29,14 @@ def load(input, output):
         if str(input).endswith('.xml'): reviews = SemEvalReview.xmlloader(input)
         else: reviews = SemEvalReview.txtloader(input)
         print(f'(#reviews: {len(reviews)})')
-        print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} ...')
+        print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
         for lang in params.settings['prep']['langaug']:
-            print(lang)
-            if params.settings["prep"]['batch']: Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
+            print(f'\n{lang} ...')
+            if params.settings["prep"]['batch']:
+                start = time.time()
+                Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
+                end = time.time()
+                print(f'{lang} done all at once (batch). Time: {end - start}')
             else:
                 for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
         print(f'\n1.3. Saving processed pickle file {output}...')
@@ -350,4 +354,6 @@ if __name__ == '__main__':
     #         main(args)
     #     # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
     #     visualization.plots_3d(args.output, topic_range)
+
+
 
