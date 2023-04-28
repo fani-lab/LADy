@@ -39,7 +39,8 @@ export default function Home() {
   const getRandomReview = async () => {
     const response = await fetch("http://localhost:5000/random");
     const json = await response.json();
-    setformval(json);
+
+    setformval(json[0]);
   };
 
   const handleSubmit = async (e) => {

@@ -7,7 +7,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -38,5 +38,5 @@ export const options = {
 
 export default function Example(props) {
   console.log("output", props.output);
-  return <Bar options={options} data={props.output} />;
+  return <Chart type="bar" options={options} data={props.output} />;
 }
