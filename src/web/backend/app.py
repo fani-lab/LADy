@@ -26,4 +26,4 @@ def get_random_row_from_csv():
         return jsonify(random.choice(rows))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
