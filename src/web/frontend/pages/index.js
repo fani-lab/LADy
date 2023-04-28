@@ -66,8 +66,9 @@ export default function Home() {
   };
   const isError = formval === "";
 
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+  const labels = data ? Object.keys(data) : ["ree"];
+  const values = data ? Object.values(data) : [1];
+  console.log("labels", labels);
   values.sort(function (a, b) {
     return b - a;
   });
@@ -138,7 +139,7 @@ export default function Home() {
             Submit
           </Button>
         </FormControl>
-        {data ? <Chart output={output} /> : null}
+        {<Chart output={output} />}
 
         <Footer />
       </Container>
