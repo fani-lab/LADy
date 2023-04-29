@@ -15,10 +15,10 @@ import {
 import { Textarea } from "@chakra-ui/textarea";
 import { InfoOutlineIcon, RepeatIcon, SmallCloseIcon } from "@chakra-ui/icons";
 
-import Footer from "./Components/Footer";
+import Footer from "../Components/Footer";
 import { useState } from "react";
 import { Button } from "@chakra-ui/button";
-import Chart from "./Components/Chart";
+import Chart from "../Components/Chart";
 import {
   Select,
   FormControl,
@@ -37,7 +37,7 @@ export default function Home() {
   const [data, setData] = useState("");
 
   const getRandomReview = async () => {
-    const response = await fetch("http://localhost:5000/random");
+    const response = await fetch("https://lady.onrender.com/random");
     const json = await response.json();
 
     setformval(json[0]);
@@ -55,7 +55,10 @@ export default function Home() {
       }),
     };
 
-    const response = await fetch("http://localhost:5000/api", requestOptions);
+    const response = await fetch(
+      "https://lady.onrender.com/api",
+      requestOptions
+    );
     const json = await response.json();
 
     setData(json);
@@ -66,8 +69,8 @@ export default function Home() {
   };
   const isError = formval === "";
 
-  const labels = data ? Object.keys(data) : ["ree"];
-  const values = data ? Object.values(data) : [1];
+  const labels = Object.keys(data);
+  const values = Object.values(data);
   console.log("labels", labels);
   values.sort(function (a, b) {
     return b - a;
