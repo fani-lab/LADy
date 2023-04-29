@@ -1,7 +1,6 @@
 import argparse, os, pickle, multiprocessing, json, time
 from tqdm import tqdm
-# import numpy as np
-# from json import JSONEncoder
+import numpy as np
 # import pandas as pd
 # import pytrec_eval
 # from nltk.corpus import wordnet as wn
@@ -10,21 +9,15 @@ from tqdm import tqdm
 import params
 # import visualization
 from cmn.review import Review
-# from aml.mdl import AbstractAspectModel
-# from aml.lda import Lda
-# from aml.btm import Btm
-# from aml.rnd import Rnd
-# from aml.neural import Neural
-# from aml.ctm import CTM
 
 def load(input, output):
     print('\n1. Loading reviews and preprocessing ...')
     print('#' * 50)
     try:
-        print(f'\n1.1. Loading existing processed reviews file {output}...')
+        print(f'1.1. Loading existing processed reviews file {output}...')
         with open(f'{output}', 'rb') as f: reviews = pickle.load(f)
     except (FileNotFoundError, EOFError) as e:
-        print('\n1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
+        print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
         if str(input).endswith('.xml'): reviews = SemEvalReview.xmlloader(input)
         else: reviews = SemEvalReview.txtloader(input)
@@ -43,29 +36,51 @@ def load(input, output):
         with open(output, 'wb') as f: pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
     return reviews
 
-# def split(nsample, output):
-#     from sklearn.model_selection import KFold, train_test_split
-#     train, test = train_test_split(np.arange(nsample), train_size=params.train_ratio, random_state=params.seed,
-#                                    shuffle=True)
-#
-#     splits = dict()
-#     splits['test'] = test
-#     splits['folds'] = dict()
-#     skf = KFold(n_splits=params.nfolds, random_state=params.seed, shuffle=True)
-#     for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
-#         splits['folds'][k] = dict()
-#         splits['folds'][k]['train'] = train[trainIdx]
-#         splits['folds'][k]['valid'] = train[validIdx]
-#
-#     class NumpyArrayEncoder(JSONEncoder):
-#         def default(self, obj):
-#             if isinstance(obj, np.ndarray): return obj.tolist()
-#             return JSONEncoder.default(self, obj)
-#
-#     with open(f'{output}/splits.json', 'w') as f:
-#         json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
-#     return splits
+def split(nsample, output):
+    from sklearn.model_selection import KFold, train_test_split
+    from json import JSONEncoder
 
+    train, test = train_test_split(np.arange(nsample), train_size=params.settings['train']['train_ratio'], random_state=params.seed, shuffle=True)
+
+    splits = dict()
+    splits['test'] = test
+    splits['folds'] = dict()
+    if params.settings['train']['nfolds'] == 0:
+        splits['folds'][0] = dict()
+        splits['folds'][0]['train'] = train
+        splits['folds'][0]['valid'] = []
+    elif params.settings['train']['nfolds'] == 1:
+        splits['folds'][0] = dict()
+        splits['folds'][0]['train'] = train[:len(train)//2]
+        splits['folds'][0]['valid'] = train[len(train)//2:]
+    else:
+        skf = KFold(n_splits=params.settings['train']['nfolds'], random_state=params.seed, shuffle=True)
+        for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
+            splits['folds'][k] = dict()
+            splits['folds'][k]['train'] = train[trainIdx]
+            splits['folds'][k]['valid'] = train[validIdx]
+
+    class NumpyArrayEncoder(JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray): return obj.tolist()
+            return JSONEncoder.default(self, obj)
+
+    with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
+    return splits
+
+def train(args, am, train, valid, f):
+    try:
+        model_path = f'{args.output}/{args.naspects}/{am.__class__.__name__.lower()}/'
+        print(f'2.1. Loading saved aspect model from {model_path} ...')
+        am.load(f'{model_path}/f{f}.')
+    except (FileNotFoundError, EOFError) as e:
+        print(f'2.1. Loading saved aspect model failed! Training {am.__class__.__name__.lower()} for {args.naspects} of aspects. See {model_path}/f{f}.model.train.log for training logs ...')
+        if not os.path.isdir(model_path): os.makedirs(model_path)
+        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], f'{model_path}/f{f}.')
+
+        from aml.mdl import AbstractAspectModel
+        print(f'2.2. Quality of aspects ...')
+        for q in params.settings['train'][args.am]['qualities']: print(f'({q}: {AbstractAspectModel.quality(am, q)})')
 
 # def inference(am, am_type, test, hide_percentage, output_):
 #     if am_type == 'neural':
@@ -216,69 +231,27 @@ def load(input, output):
 def main(args):
     if not os.path.isdir(args.output): os.makedirs(args.output)
     reviews = load(args.data, f'{args.output}/reviews.{".".join(params.settings["prep"]["langaug"])}.pkl'.replace('..pkl', '.pkl'))
-    return
-    #
-    # bt_reviews = load_bt(args.btdata)
-    # reviews = org_reviews + bt_reviews
-    #
-    # am_type = args.aml
-    # if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
-    #
-    # # reviews = load(args.data, args.output)
-    # splits = split(len(reviews), args.output)
-    # test = np.array(reviews)[splits['test']].tolist()
-    # for a in am_type:
-    #     fold_mean_list = [pd.DataFrame() for i in range(0, 11)]
-    #     output = f'{args.output}/{args.naspects}'
-    #     print(a)
-    #     if a == "btm":
-    #         output = f'{output}/btm/'
-    #         if not os.path.isdir(output): os.makedirs(output)
-    #     elif a == "rnd":
-    #         output = f'{output}/rnd/'
-    #         if not os.path.isdir(output): os.makedirs(output)
-    #     elif a == "lda":
-    #         output = f'{output}/lda/'
-    #         if not os.path.isdir(output): os.makedirs(output)
-    #     elif a == "ctm":
-    #         output = f'{output}/ctm/'
-    #         if not os.path.isdir(output): os.makedirs(output)
-    #     else:  # if am_type == "neural"
-    #         output = f'{output}/neural/'
-    #         if not os.path.isdir(output): os.makedirs(output)
-    #     for f in splits['folds'].keys():
-    #         output_ = f'{output}f{f}.'
-    #         model_review = np.array(reviews)[splits['folds'][f]['train']].tolist()
-    #         if a == "btm":
-    #             am = Btm(model_review, args.naspects, params.no_extremes, output_)
-    #         elif a == "rnd":
-    #             am = Rnd(model_review, args.naspects, params.no_extremes, output_)
-    #         elif a == "lda":
-    #             am = Lda(model_review, args.naspects, params.no_extremes, output_)
-    #         elif a == "ctm":
-    #             am = CTM(model_review, args.naspects, params.no_extremes, output_)
-    #         else:  # if am_type == "neural"
-    #             am = Neural(model_review, args.naspects, params.no_extremes, output_)
-    #         # training
-    #         print(f'\n2. Aspect modeling ...')
-    #         print('#' * 50)
-    #         t_s = time()
-    #         try:
-    #             print(f'2.1. Loading saved aspect model from {output} ...')
-    #             am.load()
-    #         except (FileNotFoundError, EOFError) as e:
-    #             print(
-    #                 f'2.1. Loading saved aspect model failed! Training a model for {args.naspects} of aspects. See {output_}model.train.log for training logs ...')
-    #             if a == 'neural':
-    #                 am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores,
-    #                          params.iter_c, params.seed, test)
-    #             else:
-    #                 am.train(params.doctype, multiprocessing.cpu_count() if params.cores <= 0 else params.cores,
-    #                          params.iter_c, params.seed)
-    #         print(f'2.2. Quality of aspects ...')
-    #         for q in params.qualities:
-    #             print(f'({q}: {AbstractAspectModel.quality(am, q)})')
-    #         print(f'Time elapsed: {(time() - t_s)}')
+
+    # We split originals into train, test. so each have its own augmented versions.
+    # During test, we can decide to consider augmented version or not.
+    splits = split(len(reviews), args.output)
+
+
+    print(f'\n2. Aspect modeling for {args.am} ...')
+    if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
+    if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
+    if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects)
+    if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
+    if "ctm" == args.am: from aml.ctm import CTM; am = CTM(args.naspects)
+    if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects)
+
+    for f in splits['folds'].keys():
+        t_s = time.time()
+        train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f)
+        print(f'Time elapsed: {time.time() - t_s}')
+
+    test = np.array(reviews)[splits['test']].tolist()
+
     #
     #         for i in range(0, 11):
     #             hide_percentage = i * 10
@@ -291,28 +264,38 @@ def main(args):
     #         hide_percentage = i * 10
     #         fold_mean_list[i].mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.{hide_percentage}.csv')
 
-# python -u main.py -aml lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25
-# python -u main.py -aml lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25
+
+# python -u main.py -am lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25
+# python -u main.py -am lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
-    parser.add_argument('-aml', nargs='+', type=str.lower, required=True, help='a list of aspect modeling methods (eg. --aml lda rnd btm neural ctm)')
+    parser.add_argument('-am', type=str.lower, required=True, help='aspect modeling method (eg. --am lda)')
     parser.add_argument('-data', dest='data', type=str, help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('-output', dest='output', type=str, default='../output/', help='output path, e.g., -output ../output/semeval/2016.xml')
     parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
 
     args = parser.parse_args()
 
-    main(args)
+    #main(args)
 
-    #generate seperate review pickle file for each lang including empty (no lang)
-    import copy
-    langs = copy.deepcopy(params.settings['prep']['langaug'])
-    for l in langs:
-        params.settings['prep']['langaug'] = [l]
-        main(args)
-    params.settings['prep']['langaug'] = []
-    main(args)
+    # # to run pipeline for all available aspect modeling methods
+    for am in ['rnd']:#, 'lda', 'btm', 'ctm', 'nrl']:
+        for naspects in range(5, 30, 5):
+            args.am = am
+            args.naspects = naspects
+            main(args)
+
+    # #generate seperate review pickle file for each lang including empty (no lang)
+    # import copy
+    # langs = copy.deepcopy(params.settings['prep']['langaug'])
+    # for l in langs:
+    #     params.settings['prep']['langaug'] = [l]
+    #     main(args)
+    # params.settings['prep']['langaug'] = []
+    # main(args)
+
+
 
     # aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
     #

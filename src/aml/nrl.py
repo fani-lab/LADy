@@ -27,7 +27,7 @@ import params
 from .mdl import AbstractAspectModel
 
 
-class Neural(AbstractAspectModel):
+class Nrl(AbstractAspectModel):
     def __init__(self, reviews, naspects, no_extremes, output):
         super().__init__(reviews, naspects, no_extremes, output)
 

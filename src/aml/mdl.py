@@ -1,40 +1,31 @@
 import re
 import numpy as np
-import nltk
-stop_words = nltk.corpus.stopwords.words('english')
 
 
 class AbstractAspectModel:
-    def __init__(self, reviews, naspects, no_extremes, output):
-        self.reviews = reviews
-        self.naspects = naspects
-        self.no_extremes = no_extremes
-        self.path = output
+    stop_words = None
+    def __init__(self, naspects): self.naspects = naspects
 
-    def load(self):
-        pass
-
-    def train(self, doctype, cores, iter, seed):
-        pass
-
-    def get_aspects(self, nwords):
-        pass
-
-    def infer(self, doctype, review):
-        pass
+    def load(self): pass
+    def train(self, reviews_train, reviews_valid, settings, doctype, output): pass
+    def get_aspects(self, nwords): pass
+    def infer(self, doctype, review): pass
 
     @staticmethod
-    def preprocess(doctype, reviews):
-        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews]
-        else: reviews_ = [s for r in reviews for s in r.sentences]  # doctype = 'sentence'
-        return [[word for word in doc if word not in stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_]
+    def preprocess(doctype, reviews, include_augmented=True):
+        if not AbstractAspectModel.stop_words:
+            import nltk
+            AbstractAspectModel.stop_words = nltk.corpus.stopwords.words('english')
 
+        reviews_ = []
+        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews] + [np.concatenate(r.augs[lang][1].sentences)  for r in reviews for lang in r.augs.keys()]
+        elif doctype == 'sentence': reviews_ = [s for r in reviews for s in r.sentences] + [s for r in reviews for lang in r.augs.keys() for s in r.augs[lang][1].sentences]
+        return [[word for word in doc if word not in AbstractAspectModel.stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_]
 
     @staticmethod
     def quality(model, metric):
         result = {"Coherence": f'{np.mean(model.cas)}\u00B1{np.std(model.cas)}',
-                  "Perplexity": model.perplexity
-                  }
+                  "Perplexity": model.perplexity}
         return result[metric]
         # elif metric is "perplexity":
         #     return
@@ -52,5 +43,3 @@ class AbstractAspectModel:
     #     plt.legend(loc='best')
     #     plt.savefig(f'{path}coherence.png')
     #     plt.clf()
-
-

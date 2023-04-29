@@ -13,10 +13,11 @@ dependencies:
     #python -m spacy download en_core_web_sm
   - tqdm
   - transformers==4.26.1 #needed if augmentation via backtranslation
-  - pytorch==1.13.1
-#  - gensim==4.*
+  - pytorch==1.13.1 pytorch-cuda=11.8 # the conda channel has issue, so pip3 install torch  --index-url https://download.pytorch.org/whl/cu118
+  - scikit-learn
+  - gensim==4.*
+  - nltk==3.7
 #  - matplotlib
-#  - nltk==3.7
 #  - pip:
 #    - pyLDAvis
 #    - pytrec-eval-terrier==0.5.2

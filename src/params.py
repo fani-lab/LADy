@@ -1,6 +1,7 @@
 import random, os, multiprocessing
 
-random.seed(0)
+seed = 0
+random.seed(seed)
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 settings = {
@@ -18,7 +19,13 @@ settings = {
         },
     'train': {
         'train_ratio': 0.85, # 1 - train_ratio goes to test
-        'nfolds': 5, # on the train, nfold x-valid
+        'nfolds': 0, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
+        'rnd': {'qualities': ['Coherence', 'Perplexity'],
+                'no_extremes': {
+                    'no_below': 10,  # happen less than no_below number in total
+                    'no_above': 0.9,  # happen in no_above percent of reviews
+                    },
+                },
         'lda': {'iter_c': 500, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'],
                 'no_extremes': {
                     'no_below': 10,  # happen less than no_below number in total
