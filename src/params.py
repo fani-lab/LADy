@@ -2,11 +2,12 @@ import random, os, multiprocessing
 
 seed = 0
 random.seed(seed)
+
+ncore = multiprocessing.cpu_count()
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 settings = {
     'cmd': ['prep'],                  # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
-    'ncore': multiprocessing.cpu_count(),
     'prep': {
         'doctype': 'snt', # 'rvw' ==> if 'rvw': review = [[review]] else if 'snt': review = [[subreview1], [subreview2], ...]'
         'langaug': ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn'],
@@ -19,18 +20,16 @@ settings = {
         },
     'train': {
         'train_ratio': 0.85, # 1 - train_ratio goes to test
-        'nfolds': 0, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
+        'nfolds': 5, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
         'rnd': {'qualities': ['Coherence', 'Perplexity'],
-                'no_extremes': {
-                    'no_below': 10,  # happen less than no_below number in total
-                    'no_above': 0.9,  # happen in no_above percent of reviews
-                    },
+                'no_extremes': None
+                    # {'no_below': 10,   # happen less than no_below number in total
+                    #  'no_above': 0.9}  # happen in no_above percent of reviews
                 },
-        'lda': {'iter_c': 500, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'],
-                'no_extremes': {
-                    'no_below': 10,  # happen less than no_below number in total
-                    'no_above': 0.9,  # happen in no_above percent of reviews
-                    },
+        'lda': {'passes': 1000, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
+                'no_extremes': None
+                    # {'no_below': 10,   # happen less than no_below number in total
+                    #  'no_above': 0.9}  # happen in no_above percent of reviews
                 },
         },
     'test': {},

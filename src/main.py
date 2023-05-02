@@ -280,7 +280,7 @@ if __name__ == '__main__':
     #main(args)
 
     # # to run pipeline for all available aspect modeling methods
-    for am in ['rnd']:#, 'lda', 'btm', 'ctm', 'nrl']:
+    for am in ['rnd', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
         for naspects in range(5, 30, 5):
             args.am = am
             args.naspects = naspects

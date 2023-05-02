@@ -19,7 +19,7 @@ class AbstractAspectModel:
 
         reviews_ = []
         if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews] + [np.concatenate(r.augs[lang][1].sentences)  for r in reviews for lang in r.augs.keys()]
-        elif doctype == 'sentence': reviews_ = [s for r in reviews for s in r.sentences] + [s for r in reviews for lang in r.augs.keys() for s in r.augs[lang][1].sentences]
+        elif doctype == 'snt': reviews_ = [s for r in reviews for s in r.sentences] + [s for r in reviews for lang in r.augs.keys() for s in r.augs[lang][1].sentences]
         return [[word for word in doc if word not in AbstractAspectModel.stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_]
 
     @staticmethod
