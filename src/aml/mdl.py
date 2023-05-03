@@ -12,14 +12,14 @@ class AbstractAspectModel:
     def infer(self, doctype, review): pass
 
     @staticmethod
-    def preprocess(doctype, reviews, include_augmented=True):
+    def preprocess(doctype, reviews):
         if not AbstractAspectModel.stop_words:
             import nltk
             AbstractAspectModel.stop_words = nltk.corpus.stopwords.words('english')
 
         reviews_ = []
-        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews] + [np.concatenate(r.augs[lang][1].sentences)  for r in reviews for lang in r.augs.keys()]
-        elif doctype == 'snt': reviews_ = [s for r in reviews for s in r.sentences] + [s for r in reviews for lang in r.augs.keys() for s in r.augs[lang][1].sentences]
+        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews]
+        elif doctype == 'snt': reviews_ = [s for r in reviews for s in r.sentences]
         return [[word for word in doc if word not in AbstractAspectModel.stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_]
 
     @staticmethod

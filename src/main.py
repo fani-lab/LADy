@@ -1,10 +1,11 @@
 import argparse, os, pickle, multiprocessing, json, time
 from tqdm import tqdm
-import numpy as np
-# import pandas as pd
-# import pytrec_eval
-# from nltk.corpus import wordnet as wn
-# import random
+import numpy as np, random, pandas as pd
+
+import pytrec_eval
+from nltk.corpus import wordnet as wn
+# import nltk
+# nltk.download('omw-1.4')
 
 import params
 # import visualization
@@ -68,136 +69,107 @@ def split(nsample, output):
     with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
-def train(args, am, train, valid, f):
+def train(args, am, train, valid, f, output):
     try:
-        model_path = f'{args.output}/{args.naspects}/{am.__class__.__name__.lower()}/'
-        print(f'2.1. Loading saved aspect model from {model_path} ...')
-        am.load(f'{model_path}/f{f}.')
+        print(f'2.1. Loading saved aspect model from {output} ...')
+        am.load(f'{output}/f{f}.')
     except (FileNotFoundError, EOFError) as e:
-        print(f'2.1. Loading saved aspect model failed! Training {am.__class__.__name__.lower()} for {args.naspects} of aspects. See {model_path}/f{f}.model.train.log for training logs ...')
-        if not os.path.isdir(model_path): os.makedirs(model_path)
-        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], f'{model_path}/f{f}.')
+        print(f'2.1. Loading saved aspect model failed! Training {am.__class__.__name__.lower()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
+        if not os.path.isdir(output): os.makedirs(output)
+        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], f'{output}/f{f}.')
 
         from aml.mdl import AbstractAspectModel
         print(f'2.2. Quality of aspects ...')
         for q in params.settings['train'][args.am]['qualities']: print(f'({q}: {AbstractAspectModel.quality(am, q)})')
 
-# def inference(am, am_type, test, hide_percentage, output_):
-#     if am_type == 'neural':
-#         with open(f'{output_}ridx.pkl', 'rb') as f:
-#             ridx = pickle.load(f)
-#     print(f'\n3. Evaluating on test set ...')
-#     print('#' * 50)
-#     pairs = []
-#     r_list = []
-#     r_aspect_list = []
-#     idx = 0
-#     for r_idx, r in enumerate(test):
-#         r_aspects = [[w for a, o, s in sent for w in a] for sent in
-#                      r.get_aos()]  # [['service', 'food'], ['service'], ...]
-#         if len(r_aspects[0]) == 0:
-#             continue
-#         if random.random() < hide_percentage:
-#             r_ = r.hide_aspects()
-#         else:
-#             r_ = r
-#         r_list.append(r_)
-#         r_aspect_list.append(r_aspects)
-#         if am_type == "ctm":
-#             continue
-#         elif am_type == 'neural':
-#             if r_idx in ridx:
-#                 continue
-#             r_pred_aspects = am.infer(params.doctype, r_, idx)
-#         else:
-#             r_pred_aspects = am.infer(params.doctype, r_)
-#
-#         if am_type == "btm" or am_type == "neural":
-#             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-#                 subr_pred_aspects_words = [w_p for l in
-#                                            [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in
-#                                             subr_pred_aspects] for w_p in l]
-#                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
-#                 pairs.append((r_aspects[i], subr_pred_aspects_words))
-#             pass
-#         elif am_type == "rnd":
-#             for i in range(len(r_aspects)):
-#                 pairs.append((r_aspects[i], r_pred_aspects))
-#         else:  # "lda" in am_type:
-#             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-#                 subr_pred_aspects_words = [w_p for l in
-#                                            [[(w, a_p * w_p) for w, w_p in am.mdl.show_topic(a, topn=params.nwords)] for
-#                                             a, a_p in subr_pred_aspects] for w_p in l]
-#                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
-#                 # removing duplicate aspect words ==> handled in metrics()
-#                 pairs.append((r_aspects[i], subr_pred_aspects_words))
-#         idx += 1
-#
-#     if am_type == "ctm":
-#         r_pred_aspects = am.infer(params.doctype, r_list)
-#         r_aspect_list_extended = []
-#         for r in r_aspect_list:
-#             r_aspect_list_extended.extend(r)
-#         for i, subr_pred_aspects in enumerate(r_pred_aspects):
-#             subr_pred_aspects_words = [w_p for l in
-#                                        [[(w, a_p * w_p) for w, w_p in am.show_topic(a, params.nwords)] for a, a_p in
-#                                         subr_pred_aspects] for w_p in l]
-#             subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
-#             pairs.append((r_aspect_list_extended[i], subr_pred_aspects_words))
-#     return pairs
+def test(am, test, f, output):
+    try:
+        print(f'\n3. Loading saved predictions on test set from {output}f{f}.model.pred.{params.settings["test"]["h_ratio"]} ...')
+        with open(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}', 'rb') as f: return pickle.load(f)
+    except (FileNotFoundError, EOFError) as e:
+        print(f'\n3. Loading saved predictions on test set failed! Predicting on the test set with {params.settings["test"]["h_ratio"] * 100}% latent aspect ...')
+        print('#' * 50)
 
+        print(f'3.1. Loading saved aspect model from {output}f{f}.model ...')
+        am.load(f'{output}/f{f}.')
 
-# def evaluate(am_type, syn_status, pairs):
-#     metrics_set = set()
-#     for m in params.metrics:
-#         metrics_set.add(f'{m}_{params.topkstr}')
-#     qrel = dict();
-#     run = dict()
-#     print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
-#     for i, pair in enumerate(pairs):
-#         if syn_status == 'yes':
-#             syn_list = set()
-#             for p_instance in pair[0]:
-#                 syn_list.add(p_instance)
-#                 for syn in wn.synsets(p_instance):
-#                     for lemma in syn.lemmas():
-#                         syn_list.add(lemma.name())
-#             qrel['q' + str(i)] = {w: 1 for w in syn_list}
-#         else:
-#             qrel['q' + str(i)] = {w: 1 for w in pair[0]}
-#         # the prediction list may have duplicates
-#         run['q' + str(i)] = {}
-#         if "btm" in am_type or "lda" in am_type or "neural" in am_type or "ctm" in am_type:
-#             # print(pair[1])
-#             for j, (w, p) in enumerate(pair[1]):
-#                 if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
-#         else:  # rnd
-#             # print(pair[1])
-#             for j in range(len(pair[1])):
-#                 # print(pair[1][j])
-#                 run['q' + str(i)][pair[1][j]] = len(pair[1]) - j
-#     print(f'3.2. Calling pytrec_eval for {metrics_set} ...')
-#     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(
-#         run))  # qrel should not have empty entry otherwise get exception
-#     print(f'3.3. Averaging ...')
-#     df_mean = df.mean(axis=1).to_frame('mean')
-#     return df_mean
-#
-#
-# def load_bt(dataset_path):
-#     # df = Review.save_sentences(reviews, path)
-#     dataset_df = pd.read_csv(f'{dataset_path}')
-#     bt_reviews = dataset_df['sentences'].tolist()
-#     bt_labels = dataset_df['labels'].tolist()
-#     reviews_list = []
-#     for i in range(len(bt_reviews)):
-#         reviews_list.append(
-#             Review(id=i, sentences=[[str(t).lower() for t in bt_reviews[i].split()]], time=None,
-#                    author=None, aos=[[(label, [], 0) for label in eval(bt_labels[i])]], lempos=""))
-#
-#     return reviews_list
-#
-#
+        # # ???
+        # if am.__class__.__name__.lower() == 'nrl': #isinstance(am, Nrl):
+        #     with open(f'{output}ridx.pkl', 'rb') as f: ridx = pickle.load(f)
+        # ######
+
+        pairs = []
+        r_list = []
+        r_aspect_list = []
+
+        # Since predicted aspects are distributions over words, we need to flatten them into list of words.
+        # Given a and b are two aspects, we do prob(a) * prob(a_w) for all w \in a and prob(b) * prob(b_w) for all w \in b
+        # Then sort.
+        def rank_pairs(r_aspects, r_pred_aspects):
+            nwords = params.settings['train'][am.__class__.__name__.lower()]['nwords']
+            for i, subr_pred_aspects in enumerate(r_pred_aspects):
+                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_aspect(a, nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
+                # removing duplicate aspect words ==> handled in metrics()
+                pairs.append((r_aspects[i], subr_pred_aspects_words))
+
+        idx = 0
+        for r_idx, r in enumerate(test):
+            r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+            if len(r_aspects[0]) == 0: continue #??
+            if random.random() < params.settings['test']['h_ratio']: r_ = r.hide_aspects()
+            else: r_ = r
+            r_list.append(r_)
+            r_aspect_list.append(r_aspects)
+
+            # # ???
+            # if am.__class__.__name__.lower() == 'ctm': continue #see below
+            # elif am.__class__.__name__.lower() == 'nrl':
+            #     if r_idx in ridx: continue
+            #     r_pred_aspects = am.infer(params.settings['prep']['doctype'], r_, idx)
+            # ######
+            # else:
+            r_pred_aspects = am.infer(params.settings['prep']['doctype'], r_)
+            rank_pairs(r_aspects, r_pred_aspects)
+            idx += 1
+
+        # # ???
+        # if am.__class__.__name__.lower() == 'ctm':
+        #     r_pred_aspects = am.infer(params.settings['prep']['doctype'], r_list)
+        #     r_aspect_list_extended = []
+        #     for r in r_aspect_list: r_aspect_list_extended.extend(r)
+        #     rank_pairs(r_aspect_list_extended, r_pred_aspects)
+        # ######
+
+        with open(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}', 'wb') as f: pickle.dump(pairs, f, protocol=pickle.HIGHEST_PROTOCOL)
+        return pairs
+
+def evaluate(input, output):
+    with open(input, 'rb') as f: pairs = pickle.load(f)
+    metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
+    qrel = dict(); run = dict()
+    print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
+    for i, pair in enumerate(pairs):
+        if params.settings['eval']['syn']:
+            syn_list = set()
+            for p_instance in pair[0]:
+                syn_list.add(p_instance)
+                syn_list.update(set([lemma.name() for syn in wn.synsets(p_instance) for lemma in syn.lemmas()]))
+            qrel['q' + str(i)] = {w: 1 for w in syn_list}
+        else: qrel['q' + str(i)] = {w: 1 for w in pair[0]}
+
+        # the prediction list may have duplicates
+        run['q' + str(i)] = {}
+        for j, (w, p) in enumerate(pair[1]):
+            if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
+
+    print(f'3.2. Calling pytrec_eval for {metrics_set} ...')
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))  # qrel should not have empty entry otherwise get exception
+    print(f'3.3. Averaging ...')
+    df_mean = df.mean(axis=1).to_frame('mean')
+    df_mean.to_csv(output)
+    return df_mean
+
 # def aggregate(path, save_path, naspects):
 #     if os.path.isdir(path):
 #         # given a root folder, we can crawl the folder to find pred files
@@ -227,7 +199,6 @@ def train(args, am, train, valid, f):
 #     all_results.to_csv(f'{save_path}/{naspects}aspects.agg.pred.eval.mean.csv')
 #     return all_results
 
-
 def main(args):
     if not os.path.isdir(args.output): os.makedirs(args.output)
     reviews = load(args.data, f'{args.output}/reviews.{".".join(params.settings["prep"]["langaug"])}.pkl'.replace('..pkl', '.pkl'))
@@ -236,34 +207,31 @@ def main(args):
     # During test, we can decide to consider augmented version or not.
     splits = split(len(reviews), args.output)
 
-
     print(f'\n2. Aspect modeling for {args.am} ...')
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
     if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
     if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects)
     if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
-    if "ctm" == args.am: from aml.ctm import CTM; am = CTM(args.naspects)
+    if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects)
     if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects)
 
+    output = f'{args.output}/{args.naspects}/{am.__class__.__name__.lower()}/'
+    # training
     for f in splits['folds'].keys():
         t_s = time.time()
-        train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f)
+        train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
         print(f'Time elapsed: {time.time() - t_s}')
 
-    test = np.array(reviews)[splits['test']].tolist()
+    # testing
+    for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
 
-    #
-    #         for i in range(0, 11):
-    #             hide_percentage = i * 10
-    #             hp = i / 10
-    #             pairs = inference(am, a, test, hp, output_)
-    #             df_mean = evaluate(a, args.syn, pairs)
-    #             df_mean.to_csv(f'{output_}pred.eval.mean.{hide_percentage}.csv')
-    #             fold_mean_list[i] = pd.concat([fold_mean_list[i], df_mean], axis=1)
-    #     for i in range(0, 11):
-    #         hide_percentage = i * 10
-    #         fold_mean_list[i].mean(axis=1).to_frame('mean').to_csv(f'{output}/pred.eval.mean.{hide_percentage}.csv')
-
+    # evaluating
+    df_f_means = pd.DataFrame()
+    for f in splits['folds'].keys():
+        input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
+        df_mean = evaluate(input, f'{input}.eval.mean.csv')
+        df_f_means = pd.concat([df_f_means, df_mean], axis=1)
+    df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
 # python -u main.py -am lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25
 # python -u main.py -am lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25
@@ -274,68 +242,21 @@ if __name__ == '__main__':
     parser.add_argument('-data', dest='data', type=str, help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
     parser.add_argument('-output', dest='output', type=str, default='../output/', help='output path, e.g., -output ../output/semeval/2016.xml')
     parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
-
     args = parser.parse_args()
 
-    #main(args)
-
-    # # to run pipeline for all available aspect modeling methods
-    for am in ['rnd', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
-        for naspects in range(5, 30, 5):
-            args.am = am
-            args.naspects = naspects
-            main(args)
-
-    # #generate seperate review pickle file for each lang including empty (no lang)
-    # import copy
-    # langs = copy.deepcopy(params.settings['prep']['langaug'])
-    # for l in langs:
-    #     params.settings['prep']['langaug'] = [l]
-    #     main(args)
-    # params.settings['prep']['langaug'] = []
     # main(args)
 
-
+    # to run pipeline for all available aspect modeling methods
+    for am in ['lda', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
+        for naspects in range(5, 30, 5):
+            for hide in range(0, 110, 10):
+                args.am = am
+                args.naspects = naspects
+                params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
+                main(args)
 
     # aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
-    #
-    # for lang in ['Chinese', 'German', 'Arabic', 'French', 'Spanish', 'All']:
-    #     if lang == 'Chinese':
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/Chinese.back-translated.with-labels.csv'
-    #     elif lang == 'German':
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/German.back-translated.with-labels.csv'
-    #     elif lang == 'Arabic':
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/Arabic.back-translated.with-labels.csv'
-    #     elif lang == 'French':
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/French.back-translated.with-labels.csv'
-    #     elif lang == 'Spanish':
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/Spanish.back-translated.with-labels.csv'
-    #     else:  # 'All'
-    #         args.btdata = '../output/augmentation-R-16/augmented-with-labels/All.back-translated.with-labels.csv'
-    #     args.aml = ['rnd', 'btm', 'lda', 'neural']
-    #     args.data = '../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'
-    #     args.output = f'../output/{lang}/Semeval-2016+'
-    #     args.syn = 'yes'
-    #     topic_range = range(0, 51, 5)
-    #     for naspects in topic_range:
-    #         if naspects == 0:
-    #             naspects = 1
-    #         args.naspects = naspects
-    #         main(args)
-    #         aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
-
-    # for p in ['../data/raw/semeval/2016SB5/`ABSA16_Restaurants_Train_SB1_v2.xml', '../data/raw/semeval/2016.txt']:
-    #     args.aml = ['btm', 'lda', 'rnd', 'ctm']
-    #     args.data = p
-    #     if str(p).endswith('.xml'):
-    #         args.output = f'../output/semeval-2016-full/xml-version'
-    #     else:
-    #         args.output = f'../output/semeval-2016-full/txt-version'
-    #     topic_range = range(1, 51, 1)
-    #     for naspects in topic_range:
-    #         args.naspects = naspects
-    #         main(args)
-    #     # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
+        # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
     #     visualization.plots_3d(args.output, topic_range)
 
 

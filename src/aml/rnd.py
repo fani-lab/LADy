@@ -20,12 +20,13 @@ class Rnd(AbstractAspectModel):
         self.cas = 0.00
         self.perplexity = 0.00
         self.dict.save(f'{output}model.dict')
+
         with open(f'{output}model.perf.cas', 'wb') as f: pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'{output}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def infer(self, doctype, review):
-        review_aspects = list(self.dict.token2id.keys())
-        random.shuffle(review_aspects)
-        return review_aspects
+        review_ = super().preprocess(doctype, [review])
+        return [[(0, 1)] for r in review_]
 
+    def show_aspect(self, topic_id, nwords): return [(i, 1) for i in random.sample(self.dict.token2id.keys(), min(nwords, len(self.dict)))]
 

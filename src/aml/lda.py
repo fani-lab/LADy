@@ -59,10 +59,13 @@ class Lda(AbstractAspectModel):
                     words[-1].append(word_prob.replace('"', ''))
         return words, probs
 
+    def show_aspect(self, topic_id, nwords): return self.mdl.show_topic(topic_id, nwords)
+
     def infer(self, doctype, review):
         review_aspects = []
         review_ = super().preprocess(doctype, [review])
         for r in review_: review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
         return review_aspects
+
 
 

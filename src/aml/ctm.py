@@ -17,7 +17,7 @@ import params
 from .mdl import AbstractAspectModel
 
 
-class CTM(AbstractAspectModel):
+class Ctm(AbstractAspectModel):
     def __init__(self, reviews, naspects, no_extremes, output):
         super().__init__(reviews, naspects, no_extremes, output)
 
@@ -98,8 +98,7 @@ class CTM(AbstractAspectModel):
         preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices = sp.preprocess()
         return preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices
 
-    def show_topic(self, topic_id, nwords):
-        return self.mdl.get_word_distribution_by_topic_id(topic_id)[0:nwords]
+    def show_topic(self, topic_id, nwords): return self.mdl.get_word_distribution_by_topic_id(topic_id)[0:nwords]
 
     def infer(self, doctype, review):
         # doc = [' '.join(text) for text in review]

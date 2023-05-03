@@ -1,18 +1,15 @@
 What's the difference between train_V2 and the train files in semeval folders?
-We can consider ,aspect, category as ,latent, since no where they occurre?!
-Need to show the distribution in each class?
-
+We can consider ,aspect, category as ,latent, since no where they occurr?!
 
 Next:
 - skip: word alignment
 - skip: semantic context
-- *train: check all models
-- test
-- eval
-
+- train: skip models btn, ctm, nrl, brt
+- test: I need to talk to Farinam for ctm and nrl
+- *aggregate
 
 add category to review objects
-split: stratified on category, but how about aspect term? we cannot do as term could be anything!
+split: stratified on category, but how about aspect term? we cannot do since term could be anything!
 
 
 python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 &
