@@ -38,6 +38,9 @@ def load(input, output):
     return reviews
 
 def split(nsample, output):
+    # We split originals into train, valid, test. So each have its own augmented versions.
+    # During test (or even train), we can decide to consider augmented version or not.
+
     from sklearn.model_selection import KFold, train_test_split
     from json import JSONEncoder
 
@@ -170,42 +173,29 @@ def evaluate(input, output):
     df_mean.to_csv(output)
     return df_mean
 
-# def aggregate(path, save_path, naspects):
-#     if os.path.isdir(path):
-#         # given a root folder, we can crawl the folder to find pred files
-#         files = list()
-#         for dirpath, dirnames, filenames in os.walk(path): files += [
-#             os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if
-#             file.startswith("pred")]
-#
-#     column_names = []
-#     for i in range(len(files)):
-#         p = ".".join(files[i]).replace('.csv', '').replace('...output.', '')
-#         column_names.append(p)
-#     column_names.insert(0, 'metric')
-#
-#     f_path = []
-#     all_results = pd.DataFrame()
-#     for i in range(len(files)):
-#         p = "\\".join(files[i])
-#         f_path.append(p)
-#         df = pd.read_csv(p)
-#         if i == 0:
-#             all_results = df
-#         else:
-#             all_results = pd.concat([all_results, df['mean']], axis=1)
-#
-#     all_results.columns = column_names
-#     all_results.to_csv(f'{save_path}/{naspects}aspects.agg.pred.eval.mean.csv')
-#     return all_results
+def agg(path, output):
+    files = list()
+    for dirpath, dirnames, filenames in os.walk(path): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.startswith("model.pred.eval.mean")]
+
+    column_names = []
+    for f in files:
+        p = ".".join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
+        column_names.append(p)
+    column_names.insert(0, 'metric')
+
+    all_results = pd.DataFrame()
+    for i, f in enumerate(files):
+        df = pd.read_csv(os.sep.join(f))
+        if i == 0: all_results = df
+        else: all_results = pd.concat([all_results, df['mean']], axis=1)
+
+    all_results.columns = column_names
+    all_results.to_csv(f'{output}/agg.pred.eval.mean.csv', index=False)
+    return all_results
 
 def main(args):
     if not os.path.isdir(args.output): os.makedirs(args.output)
     reviews = load(args.data, f'{args.output}/reviews.{".".join(params.settings["prep"]["langaug"])}.pkl'.replace('..pkl', '.pkl'))
-
-    # We split originals into train, test. so each have its own augmented versions.
-    # During test, we can decide to consider augmented version or not.
-    splits = split(len(reviews), args.output)
 
     print(f'\n2. Aspect modeling for {args.am} ...')
     if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
@@ -216,22 +206,25 @@ def main(args):
     if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects)
 
     output = f'{args.output}/{args.naspects}/{am.__class__.__name__.lower()}/'
-    # training
-    for f in splits['folds'].keys():
-        t_s = time.time()
-        train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
-        print(f'Time elapsed: {time.time() - t_s}')
+    splits = split(len(reviews), args.output)
+    if 'train' in params.settings['cmd']:
+        for f in splits['folds'].keys():
+            t_s = time.time()
+            train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
+            print(f'Time elapsed: {time.time() - t_s}')
 
     # testing
-    for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
+    if 'test' in params.settings['cmd']:
+        for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
 
     # evaluating
-    df_f_means = pd.DataFrame()
-    for f in splits['folds'].keys():
-        input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
-        df_mean = evaluate(input, f'{input}.eval.mean.csv')
-        df_f_means = pd.concat([df_f_means, df_mean], axis=1)
-    df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
+    if 'eval' in params.settings['cmd']:
+        df_f_means = pd.DataFrame()
+        for f in splits['folds'].keys():
+            input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
+            df_mean = evaluate(input, f'{input}.eval.mean.csv')
+            df_f_means = pd.concat([df_f_means, df_mean], axis=1)
+        df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
 # python -u main.py -am lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25
 # python -u main.py -am lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25
@@ -247,17 +240,23 @@ if __name__ == '__main__':
     # main(args)
 
     # to run pipeline for all available aspect modeling methods
-    for am in ['lda', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
-        for naspects in range(5, 30, 5):
-            for hide in range(0, 110, 10):
-                args.am = am
-                args.naspects = naspects
-                params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                main(args)
+    datasets = [('../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'),
+                ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml'),
+                ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
+                ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')]
 
-    # aggregate(path=args.output, save_path=f'{args.output}/{args.naspects}', naspects=args.naspects)
-        # visualization.plots_2d(args.output, 100, len(params.metrics), topic_range)
-    #     visualization.plots_3d(args.output, topic_range)
+    for (data, output) in datasets:
+        for am in ['rnd', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
+            for naspects in range(5, 30, 5):
+                for hide in range(0, 110, 10):
+                    args.am = am
+                    args.data = data
+                    args.output = output
+                    args.naspects = naspects
+                    params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
+                    main(args)
+
+    if 'agg' in params.settings['cmd']: agg(args.output, args.output)
 
 
 
