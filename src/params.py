@@ -22,7 +22,7 @@ settings = {
         },
     'train': {
         'train_ratio': 0.85, # 1 - train_ratio goes to test
-        'nfolds': 1, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
+        'nfolds': 5, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
         'rnd': {'nwords': 20, 'qualities': ['Coherence', 'Perplexity'],
                 'no_extremes': None
                     # {'no_below': 10,   # happen less than no_below number in total
