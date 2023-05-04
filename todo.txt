@@ -4,10 +4,12 @@ We can consider ,aspect, category as ,latent, since no where they occurr?!
 Next:
 - skip: word alignment
 - skip: semantic context
-- skip: train: skip models btn, ctm, nrl, brt
+- skip: train: skip models ctm, nrl, brt
 - skip: test: I need to talk to Farinam for ctm and nrl
 
-- bug in loader for get_aos()
+- training+test w/ augmentation
+    - where to put the aos of back-translated version (we can assume same aos as the parent)
+
 - *visualization
 
 Training sets:
@@ -21,9 +23,7 @@ baselines on
 add category to review objects
 split: stratified on category, but how about aspect term? we cannot do since term could be anything!
 
-python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 &
 python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml &
-
 python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml -output ../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml &
 python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml -output ../output/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml &
 python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml &

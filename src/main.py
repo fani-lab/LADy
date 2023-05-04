@@ -79,7 +79,7 @@ def train(args, am, train, valid, f, output):
     except (FileNotFoundError, EOFError) as e:
         print(f'2.1. Loading saved aspect model failed! Training {am.__class__.__name__.lower()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
-        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], f'{output}/f{f}.')
+        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], params.settings['prep']['langaug'], f'{output}/f{f}.')
 
         from aml.mdl import AbstractAspectModel
         print(f'2.2. Quality of aspects ...')
@@ -111,7 +111,7 @@ def test(am, test, f, output):
         def rank_pairs(r_aspects, r_pred_aspects):
             nwords = params.settings['train'][am.__class__.__name__.lower()]['nwords']
             for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.show_aspect(a, nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
+                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.get_aspect(a, nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
                 subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
                 # removing duplicate aspect words ==> handled in metrics()
                 pairs.append((r_aspects[i], subr_pred_aspects_words))
@@ -246,7 +246,7 @@ if __name__ == '__main__':
                 ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')]
 
     for (data, output) in datasets:
-        for am in ['rnd', 'lda']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
+        for am in ['rnd', 'lda', 'btm']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
             for naspects in range(5, 30, 5):
                 for hide in range(0, 110, 10):
                     args.am = am

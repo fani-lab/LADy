@@ -20,7 +20,7 @@ dependencies:
 #  - matplotlib
   - pip:
     - pytrec-eval-terrier
+    - bitermplus==0.6.10 #install it if you want to use btm model in the topic modeling layer
 #    - pyLDAvis
-#    - bitermplus==0.6.10 #install it if you want to use btm model in the topic modeling layer
 #    - seaborn==0.12.2
 #    - simalign==0.3

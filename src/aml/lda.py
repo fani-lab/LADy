@@ -14,7 +14,7 @@ class Lda(AbstractAspectModel):
         with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, output):
+    def train(self, reviews_train, reviews_valid, settings, doctype, langaug, output):
         reviews_ = super().preprocess(doctype, reviews_train)
         self.dict = gensim.corpora.Dictionary(reviews_)
         if settings['no_extremes']: self.dict.filter_extremes(no_below=settings['no_extremes']['no_below'], no_above=settings['no_extremes']['no_above'], keep_n=100000)
@@ -28,6 +28,7 @@ class Lda(AbstractAspectModel):
         # convergence_logger = ConvergenceMetric(logger='shell')
         # coherence_cv_logger = CoherenceMetric(corpus=corpus, logger='shell', coherence='c_v', texts=reviews_)
         # self.model = gensim.models.wrappers.LdaMallet(mallet, corpus, num_topics=self.naspects, id2word=self.dict, workers=cores, iterations=iter, callback=)
+        # alpha=symetric, i.e., 1/#topics, beta=0.01
         self.mdl = gensim.models.ldamulticore.LdaMulticore(corpus, num_topics=self.naspects, id2word=self.dict, workers=settings['ncore'], passes=settings['passes'], random_state=settings['seed'], per_word_topics=True)
 
         # TODO: quality diagram ==> https://www.meganstodel.com/posts/callbacks/
@@ -59,7 +60,7 @@ class Lda(AbstractAspectModel):
                     words[-1].append(word_prob.replace('"', ''))
         return words, probs
 
-    def show_aspect(self, topic_id, nwords): return self.mdl.show_topic(topic_id, nwords)
+    def get_aspect(self, topic_id, nwords): return self.mdl.show_topic(topic_id, nwords)
 
     def infer(self, doctype, review):
         review_aspects = []

@@ -95,6 +95,6 @@ class SemEvalReview(Review):
             for j, idx in enumerate(idxlist): tokens[idx] = aspect_token.split()[j]
             aos[i] = (idxlist, o, s)
         return Review(id=id, sentences=[[str(t).lower() for t in tokens]], time=None, author=None,
-                      aos=aos, lempos=None,
+                      aos=[aos], lempos=None,
                       parent=None, lang='eng_Latn') if aos else None
 
