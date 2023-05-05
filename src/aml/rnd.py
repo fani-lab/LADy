@@ -10,7 +10,7 @@ class Rnd(AbstractAspectModel):
         with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, langaug, output):
+    def train(self, reviews_train, reviews_valid, settings, doctype, output):
         reviews_ = super().preprocess(doctype, reviews_train)
         self.dict = gensim.corpora.Dictionary(reviews_)
         if settings['no_extremes']: self.dict.filter_extremes(no_below=settings['no_extremes']['no_below'], no_above=settings['no_extremes']['no_above'], keep_n=100000)

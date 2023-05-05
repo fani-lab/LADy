@@ -19,6 +19,7 @@ class AbstractAspectModel:
                                              for a, a_p in subr_pred_aspects]
                                    for w_p in l]
             result.append(sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1]))
+        return result
 
     @staticmethod
     def preprocess(doctype, reviews):

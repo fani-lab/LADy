@@ -25,14 +25,22 @@ def load(input, output):
         print(f'(#reviews: {len(reviews)})')
         print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
         for lang in params.settings['prep']['langaug']:
-            print(f'\n{lang} ...')
-            if params.settings["prep"]['batch']:
-                start = time.time()
-                Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
-                end = time.time()
-                print(f'{lang} done all at once (batch). Time: {end - start}')
-            else:
-                for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
+            if lang:
+                print(f'\n{lang} ...')
+                if params.settings['prep']['batch']:
+                    start = time.time()
+                    Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
+                    end = time.time()
+                    print(f'{lang} done all at once (batch). Time: {end - start}')
+                else:
+                    for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
+
+            # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
+            output_ = output
+            for l in params.settings['prep']['langaug']:
+                if l and l != lang: output_ = output_.replace(f'{l}.', '')
+            with open(output_, 'wb') as f: pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
+
         print(f'\n1.3. Saving processed pickle file {output}...')
         with open(output, 'wb') as f: pickle.dump(reviews, f, protocol=pickle.HIGHEST_PROTOCOL)
     return reviews
@@ -79,7 +87,7 @@ def train(args, am, train, valid, f, output):
     except (FileNotFoundError, EOFError) as e:
         print(f'2.1. Loading saved aspect model failed! Training {am.__class__.__name__.lower()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
-        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], params.settings['prep']['langaug'], f'{output}/f{f}.')
+        am.train(train, valid, params.settings['train'][args.am], params.settings['prep']['doctype'], f'{output}/f{f}.')
 
         from aml.mdl import AbstractAspectModel
         print(f'2.2. Quality of aspects ...')
@@ -148,7 +156,7 @@ def evaluate(input, output):
     with open(input, 'rb') as f: pairs = pickle.load(f)
     metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
     qrel = dict(); run = dict()
-    print(f'3.1. Building pytrec_eval input for {len(pairs)} instances ...')
+    print(f'\n4. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
         if params.settings['eval']['syn']:
             syn_list = set()
@@ -163,14 +171,15 @@ def evaluate(input, output):
         for j, (w, p) in enumerate(pair[1]):
             if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
 
-    print(f'3.2. Calling pytrec_eval for {metrics_set} ...')
+    print(f'4.1. Calling pytrec_eval for {metrics_set} ...')
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))  # qrel should not have empty entry otherwise get exception
-    print(f'3.3. Averaging ...')
+    print(f'4.2. Averaging ...')
     df_mean = df.mean(axis=1).to_frame('mean')
     df_mean.to_csv(output)
     return df_mean
 
 def agg(path, output):
+    print(f'\n5. Aggregating results in {path} in {output} ...')
     files = list()
     for dirpath, dirnames, filenames in os.walk(path): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.startswith("model.pred.eval.mean")]
 
@@ -192,23 +201,27 @@ def agg(path, output):
 
 def main(args):
     if not os.path.isdir(args.output): os.makedirs(args.output)
-    reviews = load(args.data, f'{args.output}/reviews.{".".join(params.settings["prep"]["langaug"])}.pkl'.replace('..pkl', '.pkl'))
+    langaug_str = '.'.join([l for l in params.settings['prep']['langaug'] if l])
+    reviews = load(args.data, f'{args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'))
+    splits = split(len(reviews), args.output)
+    output = f'{args.output}/{args.naspects}.{langaug_str}'
 
     print(f'\n2. Aspect modeling for {args.am} ...')
-    if not os.path.isdir(f'{args.output}/{args.naspects}'): os.makedirs(f'{args.output}/{args.naspects}')
+    if not os.path.isdir(output): os.makedirs(output)
     if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
     if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects)
     if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
     if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects)
     if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects)
+    output = f'{output}/{am.__class__.__name__.lower()}/'
 
-    output = f'{args.output}/{args.naspects}/{am.__class__.__name__.lower()}/'
-    splits = split(len(reviews), args.output)
     if 'train' in params.settings['cmd']:
         for f in splits['folds'].keys():
             t_s = time.time()
-            train(args, am, np.array(reviews)[splits['folds'][f]['train']].tolist(), np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
-            print(f'Time elapsed: {time.time() - t_s}')
+            reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
+            reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
+            train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
+            print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
 
     # testing
     if 'test' in params.settings['cmd']:
@@ -235,28 +248,45 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # main(args)
+    # if 'agg' in params.settings['cmd']: agg(args.output, args.output)
 
-    # to run pipeline for all available aspect modeling methods
-    datasets = [('../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'),
-                ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml'),
-                ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
-                ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')]
+    #################################################################
+    # experiments ...
+    # to run pipeline for datasets * baselines * naspects * hide_ratios
+    # datasets = [('../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'),
+    #             ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml'),
+    #             ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
+    #             ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    #             ]
+
+    datasets = [('../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'),
+                # ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml'),
+                # ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
+                # ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+                ]
 
     for (data, output) in datasets:
-        for am in ['rnd', 'lda', 'btm']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
-            for naspects in range(5, 30, 5):
-                for hide in range(0, 110, 10):
-                    args.am = am
-                    args.data = data
-                    args.output = output
-                    args.naspects = naspects
-                    # # to train on entire dataset only
-                    # params.settings['train']['train_ratio'] = 0.999
-                    # params.settings['train']['nfolds'] = 0
-                    params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                    main(args)
-
-    if 'agg' in params.settings['cmd']: agg(args.output, args.output)
+        args.data = data
+        args.output = output
+        params.settings['prep']['langaug'] = ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
+        params.settings['cmd'] = ['prep']
+        main(args)
+        langs = params.settings['prep']['langaug'].copy()
+        langs.extend([params.settings['prep']['langaug']])
+        for lang in langs:
+            params.settings['prep']['langaug'] = lang if isinstance(lang, list) else [lang]
+            for am in ['rnd']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
+                for naspects in range(5, 30, 5):
+                    for hide in range(0, 110, 10):
+                        args.am = am
+                        args.naspects = naspects
+                        # # to train on entire dataset only
+                        # params.settings['train']['train_ratio'] = 0.999
+                        # params.settings['train']['nfolds'] = 0
+                        params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
+                        params.settings['cmd'] = ['prep', 'train', 'test', 'eval', 'agg']
+                        main(args)
+            if 'agg' in params.settings['cmd']: agg(args.output, args.output)
 
 
 

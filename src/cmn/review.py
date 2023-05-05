@@ -1,8 +1,9 @@
-import pandas as pd
-import copy
+import pandas as pd, copy
+from scipy.spatial.distance import cosine
 
 class Review(object):
     translator_mdl = None; translator_tokenizer = None
+    semantic_mdl = None
     def __init__(self, id, sentences, time, author, aos, lempos, parent=None, lang='eng_Latn'):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
@@ -53,11 +54,21 @@ class Review(object):
         Review.back_translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
 
         translated_txt = Review.translator(self.get_txt())[0]['translation_text']
+        translated_obj = Review(self.id, [[str(t).lower() for t in translated_txt.split()]], None, None, None, None, self, tgt)
+
         back_translated_txt = Review.back_translator(translated_txt)[0]['translation_text']
-        self.augs[tgt] = (
-                Review(self.id, [[str(t).lower() for t in translated_txt.split()]], None, None, None, None, self, tgt),
-                Review(self.id, [[str(t).lower() for t in back_translated_txt.split()]], None, None, None, None, self, src))
+        back_translated_obj = Review(self.id, [[str(t).lower() for t in back_translated_txt.split()]], None, None, None, None, self, src)
+
+        self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
         return self.augs[tgt]
+
+    def semsim(self, other):
+        if not Review.semantic_mdl:
+            from sentence_transformers import SentenceTransformer
+            Review.semantic_mdl = SentenceTransformer("johngiorgi/declutr-small")
+        me, you = Review.semantic_mdl.encode([self.get_txt(), other.get_txt()])
+        return 1 - cosine(me, you)
+
     @staticmethod
     def load(path, output, settings): pass
 
@@ -81,8 +92,8 @@ class Review(object):
         back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
 
         for i, r in enumerate(reviews):
-            r.augs[tgt] = (
-                Review(r.id, [[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], None, None, None, None, r, tgt),
-                Review(r.id, [[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], None, None, None, None, r, src))
+            translated_obj = Review(r.id, [[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], None, None, None, None, r, tgt)
+            back_translated_obj = Review(r.id, [[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], None, None, None, None, r, src)
+            r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
 
 
