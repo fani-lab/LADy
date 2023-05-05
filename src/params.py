@@ -21,7 +21,7 @@ settings = {
         'batch': True,
         },
     'train': {
-        'train_ratio': 0.85, # 1 - train_ratio goes to test
+        'train_ratio': 0.85, # 1 - train_ratio goes to test. To train on entire dataset: 0.999 and 'nfolds': 0
         'nfolds': 5, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
         'rnd': {'nwords': 20, 'qualities': ['Coherence', 'Perplexity'],
                 'no_extremes': None

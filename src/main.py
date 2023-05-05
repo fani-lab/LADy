@@ -110,11 +110,8 @@ def test(am, test, f, output):
         # Then sort.
         def rank_pairs(r_aspects, r_pred_aspects):
             nwords = params.settings['train'][am.__class__.__name__.lower()]['nwords']
-            for i, subr_pred_aspects in enumerate(r_pred_aspects):
-                subr_pred_aspects_words = [w_p for l in [[(w, a_p * w_p) for w, w_p in am.get_aspect(a, nwords)] for a, a_p in subr_pred_aspects] for w_p in l]
-                subr_pred_aspects_words = sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1])
-                # removing duplicate aspect words ==> handled in metrics()
-                pairs.append((r_aspects[i], subr_pred_aspects_words))
+            # removing duplicate aspect words ==> handled in metrics()
+            pairs.extend(list(zip(r_aspects, am.get_aspects_words(r_pred_aspects, nwords))))
 
         idx = 0
         for r_idx, r in enumerate(test):
@@ -253,6 +250,9 @@ if __name__ == '__main__':
                     args.data = data
                     args.output = output
                     args.naspects = naspects
+                    # # to train on entire dataset only
+                    # params.settings['train']['train_ratio'] = 0.999
+                    # params.settings['train']['nfolds'] = 0
                     params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
                     main(args)
 
