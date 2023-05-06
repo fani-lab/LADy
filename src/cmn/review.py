@@ -4,7 +4,7 @@ from scipy.spatial.distance import cosine
 class Review(object):
     translator_mdl = None; translator_tokenizer = None
     semantic_mdl = None
-    def __init__(self, id, sentences, time, author, aos, lempos, parent=None, lang='eng_Latn'):
+    def __init__(self, id, sentences, time=None, author=None, aos=None, lempos=None, parent=None, lang='eng_Latn'):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
         self.time = time

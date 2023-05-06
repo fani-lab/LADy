@@ -236,8 +236,10 @@ def main(args):
             df_f_means = pd.concat([df_f_means, df_mean], axis=1)
         df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
-# python -u main.py -am lda -data ../data/raw/semeval/toy.2016.txt -output ../output/semeval/toy.2016 -naspect 25
-# python -u main.py -am lda -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2 -naspect 25
+# python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml &
+# python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml -output ../output/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml &
+# python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml -output ../output/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml &
+# python -u main.py -am lda -naspect 25 -data ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml &
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
@@ -247,8 +249,8 @@ if __name__ == '__main__':
     parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
     args = parser.parse_args()
 
-    # main(args)
-    # if 'agg' in params.settings['cmd']: agg(args.output, args.output)
+    main(args)
+    if 'agg' in params.settings['cmd']: agg(args.output, args.output)
 
     #################################################################
     # experiments ...
@@ -260,33 +262,30 @@ if __name__ == '__main__':
     #             ]
 
     datasets = [('../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'),
-                # ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml'),
-                # ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
-                # ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+                ('../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml', '../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml'),
+                ('../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml', '../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml'),
+                ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
                 ]
 
-    for (data, output) in datasets:
-        args.data = data
-        args.output = output
-        params.settings['prep']['langaug'] = ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
-        params.settings['cmd'] = ['prep']
-        main(args)
-        langs = params.settings['prep']['langaug'].copy()
-        langs.extend([params.settings['prep']['langaug']])
-        for lang in langs:
-            params.settings['prep']['langaug'] = lang if isinstance(lang, list) else [lang]
-            for am in ['rnd']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
-                for naspects in range(5, 30, 5):
-                    for hide in range(0, 110, 10):
-                        args.am = am
-                        args.naspects = naspects
-                        # # to train on entire dataset only
-                        # params.settings['train']['train_ratio'] = 0.999
-                        # params.settings['train']['nfolds'] = 0
-                        params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                        params.settings['cmd'] = ['prep', 'train', 'test', 'eval', 'agg']
-                        main(args)
-            if 'agg' in params.settings['cmd']: agg(args.output, args.output)
-
-
-
+    # for (data, output) in datasets:
+    #     args.data = data
+    #     args.output = output
+    #     params.settings['prep']['langaug'] = ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
+    #     params.settings['cmd'] = ['prep']
+    #     main(args)
+    #     langs = params.settings['prep']['langaug'].copy()
+    #     langs.extend([params.settings['prep']['langaug']])
+    #     for lang in langs:
+    #         params.settings['prep']['langaug'] = lang if isinstance(lang, list) else [lang]
+    #         for am in ['rnd']:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
+    #             for naspects in range(5, 30, 5):
+    #                 for hide in range(0, 110, 10):
+    #                     args.am = am
+    #                     args.naspects = naspects
+    #                     # # to train on entire dataset only
+    #                     # params.settings['train']['train_ratio'] = 0.999
+    #                     # params.settings['train']['nfolds'] = 0
+    #                     params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
+    #                     params.settings['cmd'] = ['prep', 'train', 'test', 'eval', 'agg']
+    #                     main(args)
+    #         if 'agg' in params.settings['cmd']: agg(args.output, args.output)

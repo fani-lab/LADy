@@ -19,7 +19,7 @@ dependencies:
   - nltk==3.7
 #  - matplotlib
   - pip:
-      - sentence-transformers #for semantic simarlity of backtranslated review with original review
+      - sentence-transformers #for semantic similarity of backtranslated review with its original review
       - pytrec-eval-terrier
       - bitermplus==0.6.10 #install it if you want to use btm model in the topic modeling layer
 #    - pyLDAvis
