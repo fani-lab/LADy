@@ -3,6 +3,16 @@ import bitermplus as btm, gensim
 
 from .mdl import AbstractAspectModel
 
+# @inproceedings{DBLP:conf/www/YanGLC13,
+#   author       = {Xiaohui Yan and Jiafeng Guo and Yanyan Lan and Xueqi Cheng},
+#   title        = {A biterm topic model for short texts},
+#   booktitle    = {22nd International World Wide Web Conference, {WWW} '13, Rio de Janeiro, Brazil, May 13-17, 2013},
+#   pages        = {1445--1456},
+#   publisher    = {International World Wide Web Conferences Steering Committee / {ACM}},
+#   year         = {2013},
+#   url          = {https://doi.org/10.1145/2488388.2488514},
+#   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
+# }
 class Btm(AbstractAspectModel):
     def __init__(self, naspects): super().__init__(naspects)
 
@@ -37,7 +47,7 @@ class Btm(AbstractAspectModel):
         with open(f'{output}model.perf.cas', 'wb') as f: pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'{output}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def get_aspects(self, nwords):
+    def get_aspects_words(self, nwords):
         words = []; probs = []
         topic_range_idx = list(range(0, self.naspects))
         top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
@@ -46,16 +56,16 @@ class Btm(AbstractAspectModel):
             words.append(list(top_words[f'topic{i}']))
         return words, probs
 
-    def get_aspect(self, topic_id, nwords):
+    def get_aspect_words(self, aspect_id, nwords):
         dict_len = len(self.dict)
         if nwords > dict_len: nwords = dict_len
         topic_range_idx = list(range(0, self.naspects))
         top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
-        probs = sorted(self.mdl.matrix_topics_words_[topic_id, :])
-        words = list(top_words[f'topic{topic_id}'])
+        probs = sorted(self.mdl.matrix_topics_words_[aspect_id, :])
+        words = list(top_words[f'topic{aspect_id}'])
         return list(zip(words, probs))
 
-    def infer(self, doctype, review):
+    def infer(self, review, doctype):
         review_aspects = []
         review_ = super().preprocess(doctype, [review])
         for r in review_: review_aspects.append([(i, p) for i, p in enumerate(self.mdl.transform(btm.get_vectorized_docs([' '.join(r)], self.dict))[0])])

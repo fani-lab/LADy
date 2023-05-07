@@ -20,8 +20,7 @@ def load(input, output):
     except (FileNotFoundError, EOFError) as e:
         print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
-        if str(input).endswith('.xml'): reviews = SemEvalReview.xmlloader(input)
-        else: reviews = SemEvalReview.txtloader(input)
+        reviews = SemEvalReview.load(input)
         print(f'(#reviews: {len(reviews)})')
         print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
         for lang in params.settings['prep']['langaug']:
@@ -52,7 +51,7 @@ def split(nsample, output):
     from sklearn.model_selection import KFold, train_test_split
     from json import JSONEncoder
 
-    train, test = train_test_split(np.arange(nsample), train_size=params.settings['train']['train_ratio'], random_state=params.seed, shuffle=True)
+    train, test = train_test_split(np.arange(nsample), train_size=params.settings['train']['ratio'], random_state=params.seed, shuffle=True)
 
     splits = dict()
     splits['test'] = test
@@ -119,7 +118,7 @@ def test(am, test, f, output):
         def rank_pairs(r_aspects, r_pred_aspects):
             nwords = params.settings['train'][am.__class__.__name__.lower()]['nwords']
             # removing duplicate aspect words ==> handled in metrics()
-            pairs.extend(list(zip(r_aspects, am.get_aspects_words(r_pred_aspects, nwords))))
+            pairs.extend(list(zip(r_aspects, am.merge_aspects_words(r_pred_aspects, nwords))))
 
         idx = 0
         for r_idx, r in enumerate(test):
@@ -137,7 +136,7 @@ def test(am, test, f, output):
             #     r_pred_aspects = am.infer(params.settings['prep']['doctype'], r_, idx)
             # ######
             # else:
-            r_pred_aspects = am.infer(params.settings['prep']['doctype'], r_)
+            r_pred_aspects = am.infer(r_, params.settings['prep']['doctype'])
             rank_pairs(r_aspects, r_pred_aspects)
             idx += 1
 

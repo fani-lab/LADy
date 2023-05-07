@@ -8,11 +8,15 @@ from cmn.review import Review
 
 class SemEvalReview(Review):
 
-    def __init__(self, id, sentences, time, author, aos):
-        super().__init__(self, id, sentences, time, author, aos)
+    def __init__(self, id, sentences, time, author, aos): super().__init__(self, id, sentences, time, author, aos)
 
     @staticmethod
-    def txtloader(path):
+    def load(path):
+        if str(path).endswith('.xml'): return SemEvalReview._xmlloader(path)
+        return SemEvalReview._txtloader(input)
+
+    @staticmethod
+    def _txtloader(path):
         reviews = []
         with tqdm(total=os.path.getsize(path)) as pbar, open(path, "r", encoding='utf-8') as f:
             for i, line in enumerate(f.readlines()):
@@ -28,16 +32,16 @@ class SemEvalReview(Review):
         return reviews
 
     @staticmethod
-    def xmlloader(path):
+    def _xmlloader(path):
         reviews_list = []
         xtree = et.parse(path).getroot()
-        if xtree.tag == 'Reviews':   reviews = [SemEvalReview.parse(xsentence) for xreview in tqdm(xtree) for xsentences in xreview for xsentence in xsentences]
-        if xtree.tag == 'sentences': reviews = [SemEvalReview.parse(xsentence) for xsentence in tqdm(xtree)]
+        if xtree.tag == 'Reviews':   reviews = [SemEvalReview._parse(xsentence) for xreview in tqdm(xtree) for xsentences in xreview for xsentence in xsentences]
+        if xtree.tag == 'sentences': reviews = [SemEvalReview._parse(xsentence) for xsentence in tqdm(xtree)]
 
         return [r for r in reviews if r]
 
     @staticmethod
-    def map_idx(aspect, text):
+    def _map_idx(aspect, text):
         # aspect: ('token', from_char, to_char)
         text_tokens = text[:aspect[1]].split()
         # to fix if  "aaaa ,b, c" ",b c" if b is the aspect
@@ -52,7 +56,7 @@ class SemEvalReview(Review):
         return [i for i in range(len(text_tokens), len(text_tokens) + len(aspect_tokens))]
 
     @staticmethod
-    def parse(xsentence):
+    def _parse(xsentence):
         id = xsentence.attrib["id"]
         aos = []
         for element in xsentence:
@@ -64,7 +68,7 @@ class SemEvalReview(Review):
                     # we may have duplicates for the same aspect due to being in different category like in semeval 2016's <sentence id="1064477:4">
                     aspect = (opinion.attrib["target"], int(opinion.attrib["from"]), int(opinion.attrib["to"])) #('place', 5, 10)
                     # we need to map char index to token index in aspect
-                    aspect = SemEvalReview.map_idx(aspect, sentence)
+                    aspect = SemEvalReview._map_idx(aspect, sentence)
                     category = opinion.attrib["category"] # 'RESTAURANT#GENERAL'
                     sentiment = opinion.attrib["polarity"].replace('positive', '+1').replace('negative', '-1').replace('neutral', '0') #'+1'
                     aos.append((aspect, [], sentiment, opinion.attrib["target"]))
@@ -77,7 +81,7 @@ class SemEvalReview(Review):
                     # we may have duplicates for the same aspect due to being in different category like in semeval 2016's <sentence id="1064477:4">
                     aspect = (opinion.attrib["term"], int(opinion.attrib["from"]), int(opinion.attrib["to"])) #('place', 5, 10)
                     # we need to map char index to token index in aspect
-                    aspect = SemEvalReview.map_idx(aspect, sentence)
+                    aspect = SemEvalReview._map_idx(aspect, sentence)
                     sentiment = opinion.attrib["polarity"].replace('positive', '+1').replace('negative', '-1').replace('neutral', '0') #'+1'
                     aos.append((aspect, [], sentiment, opinion.attrib["term"]))
 

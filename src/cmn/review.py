@@ -70,7 +70,7 @@ class Review(object):
         return 1 - cosine(me, you)
 
     @staticmethod
-    def load(path, output, settings): pass
+    def load(path): pass
 
     @staticmethod
     def to_df(reviews): return pd.DataFrame.from_dict([rr for r in reviews for rr in r.to_dict()])

@@ -4,6 +4,16 @@ from gensim.models.coherencemodel import CoherenceModel
 
 from .mdl import AbstractAspectModel
 
+# @inproceedings{DBLP:conf/naacl/BrodyE10,
+#   author       = {Samuel Brody and Noemie Elhadad},
+#   title        = {An Unsupervised Aspect-Sentiment Model for Online Reviews},
+#   booktitle    = {Human Language Technologies: Conference of the North American Chapter of the Association of Computational Linguistics, Proceedings, June 2-4, 2010, Los Angeles, California, {USA}},
+#   pages        = {804--812},
+#   publisher    = {The Association for Computational Linguistics},
+#   year         = {2010},
+#   url          = {https://aclanthology.org/N10-1122/},
+#   biburl       = {https://dblp.org/rec/conf/naacl/BrodyE10.bib},
+# }
 class Lda(AbstractAspectModel):
     def __init__(self, naspects): super().__init__(naspects)
 
@@ -43,7 +53,7 @@ class Lda(AbstractAspectModel):
         with open(f'{output}model.perf.cas', 'wb') as f: pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'{output}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def get_aspects(self, nwords):
+    def get_aspects_words(self, nwords):
         # self.model.get_topics() does not have words
         # self.model.show_topics() and model.show_topic()
         words = []
@@ -60,9 +70,9 @@ class Lda(AbstractAspectModel):
                     words[-1].append(word_prob.replace('"', ''))
         return words, probs
 
-    def get_aspect(self, topic_id, nwords): return self.mdl.show_topic(topic_id, nwords)
+    def get_aspect_words(self, aspect_id, nwords): return self.mdl.show_topic(aspect_id, nwords)
 
-    def infer(self, doctype, review):
+    def infer(self, review, doctype):
         review_aspects = []
         review_ = super().preprocess(doctype, [review])
         for r in review_: review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))

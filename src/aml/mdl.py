@@ -4,18 +4,21 @@ import numpy as np
 
 class AbstractAspectModel:
     stop_words = None
-    def __init__(self, naspects): self.naspects = naspects
+    def __init__(self, naspects):
+        self.naspects = naspects
+        self.dict = None
+        self.mdl = None
 
     def load(self): pass
     def train(self, reviews_train, reviews_valid, settings, doctype, output): pass
-    def get_aspects(self, nwords): pass
-    def get_aspect(self, nwords): pass
-    def infer(self, doctype, review): pass
-    def get_aspects_words(self, r_pred_aspects, nwords):
+    def get_aspects_words(self, nwords): pass
+    def get_aspect_words(self, aspect_id, nwords): pass
+    def infer(self, review, doctype): pass
+    def merge_aspects_words(self, r_pred_aspects, nwords):
         result = []
         for subr_pred_aspects in r_pred_aspects:
             subr_pred_aspects_words = [w_p
-                                   for l in [[(w, a_p * w_p) for w, w_p in self.get_aspect(a, nwords)]
+                                   for l in [[(w, a_p * w_p) for w, w_p in self.get_aspect_words(a, nwords)]
                                              for a, a_p in subr_pred_aspects]
                                    for w_p in l]
             result.append(sorted(subr_pred_aspects_words, reverse=True, key=lambda t: t[1]))
