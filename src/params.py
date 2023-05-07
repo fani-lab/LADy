@@ -2,9 +2,7 @@ import random, os, multiprocessing
 
 seed = 0
 random.seed(seed)
-
 ncore = multiprocessing.cpu_count()
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def to_range(range_str): return range(int(range_str.split(':')[0]), int(range_str.split(':')[2]), int(range_str.split(':')[1]))
 

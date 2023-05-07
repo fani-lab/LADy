@@ -51,10 +51,10 @@ For quickstart purposes, a `toy` sample of reviews has been provided at [`./data
 You can run `LADy` by:
 ```bash
 cd ./src
-python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
+python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
 ```
-This run will produce an output folder at [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
-The final evaluation results are aggregated in [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
+This run will produce an output folder at [`../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
+The final evaluation results are aggregated in [`../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
 
 ## 3. Structure
 `LADy` has two layers: 
