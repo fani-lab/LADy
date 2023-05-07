@@ -31,14 +31,14 @@ pip install -r requirements.txt
 ```
 This command installs compatible versions of the following libraries:
 
-> `./src/cmn`: `transformers, sentence_transformers, scipy, simalign, nltk`
+> [`./src/cmn`](./src/cmn): `transformers, sentence_transformers, scipy, simalign, nltk`
 
-> `./src/aml`: `gensim, nltk, pandas, requests, bitermplus`
+> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus`
 
 > others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
 
 Additionally, the following libraries should be installed:
-> [`Microsoft C++ Build Tools`](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement in ``btm``.
+> [`Microsoft C++ Build Tools`](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement of biterm topic modeling in [`./src/btm.py`](./src/btm.py).
 
 ```bash
 python -m spacy download en_core_web_sm
@@ -51,10 +51,10 @@ For quickstart purposes, a `toy` sample of reviews has been provided at [`./data
 You can run `LADy` by:
 ```bash
 cd ./src
-python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
+python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
 ```
-This run will produce an output folder at [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
-The final evaluation results are aggregated in [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
+This run will produce an output folder at [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
+The final evaluation results are aggregated in [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
 
 ## 3. Structure
 `LADy` has two layers: 
@@ -112,7 +112,7 @@ Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.20
 
 > `-output`: the folder to store the pipeline outputs, e.g., `-output ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml` including preprocessed reviews, trained models, predictions, evaluations, ...
 
-`LADy` knows the methods' hyperparameters and evaluation settings from [`./src/param.py`](./src/param.py)
+`LADy` knows the methods' hyperparameters and evaluation settings from [`./src/params.py`](./src/params.py)
 
 Here is the codebase folder structure:
 ```
@@ -127,7 +127,7 @@ Here is the codebase folder structure:
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
 |   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling
 |   |   ├── nrl.py      -> 
-|   ├── param.py        -> running settings of the pipeline
+|   ├── params.py        -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
 
