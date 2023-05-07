@@ -1,23 +1,62 @@
-# ``LADy``<sup>*</sup>: A System for Latent Aspect Detection
+# `LADy`<sup>*</sup>: A System for Latent Aspect Detection
 <sup>*Suggested by [Christine!](https://github.com/Lillliant)
 
 `LADy` is an open-source platform that provides a standard and reproducible way of analyzing `unsolicited online reviews`. 
 `LADy` is specifically focused on `Latent Aspect Detection` and is equipped with a wide range of `topic modeling` methods, `SemEval` training datasets, and `data augmentation` via `natural language back-translation`.
-The latter helps to increase the size of the benchmark datasets by using different interlanguages with English datasets.
+The latter helps to increase the size of the benchmark datasets using different interlanguages with English datasets.
 Using `back-translation`, `LADy` could boost the performance of existing aspect detection methods like ***. 
 `LADy` provides ideal platform for researchers, businesses, and individuals who want to gain insights into customer feedback and improve their products or services accordingly.
 
-1. [Quickstart](#1-Quickstart-Script)
-2. [Structure](#2-Structure)
-3. [Setup](#3-Setup)
-4. [Quickstart](#4-Quickstart)
-5. [Experiment](#5-Experiment)
-6. [License](#6-License)
-7. [Awards](#7-Awards)
+1. [Setup](#1-Setup)
+2. [Quickstart](#2-Quickstart)
+3. [Structure](#3-Structure)
+4. [Experiment](#4-Experiment)
+5. [License](#5-License)
+6. [Awards](#6-Awards)
 
-## 1. [Quickstart](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing):
+## 1. Setup
+`LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
 
-## 2. Structure
+```bash
+git clone https://github.com/fani-lab/LADy.git
+cd LADy
+conda env create -f environment.yml
+conda activate lady
+```
+
+```bash
+git clone https://github.com/fani-lab/LADy.git
+cd LADy
+pip install -r requirements.txt
+```
+This command installs compatible versions of the following libraries:
+
+> `./src/cmn`: `transformers, sentence_transformers, scipy, simalign, nltk`
+
+> `./src/aml`: `gensim, nltk, pandas, requests, bitermplus`
+
+> others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
+
+Additionally, the following libraries should be installed:
+> [`Microsoft C++ Build Tools`](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement in ``btm``.
+
+```bash
+python -m spacy download en_core_web_sm
+python -m nltk.downloader stopwords
+python -m nltk.downloader punkt
+```
+
+## 2. [Quickstart](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
+For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
+You can run `LADy` by:
+```bash
+cd ./src
+python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
+```
+This run will produce an output folder at [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
+The final evaluation results are aggregated in [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
+
+## 3. Structure
 `LADy` has two layers: 
 
 ###[`./src/cmn`](./src/cmn)
@@ -112,55 +151,10 @@ Here is the codebase folder structure:
  
 > `['agg']`: 
 
-## 3. Setup
-
-It has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
-
-```bash
-git clone https://github.com/fani-lab/LADy.git
-cd LADy
-conda env create -f environment.yml
-conda activate lady
-```
-
-```bash
-git clone https://github.com/fani-lab/LADy.git
-cd LADy
-pip install -r requirements.txt
-```
-This command installs compatible versions of the following libraries:
-
-- `./src/cmn`: `transformers, sentence_transformers, scipy, simalign, nltk`
-- `./src/aml`: `gensim, nltk, pandas, requests, bitermplus`
-- others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
-
-Additionally, the following libraries should be installed:
-- [``Microsoft C++ Build Tools``](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement in ``btm``.
-- ``en_core_web_sm`` as a requirement in ``spaCy`` library with the following command:
-  ```bash
-  python -m spacy download en_core_web_sm
-  ```
-- ``stopwords`` and ``punkt`` as a requirement in ``nltk`` library with the following command:
-  
-  ```bash
-  python -m nltk.downloader stopwords
-  python -m nltk.downloader punkt
-  ```
-
-## 4. Quickstart
-For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
-You can run `LADy` by:
-```bash
-cd ./src
-python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
-```
-This run will produce an output folder at [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling baseline.
-The final evaluation results are aggregated in [`./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/raw/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
-
-## 5. Experiment
+## 4. Experiment
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
-## 6. License
+## 5. License
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ### Authors
@@ -175,8 +169,10 @@ Farinam Hemmatizadeh <sup>1,2</sup>, Chritine Wong<sup>1</sup>, [Hossein Fani](h
 Pull requests are highly encouraged and welcomed. However, for significant modifications, please initiate a discussion by opening an issue beforehand to clarify what modifications you intend to make.
 
 ### Acknowledgments
-In this work, we use [``LDA``](https://radimrehurek.com/gensim/models/ldamodel.html), [``bitermplus``](https://github.com/maximtrp/bitermplus), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``SimAlign``](https://github.com/cisnlp/simalign), [``DeCLUTR``](https://github.com/JohnGiorgi/DeCLUTR), [``No Language Left Behind (NLLB)``](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We would like to thank the authors of these works.
+In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We would like to thank the authors of these works.
 
 ## 7. Awards
 
-> [CAD$150, Silver Medalist, UWill Discover, 2023](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
+> [CAD$150, Silver Medalist, UWill Discover, 2023,](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
+> [`slides`](./misc/UWillDiscover23.pdf)
+> <p align="center"><img src='./misc/cs_demo_day_23april23.png' width="350" ></p>
