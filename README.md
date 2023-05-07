@@ -59,7 +59,7 @@ The final evaluation results are aggregated in [`./output/semeval+/toy.2016SB5/A
 ## 3. Structure
 `LADy` has two layers: 
 
-###[`./src/cmn`](./src/cmn)
+### [`./src/cmn`](./src/cmn)
 Common layer (`cmn`) includes the abstract class definition for `Review`. 
 Important attributes of `Review` are:
 
@@ -76,7 +76,7 @@ where the filename `review.{list of languages}.pkl` shows the review objects als
 
 <p align="center"><img src='./src/cmn/LADy.png' width="350" ></p>
 
-###[`./src/aml`](./src/aml)
+### [`./src/aml`](./src/aml)
 Aspect model layer (`aml`) includes the abstract class definition `AbstractAspectModel` for aspect modeling methods. 
 Important methods of are:
 
@@ -101,7 +101,7 @@ Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.20
 
 <p align="center"><img src='./src/aml/LADy.png' width="350" ></p>
 
-###[`./src/main.py`](./src/main.py)
+### [`./src/main.py`](./src/main.py)
 `LADy`'s driver code accepts the following args:
 
 > `-naspects`: the number of possible aspects for a review in a domain, e.g., `-naspect 5`, like in `restaurant` we may have 5 aspects including `['food', 'staff', ...]`
@@ -173,7 +173,6 @@ In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.htm
 
 ## 7. Awards
 
-> [`CAD$150, Silver Medalist, UWill Discover 2023`](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413)
-> 👉 [`slides`](./misc/UWillDiscover23.pdf)
+> [`CAD$150, Silver Medalist, UWill Discover 2023`](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413) 👉 [`slides`](./misc/UWillDiscover23.pdf)
 > <p align="center"><img src='./misc/cs_demo_day_23april23.png' width="350" ></p>
 > <p align="center">From Left: Soroush, Atefeh, Christine, Farinam, Mohammad</p>
