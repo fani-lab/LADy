@@ -139,7 +139,7 @@ Here is the codebase folder structure:
 > `['train']`: loads review objects and create an instance of aspect modeling (detection) method given in `-am {am}`. 
 > `LADy` splits reviews into `train` and `test` based on `params.settings['train']['ratio']` in [`./src/params.py`](./src/params.py).
 > `LADy` further splits `train` into `params.settings['train']['nfolds']` for cross-validation and model tuning during training. 
-> The results of this step is a collection trained models for each fold in `{output}/{am}/` like [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/lda/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/lda/)
+> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd/)
 ```
 ├── f{k}.model            -> saved aspect model for k-th fold
 ├── f{k}.model.dict       -> dictionary of tokens/words for k-th fold
@@ -152,6 +152,11 @@ Here is the codebase folder structure:
 > `['agg']`: 
 
 ## 4. Experiment
+to be completed ...
+- datasets and stats
+- table of results
+- link to results
+
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
 ## 5. License
