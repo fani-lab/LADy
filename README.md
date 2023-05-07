@@ -15,7 +15,7 @@ Using `back-translation`, `LADy` could boost the performance of existing aspect 
 6. [Awards](#6-Awards)
 
 ## 1. Setup
-`LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
+`LADy` has been developed on `Python 3.10` and can be installed by `conda` or `pip`:
 
 ```bash
 git clone https://github.com/fani-lab/LADy.git

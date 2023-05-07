@@ -23,7 +23,7 @@ class Btm(AbstractAspectModel):
         with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, langaug, output):
+    def train(self, reviews_train, reviews_valid, settings, doctype, output):
         reviews_ = super().preprocess(doctype, reviews_train)
         logging.getLogger().handlers.clear()
         logging.basicConfig(filename=f'{output}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)

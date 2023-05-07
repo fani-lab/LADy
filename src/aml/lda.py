@@ -24,7 +24,7 @@ class Lda(AbstractAspectModel):
         with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
         with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, langaug, output):
+    def train(self, reviews_train, reviews_valid, settings, doctype, output):
         reviews_ = super().preprocess(doctype, reviews_train)
         self.dict = gensim.corpora.Dictionary(reviews_)
         if settings['no_extremes']: self.dict.filter_extremes(no_below=settings['no_extremes']['no_below'], no_above=settings['no_extremes']['no_above'], keep_n=100000)
@@ -42,7 +42,7 @@ class Lda(AbstractAspectModel):
         self.mdl = gensim.models.ldamulticore.LdaMulticore(corpus, num_topics=self.naspects, id2word=self.dict, workers=settings['ncore'], passes=settings['passes'], random_state=settings['seed'], per_word_topics=True)
 
         # TODO: quality diagram ==> https://www.meganstodel.com/posts/callbacks/
-        aspects, probs = self.get_aspects(settings['nwords'])
+        aspects, probs = self.get_aspects_words(settings['nwords'])
         # https://stackoverflow.com/questions/50607378/negative-values-evaluate-gensim-lda-with-topic-coherence
         # umass: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://aclanthology.org/D11-1024.pdf
         # [-inf, 0]: close to zero, the better
