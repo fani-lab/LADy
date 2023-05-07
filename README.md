@@ -53,7 +53,7 @@ You can run `LADy` by:
 cd ./src
 python main.py -naspects 5 -am rnd -data ./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
 ```
-This run will produce an output folder at [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
+This run will produce an output folder at [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
 The final evaluation results are aggregated in [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
 
 ## 3. Structure
