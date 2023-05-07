@@ -203,7 +203,7 @@ def main(args):
     langaug_str = '.'.join([l for l in params.settings['prep']['langaug'] if l])
     reviews = load(args.data, f'{args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'))
     splits = split(len(reviews), args.output)
-    output = f'{args.output}/{args.naspects}.{langaug_str}'
+    output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
     print(f'\n2. Aspect modeling for {args.am} ...')
     if not os.path.isdir(output): os.makedirs(output)
