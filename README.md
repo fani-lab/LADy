@@ -74,7 +74,11 @@ Specifically, this class overrides loading `SemEval`'s reviews into `Review` obj
 Pickle file is later used by models for training and testing purposes. Sample pickle files for a `toy` dataset: [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml), there are some
 where the filename `review.{list of languages}.pkl` shows the review objects also include back-translated versions in `{list of languages}`.
 
-<p align="center"><img src='./src/cmn/LADy.png' width="350" ></p>
+<p align="center">
+ <img src='./src/cmn/LADy.png' width="350" >
+ <br>
+ <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for review</a>
+</p>
 
 ### [`./src/aml`](./src/aml)
 Aspect model layer (`aml`) includes the abstract class definition `AbstractAspectModel` for aspect modeling methods. 
@@ -99,7 +103,10 @@ This layer further includes realizations for different aspect modeling methods l
 
 Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/{model name}`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 
-<p align="center"><img src='./src/aml/LADy.png' width="350" ></p>
+<p align="center"><img src='./src/aml/LADy.png' width="350" >
+ <br>
+  <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for aspect modeling hierarchy</a>
+</p>
 
 ### [`./src/main.py`](./src/main.py)
 `LADy`'s driver code accepts the following args:
