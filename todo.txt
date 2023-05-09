@@ -3,10 +3,13 @@ We can consider ,aspect, category as ,latent, since no where they occurr?!
 
 Next:
 - skip: word alignment
-- skip: train+test: skip models ctm, nrl, brt (talk to Farinam)
+- skip: train+test: skip models nrl, brt
+
+focus on and nrl and brt
 
 - training+test w/ augmentation
-    - where to put the aos of back-translated version (we can assume same aos as the parent)
+    - where to put the aos of back-translated version (we can assume same aos as the parent) for the unsupervised
+	- but for supervised
 
 - visualization
 

@@ -1,4 +1,5 @@
-import gensim, logging, pickle
+import gensim, logging, pickle, pandas as pd
+
 from gensim.models.callbacks import PerplexityMetric, ConvergenceMetric, CoherenceMetric
 from gensim.models.coherencemodel import CoherenceModel
 
@@ -17,7 +18,7 @@ from .mdl import AbstractAspectModel
 class Lda(AbstractAspectModel):
     def __init__(self, naspects): super().__init__(naspects)
 
-    def load(self, path):
+    def load(self, path, settings):
         self.mdl = gensim.models.LdaModel.load(f'{path}model')
         assert self.mdl.num_topics == self.naspects
         self.dict = gensim.corpora.Dictionary.load(f'{path}model.dict')
@@ -25,10 +26,7 @@ class Lda(AbstractAspectModel):
         with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
 
     def train(self, reviews_train, reviews_valid, settings, doctype, output):
-        reviews_ = super().preprocess(doctype, reviews_train)
-        self.dict = gensim.corpora.Dictionary(reviews_)
-        if settings['no_extremes']: self.dict.filter_extremes(no_below=settings['no_extremes']['no_below'], no_above=settings['no_extremes']['no_above'], keep_n=100000)
-        self.dict.compactify()
+        reviews_, self.dict = super(Lda, self).preprocess(doctype, reviews_train, settings['no_extremes'])
         corpus = [self.dict.doc2bow(doc) for doc in reviews_]
 
         logging.getLogger().handlers.clear()
@@ -50,8 +48,8 @@ class Lda(AbstractAspectModel):
         self.perplexity = self.mdl.log_perplexity(corpus)
         self.dict.save(f'{output}model.dict')
         self.mdl.save(f'{output}model')
-        with open(f'{output}model.perf.cas', 'wb') as f: pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f'{output}model.perf.perplexity', 'wb') as f: pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
+        pd.to_pickle(self.cas, f'{output}model.perf.cas')
+        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
 
     def get_aspects_words(self, nwords):
         # self.model.get_topics() does not have words
@@ -74,7 +72,7 @@ class Lda(AbstractAspectModel):
 
     def infer(self, review, doctype):
         review_aspects = []
-        review_ = super().preprocess(doctype, [review])
+        review_, _ = super(Lda, self).preprocess(doctype, [review])
         for r in review_: review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
         return review_aspects
 

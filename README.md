@@ -185,6 +185,6 @@ In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.htm
 
 ## 7. Awards
 
-> [`CAD$150, Silver Medalist, UWill Discover 2023`](https://symposium.foragerone.com/uwill-discover-sustainable-futures/presentations/51413) 👉 [`slides`](./misc/UWillDiscover23.pdf)
+> [`CAD$150, Silver Medalist, UWill Discover 2023`](https://www.uwindsor.ca/uwilldiscover/312/uwill-discover-awards) 👉 [`slides`](./misc/UWillDiscover23.pdf)
 > <p align="center"><img src='./misc/cs_demo_day_23april23.png' width="350" ></p>
 > <p align="center">From Left: Soroush, Atefeh, Christine, Farinam, Mohammad</p>
