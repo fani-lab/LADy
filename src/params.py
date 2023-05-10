@@ -40,10 +40,11 @@ settings = {
                 # {'no_below': 10,   # happen less than no_below number in total
                 #  'no_above': 0.9}  # happen in no_above percent of reviews
                 },
-        'ctm': {'epoch': 2, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
+        'ctm': {'epoch': 1000, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
                 'pretrained_contextual_mdl': 'all-mpnet-base-v2',
                 'contextual_size': 768,
-                'batch_size': 10,
+                'batch_size': 100,
+                'nsamples': 10,
                 'no_extremes': None,
                 # {'no_below': 10,   # happen less than no_below number in total
                 #  'no_above': 0.9}  # happen in no_above percent of reviews

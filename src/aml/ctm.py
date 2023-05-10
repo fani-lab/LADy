@@ -23,8 +23,9 @@ class Ctm(AbstractAspectModel):
         self.tp = pd.read_pickle(f'{path}model.tp')
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=settings['contextual_size'], n_components=self.naspects)
         files = list(os.walk(f'{path}model'))
-        # self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_','').replace('.pth', '')))
-        self.mdl.load(files[-1][0], epoch=settings['epoch'] - 1)
+        print(f'{files[-1][0]}/{files[-1][-1][-1]}')
+        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_','').replace('.pth', '')))
+        # self.mdl.load(files[-1][0], epoch=settings['epoch'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
         self.dict = pd.read_pickle(f'{path}model.dict')
         self.cas = pd.read_pickle(f'{path}model.perf.cas')
         self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
@@ -32,8 +33,6 @@ class Ctm(AbstractAspectModel):
     def train(self, reviews_train, reviews_valid, settings, doctype, output):
         corpus_train, self.dict = super(Ctm, self).preprocess(doctype, reviews_train, settings['no_extremes'])
         corpus_train = [' '.join(doc) for doc in corpus_train]
-        corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_train, settings['no_extremes'])
-        corpus_valid = [' '.join(doc) for doc in corpus_valid]
 
         self._seed(settings['seed'])
         self.tp = TopicModelDataPreparation(settings['pretrained_contextual_mdl'])
@@ -48,10 +47,16 @@ class Ctm(AbstractAspectModel):
                               num_data_loader_workers=settings['ncore'],
                               batch_size=settings['batch_size'])
 
-        processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
-        valid_dataset = self.tp.fit(text_for_contextual=unprocessed, text_for_bow=processed)
+        valid_dataset = None
+        # bug when we have validation=> RuntimeError: mat1 and mat2 shapes cannot be multiplied (5x104 and 94x100)
+        # File "C:\ProgramData\Anaconda3\envs\lady\lib\site-packages\contextualized_topic_models\models\ctm.py", line 457, in _validation
+        if len(reviews_valid) > 0:
+            corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_valid, settings['no_extremes'])
+            corpus_valid = [' '.join(doc) for doc in corpus_valid]
+            processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
+            valid_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
 
-        self.mdl.fit(train_dataset=training_dataset, validation_dataset=valid_dataset, verbose=True)#, save_dir=f'{output}model', )
+        self.mdl.fit(train_dataset=training_dataset, validation_dataset=valid_dataset, verbose=True, save_dir=f'{output}model', )
         self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(settings['nwords'])).score()
 
         # self.mdl.get_doc_topic_distribution(training_dataset, n_samples=20)
@@ -82,7 +87,7 @@ class Ctm(AbstractAspectModel):
 
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_test, stopwords_list=[]).preprocess()
         testing_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
-        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset)
+        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=settings['nsamples'])
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
             r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
