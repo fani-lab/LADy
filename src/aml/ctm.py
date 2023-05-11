@@ -24,7 +24,7 @@ class Ctm(AbstractAspectModel):
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=settings['contextual_size'], n_components=self.naspects)
         files = list(os.walk(f'{path}model'))
         print(f'{files[-1][0]}/{files[-1][-1][-1]}')
-        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_','').replace('.pth', '')))
+        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_', '').replace('.pth', '')))
         # self.mdl.load(files[-1][0], epoch=settings['epoch'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
         self.dict = pd.read_pickle(f'{path}model.dict')
         self.cas = pd.read_pickle(f'{path}model.perf.cas')
@@ -40,12 +40,6 @@ class Ctm(AbstractAspectModel):
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_train, stopwords_list=[]).preprocess()#we already preproccess corpus in super()
         training_dataset = self.tp.fit(text_for_contextual=unprocessed, text_for_bow=processed)
         self.dict = self.tp.vocab
-        self.mdl = CombinedTM(bow_size=len(self.tp.vocab),
-                              contextual_size=settings['contextual_size'],
-                              n_components=self.naspects,
-                              num_epochs=settings['epoch'],
-                              num_data_loader_workers=settings['ncore'],
-                              batch_size=settings['batch_size'])
 
         valid_dataset = None
         # bug when we have validation=> RuntimeError: mat1 and mat2 shapes cannot be multiplied (5x104 and 94x100)
@@ -53,11 +47,19 @@ class Ctm(AbstractAspectModel):
         if len(reviews_valid) > 0:
             corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_valid, settings['no_extremes'])
             corpus_valid = [' '.join(doc) for doc in corpus_valid]
-            processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
-            valid_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
+            processed_valid, unprocessed_valid, _, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
+            valid_dataset = self.tp.transform(text_for_contextual=unprocessed_valid, text_for_bow=processed_valid)
+
+        self.mdl = CombinedTM(bow_size=len(self.tp.vocab),
+                              contextual_size=settings['contextual_size'],
+                              n_components=self.naspects,
+                              num_epochs=settings['epoch'],
+                              num_data_loader_workers=settings['ncore'],
+                              batch_size=min([settings['batch_size'], len(training_dataset), len(valid_dataset) if valid_dataset else np.inf]))
+                            # drop_last=True!! So, for small train/valid sets, it raises devision by zero in val_loss /= samples_processed
 
         self.mdl.fit(train_dataset=training_dataset, validation_dataset=valid_dataset, verbose=True, save_dir=f'{output}model', )
-        self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(settings['nwords'])).score()
+        self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(settings['nwords'])).score(topk=settings['nwords'], per_topic=True)
 
         # self.mdl.get_doc_topic_distribution(training_dataset, n_samples=20)
         # log_perplexity = -1 * np.mean(np.log(np.sum(bert, axis=0)))
