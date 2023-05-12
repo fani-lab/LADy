@@ -1,3 +1,4 @@
+#python==3.10
 pandas==1.4.4
 spacy==3.3.1
 tqdm==4.64.1
@@ -5,83 +6,13 @@ tqdm==4.64.1
 # python -m spacy download en_core_web_trf
 # python -m spacy download en_core_web_sm
 # en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.3.0/en_core_web_sm-3.3.0-py3-none-any.whl
-gensim==4.2.0
-matplotlib==3.6.2
-nltk==3.7
-pyLDAvis
-pytrec-eval-terrier==0.5.2
-bitermplus==0.6.10 #install it if you want to use btm model in the topic modeling layer
-seaborn==0.12.2
-anyio==3.6.2
-blis==0.7.9
-catalogue==2.0.8
-certifi==2022.9.24
-chardet==3.0.4
-charset-normalizer==2.1.1
-click==8.1.3
-colorama==0.4.6
-contourpy==1.0.6
-cycler==0.11.0
-cymem==2.0.7
-Cython==0.29.28
-filelock==3.9.0
-fonttools==4.38.0
-funcy==1.17
-future==0.18.2
-google-trans-new==1.1.9
-googletrans==3.0.0
-googletrans-py==4.0.0
-h11==0.14.0
-h2==4.1.0
-hpack==4.0.0
-hstspreload==2023.1.1
-httpcore==0.16.3
-httpx==0.23.3
-huggingface-hub==0.12.0
-hyperframe==6.0.1
-idna==2.10
-Jinja2==3.1.2
-joblib==1.2.0
-kiwisolver==1.4.4
-langcodes==3.3.0
-libretranslatepy==2.1.1
-lxml==4.9.2
-MarkupSafe==2.1.1
-murmurhash==1.0.9
-numexpr==2.8.4
-numpy==1.23.5
-packaging==21.3
-pathy==0.10.0
-Pillow==9.3.0
-preshed==3.0.8
-pydantic==1.8.2
-pyparsing==3.0.9
-python-dateutil==2.8.2
-pytz==2022.6
-PyYAML==6.0
-regex==2022.10.31
-requests==2.28.1
-rfc3986==1.5.0
-scikit-learn==1.1.3
-scipy==1.9.3
-six==1.16.0
-sklearn==0.0.post1
-smart-open==5.2.1
-sniffio==1.3.0
-spacy==3.3.1
-spacy-legacy==3.0.10
-spacy-loggers==1.0.3
-srsly==2.4.5
-thinc==8.0.17
-threadpoolctl==3.1.0
-tokenizers==0.13.2
-torch==1.13.1
-torchaudio==0.13.1
-torchvision==0.14.1
 transformers==4.26.1
-translate==3.6.1
-typer==0.4.2
-typing_extensions==4.4.0
-urllib3==1.26.13
-wasabi==0.10.1
-simalign==0.3
+torch==1.13.1
+sentence-transformers #for semantic simarlity of backtranslated review with original review
+scikit-learn
+gensim==4.*
+nltk==3.7
+pytrec-eval-terrier
+bitermplus==0.6.10          #install it if you want to use btm model in the aspect modeling layer
+contextualized_topic_models==2.5.0 #install it if you want to use ctm model in the aspect modeling layer
+

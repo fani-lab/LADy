@@ -1,0 +1,18 @@
+What's the difference between train_V2 and the train files in semeval folders?
+We can consider ,aspect, category as ,latent, since no where they occurr?!
+
+Next:
+- skip: word alignment
+- skip: train+test: skip models nrl, brt
+
+focus on and nrl and brt
+
+- training+test w/ augmentation
+    - where to put the aos of back-translated version (we can assume same aos as the parent) for the unsupervised
+	- but for supervised
+
+- visualization
+
+add category to review objects
+split: stratified on category, but how about aspect term? we cannot do since term could be anything!
+

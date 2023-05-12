@@ -1,87 +1,98 @@
-import pickle
-import numpy as np
-import pandas as pd
+import pickle, numpy as np, pandas as pd, random, os
+
 import torch
 from contextualized_topic_models.models.ctm import CombinedTM
 from contextualized_topic_models.utils.data_preparation import TopicModelDataPreparation
 from contextualized_topic_models.utils.preprocessing import WhiteSpacePreprocessingStopwords
 from contextualized_topic_models.evaluation.measures import CoherenceUMASS
 
-import nltk
-from nltk.corpus import stopwords as stop_words
-
-# nltk.download('stopwords')
-
-import params
 from .mdl import AbstractAspectModel
 
+class Ctm(AbstractAspectModel):
+    def __init__(self, naspects): super().__init__(naspects)
 
-class CTM(AbstractAspectModel):
-    def __init__(self, reviews, naspects, no_extremes, output):
-        super().__init__(reviews, naspects, no_extremes, output)
+    def _seed(self, seed):
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        torch.backends.cudnn.enabled = True
+        torch.backends.cudnn.deterministic = True
 
-    def load(self):
-        self.tp = pd.read_pickle(f'{self.path}model.tp.pkl')
-        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=768, n_components=self.naspects,
-                              num_epochs=10)
-        self.model_path = pd.read_pickle(f'{self.path}model.path.pkl')
-        self.mdl.load(f'{self.path[:-1]}/{self.model_path}', epoch=9)
-        # self.mdl.model.load_state_dict(torch.load(f'{self.path}model.pth'))
-        self.dict = pd.read_pickle(f'{self.path}model.dict.pkl')
-        with open(f'{self.path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
-        with open(f'{self.path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
+    def load(self, path, settings):
+        self.tp = pd.read_pickle(f'{path}model.tp')
+        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=settings['contextual_size'], n_components=self.naspects)
+        files = list(os.walk(f'{path}model'))
+        print(f'{files[-1][0]}/{files[-1][-1][-1]}')
+        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_', '').replace('.pth', '')))
+        # self.mdl.load(files[-1][0], epoch=settings['epoch'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
+        self.dict = pd.read_pickle(f'{path}model.dict')
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
-    def train(self, doctype, cores, iter, seed):
-        epoch = 10
-        preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices = self.preprocess(doctype, self.reviews)
-        self.tp = TopicModelDataPreparation("all-mpnet-base-v2")
+    def train(self, reviews_train, reviews_valid, settings, doctype, output):
+        corpus_train, self.dict = super(Ctm, self).preprocess(doctype, reviews_train, settings['no_extremes'])
+        corpus_train = [' '.join(doc) for doc in corpus_train]
 
-        training_dataset = self.tp.fit(text_for_contextual=unpreprocessed_corpus, text_for_bow=preprocessed_documents)
+        self._seed(settings['seed'])
+        self.tp = TopicModelDataPreparation(settings['pretrained_contextual_mdl'])
+
+        processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_train, stopwords_list=[]).preprocess()#we already preproccess corpus in super()
+        training_dataset = self.tp.fit(text_for_contextual=unprocessed, text_for_bow=processed)
         self.dict = self.tp.vocab
-        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=768, n_components=self.naspects,
-                              num_epochs=epoch)
-        self.mdl.fit(training_dataset)
 
-        cas = CoherenceUMASS(texts=[doc.split() for doc in preprocessed_documents],
-                             topics=self.mdl.get_topic_lists(self.naspects))
-        self.cas = cas.score()
+        valid_dataset = None
+        # bug when we have validation=> RuntimeError: mat1 and mat2 shapes cannot be multiplied (5x104 and 94x100)
+        # File "C:\ProgramData\Anaconda3\envs\lady\lib\site-packages\contextualized_topic_models\models\ctm.py", line 457, in _validation
+        if len(reviews_valid) > 0:
+            corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_valid, settings['no_extremes'])
+            corpus_valid = [' '.join(doc) for doc in corpus_valid]
+            processed_valid, unprocessed_valid, _, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
+            valid_dataset = self.tp.transform(text_for_contextual=unprocessed_valid, text_for_bow=processed_valid)
+
+        self.mdl = CombinedTM(bow_size=len(self.tp.vocab),
+                              contextual_size=settings['contextual_size'],
+                              n_components=self.naspects,
+                              num_epochs=settings['epoch'],
+                              num_data_loader_workers=settings['ncore'],
+                              batch_size=min([settings['batch_size'], len(training_dataset), len(valid_dataset) if valid_dataset else np.inf]))
+                            # drop_last=True!! So, for small train/valid sets, it raises devision by zero in val_loss /= samples_processed
+
+        self.mdl.fit(train_dataset=training_dataset, validation_dataset=valid_dataset, verbose=True, save_dir=f'{output}model', )
+        self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(settings['nwords'])).score(topk=settings['nwords'], per_topic=True)
 
         # self.mdl.get_doc_topic_distribution(training_dataset, n_samples=20)
-
         # log_perplexity = -1 * np.mean(np.log(np.sum(bert, axis=0)))
         # self.perplexity = np.exp(log_perplexity)
 
-        self.perplexity = 0
-        pd.to_pickle(self.dict, f'{self.path}model.dict.pkl')
-        pd.to_pickle(self.tp, f'{self.path}model.tp.pkl')
-        self.mdl.save(f'{self.path[:-1]}/')
-        self.mdl.model_dir = self.mdl._format_file()
-        pd.to_pickle(self.mdl.model_dir, f'{self.path}model.path.pkl')
-        # torch.save(self.mdl.model.state_dict(), f'{self.path}model.pth')
+        pd.to_pickle(self.dict, f'{output}model.dict')
+        pd.to_pickle(self.tp, f'{output}model.tp')
+        pd.to_pickle(self.cas, f'{output}model.perf.cas')
+        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
+        self.mdl.save(f'{output}model')
 
-        with open(f'{self.path}model.perf.cas', 'wb') as f:
-            pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f'{self.path}model.perf.perplexity', 'wb') as f:
-            pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
+    def get_aspect_words(self, aspect_id, nwords): return self.mdl.get_word_distribution_by_topic_id(aspect_id)[:nwords]
 
-    def preprocess(self, doctype, reviews):
-        reviews_ = [s for r in reviews for s in r.sentences]
-        docs = [' '.join(text) for text in reviews_]
-        stopwords = list(stop_words.words("english"))
-        sp = WhiteSpacePreprocessingStopwords(docs, stopwords_list=stopwords)
-        preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices = sp.preprocess()
-        return preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices
+    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+        reviews_test_ = []
+        reviews_aspects = []
+        for r in reviews_test:
+            r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+            if len(r_aspects[0]) == 0: continue  # ??
+            if random.random() < h_ratio: r_ = r.hide_aspects()
+            else: r_ = r
+            reviews_aspects.append(r_aspects)
+            reviews_test_.append(r_)
 
-    def show_topic(self, topic_id, nwords):
-        return self.mdl.get_word_distribution_by_topic_id(topic_id)[0:nwords]
+        corpus_test, _ = super(Ctm, self).preprocess(doctype, reviews_test_)
+        corpus_test = [' '.join(doc) for doc in corpus_test]
 
-    def infer(self, doctype, review):
-        # doc = [' '.join(text) for text in review]
-        preprocessed_documents, unpreprocessed_corpus, vocab, retained_indices = self.preprocess(doctype, review)
-        testing_dataset = self.tp.transform(text_for_contextual=unpreprocessed_corpus,
-                                            text_for_bow=preprocessed_documents)
-        review_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=10)
-        output_list = []
-        for lst in review_aspects:
-            output_list.append([(i, v) for i, v in enumerate(lst)])
-        return output_list
+        processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_test, stopwords_list=[]).preprocess()
+        testing_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
+        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=settings['nsamples'])
+        pairs = []
+        for i, r_pred_aspects in enumerate(reviews_pred_aspects):
+            r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
+            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, settings['nwords']))))
+
+        return pairs
