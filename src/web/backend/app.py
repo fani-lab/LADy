@@ -62,4 +62,4 @@ def get_random_row_from_csv():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
