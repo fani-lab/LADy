@@ -16,7 +16,7 @@ import { Textarea } from "@chakra-ui/textarea";
 import { InfoOutlineIcon, RepeatIcon, SmallCloseIcon } from "@chakra-ui/icons";
 
 import Footer from "../Components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@chakra-ui/button";
 import Chart from "../Components/Chart";
 import {
@@ -25,6 +25,12 @@ import {
   FormLabel,
   FormErrorMessage,
   FormHelperText,
+  Spinner,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,11 +39,33 @@ export default function Home() {
   const [formval, setformval] = useState(
     "The food was fresh and delicious, and the best part was that the chef sent us a dessert they had created that day."
   );
-  const [selectedModel, setSelectedModel] = useState("btm");
+  const [selectedModel, setSelectedModel] = useState("lda");
+  const [selectedLang, setSelectedLang] = useState("arb_Arab");
+  const [selectedNum, setSelectedNum] = useState(5);
+
   const [data, setData] = useState("");
+  const [isLoad, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // get the data from the api
+      const data = await fetch("http://localhost:5000/random");
+      // convert the data to json
+      const json = await data.json();
+
+      // set state with the result
+      console.log("data", data);
+      setIsLoading(false);
+    };
+
+    // call the function
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error);
+  }, []);
 
   const getRandomReview = async () => {
-    const response = await fetch("https://lady.onrender.com/random");
+    const response = await fetch("http://localhost:5000/random");
     const json = await response.json();
 
     setformval(json[0]);
@@ -45,6 +73,7 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(!isLoad);
 
     const requestOptions = {
       method: "POST",
@@ -52,15 +81,14 @@ export default function Home() {
       body: JSON.stringify({
         text: formval,
         model: selectedModel,
+        lang: selectedLang,
+        num: selectedNum,
       }),
     };
 
-    const response = await fetch(
-      "https://lady.onrender.com/api",
-      requestOptions
-    );
+    const response = await fetch("http://localhost:5000/api", requestOptions);
     const json = await response.json();
-
+    setIsLoading(false);
     setData(json);
   };
   let handleInputChange = (e) => {
@@ -101,51 +129,94 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container minWidth={"container.lg"} p="5">
-        <Heading mb="10">Latent Aspect Detection</Heading>
-        <FormControl isInvalid={isError}>
-          <HStack mb="5" spacing={4}>
-            <Button
-              leftIcon={<InfoOutlineIcon />}
-              colorScheme="teal"
-              variant="outline"
-            >
-              Info
-            </Button>{" "}
-            <Button
-              leftIcon={<RepeatIcon />}
-              colorScheme="teal"
-              variant="outline"
-              onClick={getRandomReview}
-            >
-              Random review
-            </Button>
-            <FormLabel>Model: </FormLabel>
-            <Select
-              maxWidth={"200px"}
-              borderColor={"teal"}
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-            >
-              <option value="btm">BTM</option>
-              <option value="lda">LDA</option>
-              <option value="random">Random</option>
-            </Select>
-          </HStack>
-          <Textarea
-            mb="5"
-            placeholder="Here is a sample placeholder"
-            onChange={handleInputChange}
-            value={formval}
-          />
-          <Button colorScheme="teal" type="submit" onClick={handleSubmit}>
-            Submit
-          </Button>
-        </FormControl>
-        {<Chart output={output} />}
+      {!isLoad ? (
+        <Container minWidth={"container.lg"} p="5">
+          <Heading mb="10">Latent Aspect Detection</Heading>
+          <FormControl isInvalid={isError}>
+            <HStack mb="5" spacing={4}>
+              <Button
+                leftIcon={<InfoOutlineIcon />}
+                colorScheme="teal"
+                variant="outline"
+              >
+                Info
+              </Button>{" "}
+              <Button
+                leftIcon={<RepeatIcon />}
+                colorScheme="teal"
+                variant="outline"
+                onClick={getRandomReview}
+              >
+                Random review
+              </Button>
+              <FormLabel>Model: </FormLabel>
+              <Select
+                maxWidth={"100px"}
+                borderColor={"teal"}
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+              >
+                <option value="lda">LDA</option>
+                <option value="btm">BTM</option>
+                <option value="ctm">CTM</option>
 
-        <Footer />
-      </Container>
+                <option value="random">Random</option>
+              </Select>
+              <FormLabel>Language </FormLabel>
+              <Select
+                maxWidth={"100px"}
+                borderColor={"teal"}
+                value={selectedLang}
+                onChange={(e) => setSelectedLang(e.target.value)}
+              >
+                <option value="none">None</option>
+                <option value="pes_Arab">Persian</option>
+                <option value="zho_Hans">Chinese</option>
+                <option value="deu_Latn">German</option>
+                <option value="arb_Arab">Arabic</option>
+                <option value="fra_Latn">French</option>
+                <option value="spa_Latn">Spanish</option>
+              </Select>
+              <FormLabel>Number of aspects</FormLabel>
+              <NumberInput
+                borderColor={"teal"}
+                value={selectedNum}
+                onChange={(value) => setSelectedNum(value)}
+                min={1}
+                max={5}
+                maxW={24}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </HStack>
+            <Textarea
+              mb="5"
+              placeholder="Here is a sample placeholder"
+              onChange={handleInputChange}
+              value={formval}
+            />
+            <Button
+              colorScheme="teal"
+              type="submit"
+              disabled={isLoad}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </FormControl>
+          {<Chart output={output} />}
+
+          <Footer />
+        </Container>
+      ) : (
+        <Center h="100vh">
+          <Spinner />
+        </Center>
+      )}
     </>
   );
 }
