@@ -49,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       // get the data from the api
-      const data = await fetch("http://localhost:5000/random");
+      const data = await fetch("https://lady.onrender.com/random");
       // convert the data to json
       const json = await data.json();
 
@@ -65,7 +65,7 @@ export default function Home() {
   }, []);
 
   const getRandomReview = async () => {
-    const response = await fetch("http://localhost:5000/random");
+    const response = await fetch("https://lady.onrender.com/random");
     const json = await response.json();
 
     setformval(json[0]);
@@ -86,7 +86,10 @@ export default function Home() {
       }),
     };
 
-    const response = await fetch("http://localhost:5000/api", requestOptions);
+    const response = await fetch(
+      "https://lady.onrender.com/api",
+      requestOptions
+    );
     const json = await response.json();
     setIsLoading(false);
     setData(json);

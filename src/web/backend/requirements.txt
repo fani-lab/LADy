@@ -1,3 +1,20 @@
 Flask
 flask_cors
 Gunicorn
+#python==3.10
+pandas==1.4.4
+spacy==3.3.1
+tqdm==4.64.1
+# spacy-transformers
+# python -m spacy download en_core_web_trf
+# python -m spacy download en_core_web_sm
+# en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.3.0/en_core_web_sm-3.3.0-py3-none-any.whl
+transformers==4.26.1
+torch==1.13.1
+sentence-transformers #for semantic simarlity of backtranslated review with original review
+scikit-learn
+gensim==4.*
+nltk==3.7
+pytrec-eval-terrier
+bitermplus==0.6.10          #install it if you want to use btm model in the aspect modeling layer
+contextualized_topic_models==2.5.0 #install it if you want to use ctm model in the aspect modeling layer
