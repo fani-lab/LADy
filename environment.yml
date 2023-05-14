@@ -1,31 +1,32 @@
 name: lady
 channels:
   - conda-forge
-  - pytorch
-  - nvidia
+#  - pytorch
+#  - nvidia
 #  - anaconda
   - defaults
 dependencies:
   - pip
-  - python=3.10
+  - python=3.8
   - pandas==1.4.4
-  - spacy==3.3.1 
+#  - spacy==3.3.1
     #spacy-transformers
     #python -m spacy download en_core_web_trf
     #python -m spacy download en_core_web_sm
   - tqdm
-  - transformers==4.26.1 #needed if augmentation via backtranslation
-  - pytorch==1.13.1
-  - pytorch-cuda=11.8 # the conda channel has issue, so pip3 install torch  --index-url https://download.pytorch.org/whl/cu118
-  - scikit-learn
-  - gensim==4.*
-  - nltk==3.7
+#  - transformers==4.26.1 #needed if augmentation via backtranslation
+#  - pytorch==1.13.1
+#  - pytorch-cuda=11.8 # the conda channel has issue, so pip3 install torch  --index-url https://download.pytorch.org/whl/cu118
+#  - scikit-learn
+#  - gensim==4.*
+#  - nltk==3.7
 #  - matplotlib
   - pip:
       - sentence-transformers #for semantic similarity of backtranslated review with its original review
       - pytrec-eval-terrier
-      - bitermplus==0.6.10    #install it if you want to use btm model in the aspect modeling layer
-      - contextualized_topic_models #install it if you want to use ctm model in the aspect modeling layer
+#      - bitermplus==0.6.10    #install it if you want to use btm model in the aspect modeling layer
+#      - contextualized_topic_models #install it if you want to use ctm model in the aspect modeling layer
+      - octis
 #    - pyLDAvis
 #    - seaborn==0.12.2
 #    - simalign==0.3

@@ -3,9 +3,8 @@ We can consider ,aspect, category as ,latent, since no where they occurr?!
 
 Next:
 - skip: word alignment
-- skip: train+test: skip models nrl, brt
-
-focus on and nrl and brt
+- skip: prep on the back-translated versions
+- train+test: octis only!!
 
 - training+test w/ augmentation
     - where to put the aos of back-translated version (we can assume same aos as the parent) for the unsupervised
