@@ -100,5 +100,5 @@ class SemEvalReview(Review):
             aos[i] = (idxlist, o, s)
         return Review(id=id, sentences=[[str(t).lower() for t in tokens]], time=None, author=None,
                       aos=[aos], lempos=None,
-                      parent=None, lang='eng_Latn') if aos else None
+                      parent=None, lang='eng_Latn', category=category) if aos else None
 
