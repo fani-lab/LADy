@@ -70,6 +70,7 @@ class Review(object):
         self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
         return self.augs[tgt]
 
+
     def semsim(self, other):
         if not Review.semantic_mdl:
             from sentence_transformers import SentenceTransformer
