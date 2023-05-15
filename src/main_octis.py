@@ -42,7 +42,7 @@ def main(args):
         # if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
         # if "lda" == args.am: from octis.models.LDA import LDA; am = LDA() ==> octis uses the single thread LdaModel instead of LdaMulticore!
         # if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
-        if "ctm" == args.am: from octis.models.CTM import CTM; am = CTM(inference_type='combined');
+        if "ctm" == args.am: from octis.models.CTM import CTM; am = CTM();
         if "nrl" == args.am: from octis.models.NeuralLDA import NeuralLDA; am = NeuralLDA()
 
         am.hyperparameters.update(params.settings['train'][args.am])

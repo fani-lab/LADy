@@ -38,8 +38,11 @@ settings = {
                 'contextual_size': 768,
                 'batch_size': 100,
                 'num_samples': 10,
+                'inference_type': 'combined', #for 'zeroshot' from octis only
                 },
-        'nrl': {},
+        'nrl': {'num_epochs': 1000,
+                'batch_size': 100,
+                'num_samples': 10,},
         },
     'test': {'h_ratio': 1.0},
     'eval': {
