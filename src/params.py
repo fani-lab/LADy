@@ -27,6 +27,7 @@ settings = {
         'langaug_semsim': 0.5, # backtranslated review is in training if its semantic similarity with original review is >= this value
         'nwords': 20,
         'qualities': ['coherence', 'perplexity'],
+        'quality': ['u_mass'],#[, 'c_v', 'c_uci', 'c_npmi'],
         'no_extremes': None,
                 # {'no_below': 10,   # happen less than no_below number in total
                 #  'no_above': 0.9}  # happen in no_above percent of reviews
@@ -39,10 +40,15 @@ settings = {
                 'batch_size': 100,
                 'num_samples': 10,
                 'inference_type': 'combined', #for 'zeroshot' from octis only
+                'ncore': ncore,
+                'verbose': True,
                 },
         'nrl': {'num_epochs': 1000,
                 'batch_size': 100,
-                'num_samples': 10,},
+                'num_samples': 10,
+                'ncore': ncore,
+                'verbose': True,
+                },
         },
     'test': {'h_ratio': 1.0},
     'eval': {

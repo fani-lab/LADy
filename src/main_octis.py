@@ -38,29 +38,28 @@ def main(args):
     output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
     if 'train' in params.settings['cmd']:
-        from octis.dataset.dataset import Dataset
-        # if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
-        # if "lda" == args.am: from octis.models.LDA import LDA; am = LDA() ==> octis uses the single thread LdaModel instead of LdaMulticore!
-        # if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
-        if "ctm" == args.am: from octis.models.CTM import CTM; am = CTM();
-        if "nrl" == args.am: from octis.models.NeuralLDA import NeuralLDA; am = NeuralLDA()
-
-        am.hyperparameters.update(params.settings['train'][args.am])
-        am.hyperparameters.update({'num_topics': args.naspects})
-
         print(f'\n2. Aspect model training for {args.am} ...')
         print('#' * 50)
 
         for f in splits['folds'].keys():
             octis_ds = f'{output}/octis/f{f}/'
             octis_model_output = f'{output}/octis/{args.am}/'
-            if 'bert_path' in am.hyperparameters.keys(): am.hyperparameters['bert_path'] = octis_ds
             try:
                 print(f'2.1. Loading saved aspect model from {octis_model_output}f{f}.model.npz ...')
                 am = load_model_output(f'{octis_model_output}f{f}.model.npz', top_words=params.settings['train']['nwords'])
                 am['metrics'] = pd.read_pickle(f'{octis_model_output}f{f}.model.perf.cas')
             except (FileNotFoundError, EOFError) as e:
                 print(f'2.1. Loading saved aspect model failed! Training {args.am} for {args.naspects} of aspects ...')
+                from octis.dataset.dataset import Dataset
+                # if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
+                # if "lda" == args.am: from octis.models.LDA import LDA; am = LDA() ==> octis uses the single thread LdaModel instead of LdaMulticore!
+                # if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
+                if "ctm" == args.am: from octis.models.CTM import CTM; am = CTM();
+                if "nrl" == args.am: from octis.models.NeuralLDA import NeuralLDA; am = NeuralLDA()
+
+                am.hyperparameters.update(params.settings['train'][args.am])
+                am.hyperparameters.update({'num_topics': args.naspects})
+
                 dataset = Dataset()
                 try: dataset.load_custom_dataset_from_folder(octis_ds)
                 except:
@@ -74,6 +73,7 @@ def main(args):
 
                 # training
                 t_s = time.time()
+                if 'bert_path' in am.hyperparameters.keys(): am.hyperparameters['bert_path'] = octis_ds
                 am.use_partitions = True
                 am.update_with_test = True
                 am_output = am.train_model(dataset, top_words=params.settings['train']['nwords'])
@@ -82,7 +82,8 @@ def main(args):
                 if not os.path.isdir(octis_model_output): os.makedirs(octis_model_output)
                 save_model_output(am_output, f'{octis_model_output}f{f}.model')
                 metrics = {}
-                for m in ['u_mass', 'c_v', 'c_uci', 'c_npmi']: metrics[m] = Coherence(topk=params.settings['train']['nwords'], measure=m, processes=params.settings['train'][args.am]['ncore']).score(am_output)
+                # octis uses '20NewsGroup' as default corpus when no text passes! No warning?!
+                for m in params.settings['train']['quality']: metrics[m] = Coherence(texts=dataset.get_corpus(), topk=params.settings['train']['nwords'], measure=m, processes=params.settings['train'][args.am]['ncore']).score(am_output)
                 pd.to_pickle(metrics, f'{octis_model_output}f{f}.model.perf.cas')
 
             # testing

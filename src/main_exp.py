@@ -41,6 +41,6 @@ if __name__ == '__main__':
                         # params.settings['train']['ratio'] = 0.999
                         # params.settings['train']['nfolds'] = 0
                         params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                        params.settings['cmd'] = ['prep', 'train', 'test', 'eval', 'agg']
+                        params.settings['cmd'] = ['prep', 'train', 'test']
                         main_octis.main(args) if octis else main.main(args)
             if 'agg' in params.settings['cmd']: main.agg(args.output, args.output)
