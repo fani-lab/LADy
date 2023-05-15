@@ -3,8 +3,7 @@ import gensim, pickle, random
 from .mdl import AbstractAspectModel
 
 class Rnd(AbstractAspectModel):
-    def __init__(self, naspects):
-        super().__init__(naspects)
+    def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path, settings):
         self.dict = gensim.corpora.Dictionary.load(f'{path}model.dict')
@@ -15,6 +14,5 @@ class Rnd(AbstractAspectModel):
         review_ = super(Rnd, self).preprocess(doctype, [review])
         return [[(0, 1)] for r in review_]
 
-    def get_aspect_words(self, aspect_id, nwords):
-        return [(i, 1) for i in random.sample(self.dict.token2id.keys(), min(nwords, len(self.dict)))]
+    def get_aspect_words(self, aspect_id, nwords): return [(i, 1) for i in random.sample(self.dict.token2id.keys(), min(nwords, len(self.dict)))]
 

@@ -5,6 +5,7 @@ import argparse
 
 import params
 import main
+import main_octis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
@@ -20,18 +21,19 @@ if __name__ == '__main__':
                 # ('../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml', '../output/semeval+/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
                 ]
 
+    octis = True
     for (data, output) in datasets:
         args.data = data
         args.output = output
         params.settings['prep']['langaug'] = ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
         params.settings['cmd'] = ['prep']
-        # main.main(args)
+        main_octis.main(args) if octis else main.main(args)
         langs = params.settings['prep']['langaug'].copy()
         langs.extend([params.settings['prep']['langaug']])
         for lang in langs:
             params.settings['prep']['langaug'] = lang if isinstance(lang, list) else [lang]
-            for am in ['ctm',]:#, 'rnd', 'lda', 'btm', 'ctm', 'nrl']:
-                for naspects in range(5, 30, 5):
+            for am in ['ctm', 'nrl'] if octis else ['rnd', 'lda', 'btm', 'ctm',]:
+                for naspects in [5]:#range(5, 30, 5):
                     for hide in range(0, 110, 10):
                         args.am = am
                         args.naspects = naspects
@@ -40,5 +42,5 @@ if __name__ == '__main__':
                         # params.settings['train']['nfolds'] = 0
                         params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
                         params.settings['cmd'] = ['prep', 'train', 'test', 'eval', 'agg']
-                        # main(args)
+                        main_octis.main(args) if octis else main.main(args)
             if 'agg' in params.settings['cmd']: main.agg(args.output, args.output)

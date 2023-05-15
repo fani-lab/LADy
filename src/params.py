@@ -25,30 +25,21 @@ settings = {
         'ratio': 0.85, # 1 - ratio goes to test. To train on entire dataset: 0.999 and 'nfolds': 0
         'nfolds': 5, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
         'langaug_semsim': 0.5, # backtranslated review is in training if its semantic similarity with original review is >= this value
-        'rnd': {'nwords': 20, 'qualities': ['Coherence', 'Perplexity'],
-                'no_extremes': None
-                    # {'no_below': 10,   # happen less than no_below number in total
-                    #  'no_above': 0.9}  # happen in no_above percent of reviews
-                },
-        'lda': {'passes': 1000, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
-                'no_extremes': None
-                    # {'no_below': 10,   # happen less than no_below number in total
-                    #  'no_above': 0.9}  # happen in no_above percent of reviews
-                },
-        'btm': {'iter': 1000, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
-                'no_extremes': None
+        'nwords': 20,
+        'qualities': ['coherence', 'perplexity'],
+        'no_extremes': None,
                 # {'no_below': 10,   # happen less than no_below number in total
                 #  'no_above': 0.9}  # happen in no_above percent of reviews
-                },
-        'ctm': {'epoch': 1000, 'nwords': 20, 'qualities': ['Coherence', 'Perplexity'], 'ncore': ncore, 'seed': seed,
-                'pretrained_contextual_mdl': 'all-mpnet-base-v2',
+        'rnd': {},
+        'lda': {'passes': 1000, 'workers': ncore, 'random_state': seed, 'per_word_topics': True},
+        'btm': {'iter': 1000, 'ncore': ncore, 'seed': seed},
+        'ctm': {'num_epochs': 1000, 'ncore': ncore, 'seed': seed,
+                'bert_model': 'all-mpnet-base-v2',
                 'contextual_size': 768,
                 'batch_size': 100,
-                'nsamples': 10,
-                'no_extremes': None,
-                # {'no_below': 10,   # happen less than no_below number in total
-                #  'no_above': 0.9}  # happen in no_above percent of reviews
+                'num_samples': 10,
                 },
+        'nrl': {},
         },
     'test': {'h_ratio': 1.0},
     'eval': {

@@ -88,11 +88,11 @@ def train(args, am, train, valid, f, output):
     except (FileNotFoundError, EOFError) as e:
         print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
-        am.train(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], f'{output}/f{f}.')
+        am.train(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
 
         from aml.mdl import AbstractAspectModel
         print(f'2.2. Quality of aspects ...')
-        for q in params.settings['train'][am.name()]['qualities']: print(f'({q}: {am.quality(q)})')
+        for q in params.settings['train']['qualities']: print(f'({q}: {am.quality(q)})')
 
 def test(am, test, f, output):
     print(f'\n3. Aspect model testing for {am.name()} ...')
@@ -165,11 +165,11 @@ def main(args):
     output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
     if not os.path.isdir(output): os.makedirs(output)
-    if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
-    if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects)
-    if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
-    if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects)
-    if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects)
+    if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords'])
+    if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
+    if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
+    if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'])
+    if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects, params.settings['train']['nwords'])
     output = f'{output}/{am.name()}/'
 
     if 'train' in params.settings['cmd']:

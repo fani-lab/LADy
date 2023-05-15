@@ -5,6 +5,7 @@ Next:
 - skip: word alignment
 - skip: prep on the back-translated versions
 - train+test: octis only!!
+- refactor quality metrics as octis offers many
 
 - training+test w/ augmentation
     - where to put the aos of back-translated version (we can assume same aos as the parent) for the unsupervised
