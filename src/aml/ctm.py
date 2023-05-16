@@ -92,7 +92,7 @@ class Ctm(AbstractAspectModel):
         reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=settings['num_samples'])
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
-            r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
+            r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
             pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))
 
         return pairs

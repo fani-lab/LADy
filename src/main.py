@@ -105,7 +105,7 @@ def test(am, test, f, output):
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
         am.load(f'{output}/f{f}.', params.settings['train'][am.name()])
         print(f'3.3. Testing aspect model ...')
-        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], settings=params.settings['train'][am.__class__.__name__.lower()])
+        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], settings=params.settings['train'][am.name()])
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
 def evaluate(input, output):
@@ -169,7 +169,9 @@ def main(args):
     if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
     if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
     if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'])
-    if "nrl" == args.am: from aml.nrl import Nrl; am = Nrl(args.naspects, params.settings['train']['nwords'])
+    if "octis.ctm" == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+    if "octis.neurallda" == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+
     output = f'{output}/{am.name()}/'
 
     if 'train' in params.settings['cmd']:

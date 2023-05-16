@@ -78,7 +78,7 @@ class Btm(AbstractAspectModel):
         reviews_pred_aspects = self.mdl.transform(btm.get_vectorized_docs(corpus_test, self.dict))
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
-            r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
+            r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
             pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))
 
         return pairs

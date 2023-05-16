@@ -51,14 +51,13 @@ def main(args):
             except (FileNotFoundError, EOFError) as e:
                 print(f'2.1. Loading saved aspect model failed! Training {args.am} for {args.naspects} of aspects ...')
                 from octis.dataset.dataset import Dataset
-                # if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects)
                 # if "lda" == args.am: from octis.models.LDA import LDA; am = LDA() ==> octis uses the single thread LdaModel instead of LdaMulticore!
-                # if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects)
                 if "ctm" == args.am: from octis.models.CTM import CTM; am = CTM();
                 if "nrl" == args.am: from octis.models.NeuralLDA import NeuralLDA; am = NeuralLDA()
 
                 am.hyperparameters.update(params.settings['train'][args.am])
                 am.hyperparameters.update({'num_topics': args.naspects})
+                am.hyperparameters.update({'save_dir': f'{octis_model_output}f{f}.model'})
 
                 dataset = Dataset()
                 try: dataset.load_custom_dataset_from_folder(octis_ds)

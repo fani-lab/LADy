@@ -1,120 +1,106 @@
-import gensim, logging, pickle
-import re
-import pandas as pd
-import numpy as np
-from octis.models.NeuralLDA import NeuralLDA
-from octis.models.CTM import CTM
-from octis.models.ETM import ETM
+import random, logging, pickle, pandas as pd, numpy as np, os, string
+
+import nltk
+import torch
+
+from octis.models.model import *
 from octis.dataset.dataset import Dataset
-import os
-import string
 from octis.preprocessing.preprocessing import Preprocessing
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 from octis.evaluation_metrics.coherence_metrics import Coherence
 
-from sklearn.feature_extraction.text import CountVectorizer
-
-import gensim
-from gensim.models.coherencemodel import CoherenceModel
-import gensim.corpora as corpora
-
-
-import nltk
-
-stop_words = nltk.corpus.stopwords.words('english')
-
-import params
 from .mdl import AbstractAspectModel
-
+from cmn.review import Review
 
 class Nrl(AbstractAspectModel):
-    def __init__(self, reviews, naspects, no_extremes, output):
-        super().__init__(reviews, naspects, no_extremes, output)
+    def __init__(self, octis_mdl, naspects, nwords, metrics):
+        super().__init__(naspects, nwords)
+        self.mdl = octis_mdl
+        self.metrics = metrics
 
-    def load(self):
-        self.mdl = pd.read_pickle(f'{self.path}model.pkl')
-        # with open('model.dict') as f:
-        #     self.dict = f.read().splitlines()
-        self.naspects = pd.read_pickle(f'{self.path}naspects.pkl')
-        self.dict = pd.read_pickle(f'{self.path}model.dict.pkl')
-        with open(f'{self.path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
-        with open(f'{self.path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
-    # def preprocess(doctype, reviews):
-    #     reviews_ = [s for r in reviews for s in r.sentences]
+    def name(self): return 'octis.' + self.mdl.__class__.__name__.lower()
+    def _seed(self, seed):
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        torch.backends.cudnn.enabled = True
+        torch.backends.cudnn.deterministic = True
 
-    def preprocess(self, doctype, reviews):
-        removed_indices = []
-        if doctype == 'rvw': reviews_ = [np.concatenate(r.sentences) for r in reviews]
-        else:
-            for i, r in enumerate(reviews):
-                if not r.sentences:
-                    removed_indices.append(i)
-            reviews_ = [s for r in reviews for s in r.sentences]
-        return [[word for word in doc if word not in stop_words and len(word) > 3 and re.match('[a-zA-Z]+', word)] for doc in reviews_], removed_indices
+    def load(self, path, settings):
+        self.mdl_out = load_model_output(f'{path}model.out.npz', vocabulary_path=None, top_words=self.nwords)
+        self.mdl = pd.read_pickle(f'{path}model')
+        self.dict = pd.read_pickle(f'{path}model.dict')
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
-    def train(self, doctype, cores, iter, seed, test=None):
+    def _create_ds(self, reviews_train, reviews_valid, output):
+        if not os.path.isdir(output): os.makedirs(output)
+        df_train = Review.to_df(reviews_train, w_augs=False)
+        df_train['part'] = 'train'
+        df_valid = Review.to_df(reviews_valid, w_augs=False)
+        df_valid['part'] = 'val'
+        df = pd.concat([df_train, df_valid])
+        df.to_csv(f'{output}/corpus.tsv', sep='\t', encoding='utf-8', index=False, columns=['text', 'part'], header=None)
 
-        model = ETM(num_topics=self.naspects, batch_size=params.iter_c)
-        reviews_ = super().preprocess(doctype, self.reviews)
-        reviews_ = [' '.join(text) for text in reviews_]
-        train_tag = ['train' for r in reviews_]
-
-        test_reviews_, self.removed_indices = self.preprocess(doctype, test)
-        test = [' '.join(text) for text in test_reviews_]
-        test_tag = ['test' for r in test]
-        vectorizer = CountVectorizer()
-        vectorizer.fit_transform(reviews_)
-        # Get the list of unique words
-        self.dict = vectorizer.get_feature_names()
-
-        model_path = self.path[:self.path.rfind("/")]
-        with open(f'{model_path}/vocabulary.txt', "w", encoding="utf-8") as file:
-            for item in self.dict:
-                file.write("%s\n" % item)
-        with open(f'{model_path}/corpus.tsv', "w", encoding="utf-8") as outfile:
-            for i in range(len(reviews_)):
-                if reviews_[i] == '':
-                    continue
-                outfile.write("{}\t{}\n".format(reviews_[i], train_tag[i]))
-                # if i < len(reviews_)-100:
-                #     outfile.write("{}\t{}\n".format(reviews_[i], train_tag[i]))
-                # else:
-                #     outfile.write("{}\t{}\n".format(reviews_[i], 'val'))
-            for i in range(len(test)):
-                outfile.write("{}\t{}\n".format(test[i], test_tag[i]))
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
 
         dataset = Dataset()
-        dataset.load_custom_dataset_from_folder(f'{model_path}')
-
-        # Dataset.save(dataset, f'{self.path}model.dataset')
-        # Dataset._save_vocabulary(dataset, f'{self.path}model.dict')
-
+        try: dataset.load_custom_dataset_from_folder(f'{output}corpus')
+        except:
+            self._create_ds(reviews_train, reviews_valid, f'{output}corpus')
+            dataset.load_custom_dataset_from_folder(f'{output}corpus')
         self.dict = dataset.get_vocabulary()
-        self.mdl = model.train_model(dataset)
-        # npmi = Coherence(texts=dataset.get_corpus(), topk=params.nwords, measure='u_mass')
-        npmi = Coherence(texts=dataset.get_corpus(), measure='u_mass')
-        self.cas = npmi.score(self.mdl)
-        self.perplexity = 0
+        self.mdl.hyperparameters.update(settings)
+        self.mdl.hyperparameters.update({'num_topics': self.naspects})
+        self.mdl.hyperparameters.update({'save_dir': None})#f'{output}model'})
 
-        pd.to_pickle(self.dict, f'{self.path}model.dict.pkl')
-        pd.to_pickle(self.removed_indices, f'{self.path}ridx.pkl')
-        pd.to_pickle(self.mdl, f'{self.path}model.pkl')
-        pd.to_pickle(self.naspects, f'{self.path}naspects.pkl')
-        with open(f'{self.path}model.perf.cas', 'wb') as f:
-            pickle.dump(self.cas, f, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f'{self.path}model.perf.perplexity', 'wb') as f:
-            pickle.dump(self.perplexity, f, protocol=pickle.HIGHEST_PROTOCOL)
+        if 'bert_path' in self.mdl.hyperparameters.keys(): self.mdl.hyperparameters['bert_path'] = f'{output}corpus/'
+        self.mdl.use_partitions = True
+        self.mdl.update_with_test = True
+        self.mdl_out = self.mdl.train_model(dataset, top_words=self.nwords)
 
-    def show_topic(self, topic_id, nwords):
-        word_list = self.mdl['topics'][topic_id]
+        save_model_output(self.mdl_out, f'{output}model.out')
+        # octis uses '20NewsGroup' as default corpus when no text passes! No warning?!
+        self.cas = Coherence(texts=dataset.get_corpus(), topk=self.nwords, measure='u_mass', processes=settings['ncore']).score(self.mdl_out)
+        pd.to_pickle(self.cas, f'{output}model.perf.cas')
+        pd.to_pickle(self.dict, f'{output}model.dict')
+        pd.to_pickle(self.mdl, f'{output}model')
+        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
+
+    def get_aspect_words(self, aspect_id, nwords):
+        word_list = self.mdl_out['topics'][aspect_id]
         probs = []
-        matrix = self.mdl['topic-word-matrix'][topic_id]
-        for w in word_list:
-            probs.append(matrix[self.dict.index(w)])
+        for w in word_list: probs.append(self.mdl_out['topic-word-matrix'][aspect_id][self.dict.index(w)])
         return list(zip(word_list, probs))
 
-    def infer(self, doctype, review, idx=None):
-        review_aspects = []
-        for t in range(self.naspects):
-            review_aspects.append((t, self.mdl['test-topic-document-matrix'].T[idx][t]))
-        return [review_aspects]
+    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+        reviews_test_ = []
+        reviews_aspects = []
+        for r in reviews_test:
+            r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+            if len(r_aspects[0]) == 0: continue  # ??
+            if random.random() < h_ratio: r_ = r.hide_aspects()
+            else: r_ = r
+            reviews_aspects.append(r_aspects)
+            reviews_test_.append(r_)
+
+        from sklearn.feature_extraction.text import CountVectorizer
+        from octis.models.pytorchavitm import datasets
+
+        vocab2id = {w: i for i, w in enumerate(self.mdl.vocab)}
+        vec = CountVectorizer(vocabulary=vocab2id, token_pattern=r'(?u)\b\w+\b')
+        test = [r.get_txt() for r in reviews_test_]
+        vec.fit(test)
+        idx2token = {v: k for (k, v) in vec.vocabulary_.items()}
+        test = vec.transform(test)
+        test = datasets.BOWDataset(test.toarray(), idx2token)
+        test = self.mdl.inference(test)
+
+        reviews_pred_aspects = [test['test-topic-document-matrix'][:, rdx] for rdx, _ in enumerate(reviews_test_)]
+        pairs = []
+        for i, r_pred_aspects in enumerate(reviews_pred_aspects):
+            r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
+            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))
+
+        return pairs

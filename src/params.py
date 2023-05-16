@@ -39,11 +39,11 @@ settings = {
                 'contextual_size': 768,
                 'batch_size': 100,
                 'num_samples': 10,
-                'inference_type': 'combined', #for 'zeroshot' from octis only
+                'inference_type': 'combined', #for 'zeroshot' from octis.ctm only
                 'ncore': ncore,
                 'verbose': True,
                 },
-        'nrl': {'num_epochs': 1000,
+        'octis.neurallda': {'num_epochs': 1000,
                 'batch_size': 100,
                 'num_samples': 10,
                 'ncore': ncore,
@@ -57,3 +57,6 @@ settings = {
         'syn': False, #synonyms be added to evaluation
     },
 }
+
+settings['train']['octis.ctm'] = settings['train']['ctm']
+settings['train']['octis.ctm']['inference_type'] = 'zeroshot'
