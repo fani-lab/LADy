@@ -74,14 +74,28 @@ def metrics(name, ref_data, can_data):
 
 def main(args):
     averageMetrics = []
+    all_results = []
 
     for d in args.data:
         print(f'=================={d}========================')
         og_data = f'../../output/augmentation-R-{d}/augmented-with-labels/All.back-translated.with-labels.csv' # Original Dataset
         averageMetrics.append(avg_sentence_tokens(f'R-{d} D', og_data))
+        for l in args.lan:
+            trans_data = f'../../output/augmentation-R-{d}/back-translation/D.{l}.csv' # Translated Dataset
+            back_trans_data = f'../../output/augmentation-R-{d}/back-translation/D_{l}.csv' # Back-translated Dataset
+
+            all_results.append(metrics(f'D -> D.{l}', og_data, trans_data))
+            all_results.append(metrics(f'D.{l} -> D_{l}', trans_data, back_trans_data))
+            all_results.append(metrics(f'D -> D_{l}', og_data, back_trans_data))
+
+            averageMetrics.append(avg_sentence_tokens(f'R-{d} D.{l}', trans_data))
+            averageMetrics.append(avg_sentence_tokens(f'R-{d} D_{l}', back_trans_data))
+        
+        df = pd.DataFrame(all_results, columns=["Name", "BLEU", "ROUGE-L", "EM"])
+        df.to_csv(f'../../output/back-translation-metrics/back-translation-metrics-R-{d}.csv', index=None)
     
     avg_df = pd.DataFrame(averageMetrics, columns=["Name", "Total Sentences", "Total Tokens", "Avg Tokens"])
-    avg_df.to_csv(f'../../output/back-translation-metrics/All-lang-average-sentences-tokens-R-{args.data}.csv', index=None)
+    avg_df.to_csv(f'../../output/back-translation-metrics/average-sentences-tokens-R-{args.data}.csv', index=None)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Back-translation Metrics')
