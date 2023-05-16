@@ -1,12 +1,7 @@
-import argparse, os, pickle
-from time import time
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
-import sys
+import argparse
 import pandas as pd
-from tqdm import tqdm
 import nltk
 from rouge import Rouge
-from sklearn.metrics import accuracy_score
 
 def tokenize(raw_corpus, nested):
     corpus = []
@@ -73,10 +68,10 @@ def metrics(name, ref_data, can_data):
     return metrics
 
 def main(args):
-    averageMetrics = []
     all_results = []
 
     for d in args.data:
+        averageMetrics = []
         print(f'=================={d}========================')
         og_data = f'../../output/augmentation-R-{d}/augmented-with-labels/All.back-translated.with-labels.csv' # Original Dataset
         averageMetrics.append(avg_sentence_tokens(f'R-{d} D', og_data))
