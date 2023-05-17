@@ -21,14 +21,14 @@ def load(ref_path, can_path, need_token, r_flag, c_flag):
 
     return ref_corpus, can_corpus
 
-def avg_sentence_tokens(name, path):
+def avg_sentence_tokens(name, path, lan):
     # calculate the average number of sentences
     corpus = pd.read_csv(f'{path}')['sentences'].tolist()
     num_sentences = len(corpus)
 
     sum_tokens = 0
     for sentence in corpus:
-        sum_tokens += len(sentence.split())
+        sum_tokens += len(sentence.split() if not lan == '.zho' else list(sentence))
     
     return [name, num_sentences, sum_tokens, sum_tokens / num_sentences]
 
@@ -68,34 +68,34 @@ def metrics(name, ref_data, can_data):
     return metrics
 
 def main(args):
-    all_results = []
+    tokenMetrics = []
 
     for d in args.data:
-        averageMetrics = []
+        score_metrics = []
         print(f'=================={d}========================')
-        og_data = f'../../output/augmentation-R-{d}/augmented-with-labels/All.back-translated.with-labels.csv' # Original Dataset
-        averageMetrics.append(avg_sentence_tokens(f'R-{d} D', og_data))
+        og_data = f'../../output/augmentation-R-{d}/back-translation/D.csv' # Original Dataset
+        tokenMetrics.append(avg_sentence_tokens(f'R-{d} D', og_data, "eng"))
         for l in args.lan:
             trans_data = f'../../output/augmentation-R-{d}/back-translation/D.{l}.csv' # Translated Dataset
             back_trans_data = f'../../output/augmentation-R-{d}/back-translation/D_{l}.csv' # Back-translated Dataset
 
-            all_results.append(metrics(f'D -> D.{l}', og_data, trans_data))
-            all_results.append(metrics(f'D.{l} -> D_{l}', trans_data, back_trans_data))
-            all_results.append(metrics(f'D -> D_{l}', og_data, back_trans_data))
+            score_metrics.append(metrics(f'D -> D.{l}', og_data, trans_data))
+            score_metrics.append(metrics(f'D.{l} -> D_{l}', trans_data, back_trans_data))
+            score_metrics.append(metrics(f'D -> D_{l}', og_data, back_trans_data))
 
-            averageMetrics.append(avg_sentence_tokens(f'R-{d} D.{l}', trans_data))
-            averageMetrics.append(avg_sentence_tokens(f'R-{d} D_{l}', back_trans_data))
+            tokenMetrics.append(avg_sentence_tokens(f'R-{d} D.{l}', trans_data, "." + l))
+            tokenMetrics.append(avg_sentence_tokens(f'R-{d} D_{l}', back_trans_data, "_" + l))
         
-        df = pd.DataFrame(all_results, columns=["Name", "BLEU", "ROUGE-L", "EM"])
+        df = pd.DataFrame(score_metrics, columns=["Name", "BLEU", "ROUGE-L", "EM"])
         df.to_csv(f'../../output/back-translation-metrics/back-translation-metrics-R-{d}.csv', index=None)
     
-    avg_df = pd.DataFrame(averageMetrics, columns=["Name", "Total Sentences", "Total Tokens", "Avg Tokens"])
+    avg_df = pd.DataFrame(tokenMetrics, columns=["Name", "Total Sentences", "Total Tokens", "Avg Tokens"])
     avg_df.to_csv(f'../../output/back-translation-metrics/average-sentences-tokens-R-{args.data}.csv', index=None)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Back-translation Metrics')
     #parser.add_argument('--mt',  nargs='+', type=str.lower, required=True, default=['nllb'], help='a list of translator models')
-    #parser.add_argument('--lan',  nargs='+', type=str, required=True, default='deu', help='a list of desired languages')
+    parser.add_argument('--lan',  nargs='+', type=str, required=True, default='deu', help='a list of desired languages')
     parser.add_argument('--data', nargs='+', type=str, default='16', required=True, help='year of the data (SemEval), e.g., 16 for SemEval 16')
     #parser.add_argument('--output', dest='output', type=str, default='../../output', help='output path, e.g., ../output')
     args = parser.parse_args()
