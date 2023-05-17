@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0040)https://alt.qcri.org/semeval2015/task12/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>SemEval-2015 Task 12: Aspect Based Sentiment Analysis &lt; SemEval-2015 Task 12</title>
+<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="SemEval-2015%20Task%2012_%20Aspect%20Based%20Sentiment%20Analysis%20_%20SemEval-2015%20Task%2012_files%20Task%2012_files/style.css" type="text/css" media="screen">
+</head>
+<body id="index" data-new-gr-c-s-check-loaded="14.1080.0" data-gr-ext-installed="">
+<div id="bhm-main">
+	<div class="cleared reset-box"></div>
+	<div class="bhm-box bhm-sheet">
+		<div class="bhm-box-body bhm-sheet-body">
+		<div class="bhm-bar bhm-nav">
+		<div class="bhm-nav-outer">
+		<ul class="bhm-hmenu">
+		<li class="current  index"><a href="http://alt.qcri.org/semeval2015/task12/" title="SemEval-2015 Task 12: Aspect Based Sentiment Analysis">Home</a></li>
+<li class="important-dates"><a href="http://alt.qcri.org/semeval2015/task12/index.php?id=important-dates" title="Important Dates">Important Dates</a></li>
+<li class="data-and-tools"><a href="http://alt.qcri.org/semeval2015/task12/index.php?id=data-and-tools" title="Data and Tools">Data and Tools</a></li>
+<li class="google-group"><a href="http://alt.qcri.org/semeval2015/task12/index.php?id=google-group" title="Google Group">Google Group</a></li>
+<li class="contact"><a href="http://alt.qcri.org/semeval2015/task12/index.php?id=contact" title="Contact">Contact</a></li>
+<li class="index cfp"><a href="http://alt.qcri.org/semeval2015/task12/index.php?id=cfp" title="CFP">CFP</a></li>
+		</ul></div></div>
+		<div class="cleared reset-box"></div>
+		<div class="bhm-header">
+		<div class="bhm-logo">
+		<h1 class="bhm-logo-name"><a href="https://alt.qcri.org/semeval2015/task12/#">SemEval-2015 Task 12</a></h1>
+		<h2 class="bhm-logo-text"></h2>
+		</div>                
+		</div>		
+		<div class="cleared reset-box"></div>
+		<div class="bhm-layout-wrapper">
+			<div class="bhm-content-layout">
+			<div class="bhm-content-layout-row">
+			<div class="bhm-layout-cell bhm-content">
+			<div class="bhm-box bhm-post">
+			<div class="bhm-box-body bhm-post-body">
+			<div class="bhm-post-inner bhm-article">
+			<h2 class="bhm-postheader">SemEval-2015 Task 12: Aspect Based Sentiment Analysis</h2>
+			<div class="bhm-postheadericons bhm-metadata-icons">
+
+			</div>
+			<div class="bhm-postcontent">
+			<p>
+	&nbsp;</p>
+<p>
+	<strong>Introduction</strong></p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	With the proliferation of user-generated content, interest in mining sentiment and opinions in text has grown rapidly, both in academia and business. The majority of current approaches, however, attempt to detect the overall polarity of a sentence, paragraph, or text span, irrespective of the entities mentioned (e.g., laptops, battery, screen) and their attributes (e.g. price, design, quality). The SemEval-2015 Aspect Based Sentiment Analysis (SE-ABSA15) task is a continuation of SemEval-2014 Task 4 (SE-ABSA14). In aspect-based sentiment analysis (ABSA) the aim is to identify the aspects of entities and the sentiment expressed for each aspect. The ultimate goal is to be able to generate summaries listing all the aspects and their overall polarity such as the example shown in Fig. 1.</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: center;">
+	<img alt="" height="180" src="SemEval-2015%20Task%2012_%20Aspect%20Based%20Sentiment%20Analysis%20_%20SemEval-2015%20Task%2012_files%20Task%2012_files/table.png" width="284"></p>
+<p style="text-align: center;">
+	Figure 1: Table summarizing the average sentiment for each aspect of an entity.</p>
+<p style="text-align: center;">
+	&nbsp;</p>
+<p>
+	<strong>Task Description</strong></p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	SE-ABSA15 will focus on the same domains as SE-ABSA14 (restaurants and laptops). However, unlike SE-ABSA14, the input datasets of SE-ABSA15 will contain entire reviews, not isolated (potentially out of context) sentences.&nbsp; SE-ABSA15 consolidates the four subtasks of SE-ABSA14 within a unified framework. In addition, SE-ABSA15 will include an out-of-domain ABSA subtask, involving test data from a domain unknown to the participants, other than the domains that will be considered during training. In particular, SE-ABSA15 consists of the following two subtasks.</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p>
+	<strong>Subtask 1: In-domain ABSA</strong></p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	Given a review text about a laptop or a restaurant, identify the following types of information:</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<strong>Slot 1</strong>: Aspect Category (Entity and Attribute). Identify every entity E and attribute A pair E#A towards which an opinion is expressed in the given text. E and A should be chosen from predefined inventories of Entity types (e.g. laptop, keyboard, operating system, restaurant, food, drinks) and Attribute labels (e.g. performance, design, price, quality) per domain. Each E#A pair defines an aspect category of the given text.</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	The E#A inventories for the laptops domain contains 22 Entity types (LAPTOP, DISPLAY, CPU, MOTHERBOARD, HARD DISC, MEMORY, BATTERY, etc.) and 9 Attribute labels (GENERAL, PRICE, QUALITY, OPERATION_PERFORMANCE, etc.). The entity types and attribute labels are described in the respective annotation <a href="http://alt.qcri.org/semeval2015/task12/data/uploads/semeval2015_absa_laptops_annotationguidelines.pdf">guidelines</a> document. Some examples highlighting these annotations are given below:</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p>
+	(1)&nbsp; It fires up in the morning in less than 30 seconds and I have never had any issues with it freezing.&nbsp;→ {LAPTOP#OPERATION_PERFORMANCE}<br>
+	(2)&nbsp; Sometimes you will be moving your finger and the pointer will not even move.&nbsp; → {MOUSE#OPERATION_PERFORMANCE}<br>
+	(3)&nbsp; The backlit keys are wonderful when you are working in the dark.&nbsp; → {KEYBOARD#DESIGN_FEATURES}<br>
+	(4)&nbsp; I dislike the quality and the placement of the speakers. {MULTIMEDIA DEVICES#QUALITY}, {MULTIMEDIA DEVICES#DESIGN_FEATURES}<br>
+	(5)&nbsp; The applications are also very easy to find and maneuver.&nbsp; → {SOFTWARE#USABILITY}<br>
+	(6)&nbsp; I took it to the shop and they said it would cost too much to repair it.&nbsp; → {SUPPORT#PRICE}<br>
+	(7)&nbsp; It is extremely portable and easily connects to WIFI at the library and elsewhere. → {LAPTOP#PORTABILITY}, {LAPTOP#CONNECTIVITY}</p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	The E#A inventories for the restaurants domain contains 6 Entity types (RESTAURANT, FOOD, DRINKS, SERVICE, AMBIENCE, LOCATION) and 5 Attribute labels (GENERAL, PRICES, QUALITY, STYLE_OPTIONS, MISCELLANEOUS). The entity types and attribute labels are described in the respective annotation <a href="http://alt.qcri.org/semeval2015/task12/data/uploads/semeval2015_absa_restaurants_annotationguidelines.pdf">guidelines</a> document. Some examples highlighting these annotations are given below:</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	(1) Great for a romantic evening, but over-priced. → {AMBIENCE#GENERAL}, {RESTAURANT#PRICES}<br>
+	(2) The fajitas were delicious, but expensive. → {FOOD#QUALITY}, {FOOD# PRICES}<br>
+	(3)The exotic food is beautifully presented and is a delight in delicious combinations. → {FOOD#STYLE_OPTIONS}, {FOOD#QUALITY}<br>
+	(4) The atmosphere isn't the greatest , but I suppose that's how they keep the prices down. → {AMBIENCE#GENERAL}, {RESTAURANT# PRICES}<br>
+	(5) The staff is incredibly helpful and attentive. → {SERVICE# GENERAL}<br>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<strong>Slot 2 (Only for the restaurants domain)</strong>: Opinion Target Expression (OTE). An opinion target expression (OTE) is an expression used in the given text to refer to the reviewed entity E of a pair E#A. The OTE is defined by its starting and ending offsets in the given text. The OTE slot takes the value “NULL”, when there is no explicit mention of the opinion entity (e.g. pronominal mentions like “they” in example 4 below) or no mention at all (as in example 1 below). For more information and further examples please consult the annotation <a href="http://alt.qcri.org/semeval2015/task12/data/uploads/semeval2015_absa_restaurants_annotationguidelines.pdf">guidelines</a> document (sec. 4).<br>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	(1) Great for a romantic evening, but over-priced. → {AMBIENCE#GENERAL, “NULL”}, {RESTAURANT# PRICES, “NULL”}<br>
+	(2) The fajitas were delicious, but expensive. → {FOOD#QUALITY, “fajitas”}, {FOOD# PRICES, “fajitas”}<br>
+	(3) The exotic food is beautifully presented and is a delight in delicious combinations. → {FOOD#STYLE_OPTIONS, “exotic food”}, {FOOD# QUALITY, “exotic food”}<br>
+	(4) The atmosphere isn't the greatest , but I suppose that's how they keep the prices down. → {AMBIENCE#GENERAL, “atmosphere”}, {RESTAURANT# PRICES, “NULL”}<br>
+	(5) The staff is incredibly helpful and attentive. → {SERVICE# GENERAL, “staff”}</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<strong>Slot 3: Sentiment Polarity</strong>. Each identified E#A pair of the given text has to be assigned a polarity, from a set P = {positive, negative, neutral}. The neutral label applies to mildly positive or mildly negative sentiment (as in examples 4 and 5 below). Notice that the last two sentences below have not been assigned any aspect categories, OTEs, or sentiment polarities, since they convey only objective information without expressing opinions.</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	(1) The applications are also very easy to find and maneuver. → {SOFTWARE#USABILITY,&nbsp; positive}<br>
+	(2) The fajitas were great to taste, but not to see”→ {FOOD#QUALITY, “fajitas”, positive},&nbsp; {FOOD#STYLE_OPTIONS, “fajitas”, negative }<br>
+	(3) We were planning to get dessert, but the waitress basically through the bill at us before we had a chance to order.&nbsp; → {SERVICE# GENERAL, “waitress”, negative}<br>
+	(4) It does run a little warm but that is a negligible concern.&nbsp; → {LAPTOP#QUALITY neutral}<br>
+	(5) The fajitas are nothing out of the ordinary” → {FOOD#GENERAL, “fajitas”,&nbsp; neutral}<br>
+	(6) I bought this laptop yesterday. → {}<br>
+	(7) The fajitas are their first plate&nbsp; → {}</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<strong>Subtask 2: Out-of-domain ABSA</strong></p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<br>
+	The participating teams will be asked to test their systems in a previously unseen domain for which no training data will be made available. The gold annotations for Slot 1 will be provided and the teams will be required to return annotations for Slot 3 (sentiment polarity).</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<strong>Evaluation</strong></p>
+<p style="text-align: justify;">
+	<br>
+	The input for the participating systems will be reviews from a particular domain (e.g., laptop or restaurant reviews). Each system will be required to construct all the {E#A, P} tuples for the laptops domain and the {E#A, OTE, P} tuples for the restaurants domain (Fig. 2).<br>
+	&nbsp;</p>
+<pre> Review id:"1004293"
+
+ Judging from previous posts this used to be a good place, but not any longer.
+ {target:"NULL" category:"RESTAURANT#GENERAL" polarity:"negative" from:"-" to="-"}
+
+ We, there were four of us, arrived at noon - the place was empty - and the staff acted 
+ like we were imposing on them and they were very rude.
+ {target:"staff" category:"SERVICE#GENERAL" polarity:"negative" from:"75" to:"80"}
+
+ They never brought us complimentary noodles, ignored repeated requests for sugar, 
+ and threw our dishes on the table.
+ {target:"NULL" category:"SERVICE#GENERAL" polarity:"negative" from:"-" to:"-"}
+
+ The food was lousy - too sweet or too salty and the portions tiny.
+ {target:"food" category="FOOD#QUALITY" polarity="negative" from:"4" to:"8"}
+ {target:"portions" category:"FOOD#STYLE_OPTIONS" polarity:"negative" from:"52" to:"60"}
+
+ After all that, they complained to me about the small tip.
+ {target:"NULL" category:"SERVICE#GENERAL" polarity:"negative" from:"-" to:"-"}
+			
+ Avoid this place!
+ {target:"place" category:"RESTAURANT#GENERAL" polarity:"negative" from:"11" to:"16"}
+
+</pre>
+<p style="text-align: center;">
+	Figure 2: ABSA system input/output example.</p>
+<p style="text-align: center;">
+	&nbsp;</p>
+<p style="text-align: center;">
+	&nbsp;</p>
+<p style="text-align: justify;">
+	The output files of the participating systems will be evaluated by comparing them to corresponding files based on human annotations of the test reviews. Participants are free to decide the domain(s), subtask(s), and slot(s) they wish to participate in. The evaluation framework will be similar to that of the SE-ABSA14. Details about the evaluation procedure will be provided shortly.</p>
+<p>
+	Similarly to previous SemEval Sentiment Analysis tasks, each team may submit two runs:<br>
+	<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Constrained</strong>: using ONLY the provided training data (of the corresponding domain).<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Unconstrained</strong>: using additional resources, such as lexicons or additional training data.</p>
+<p>
+	&nbsp;</p>
+<p>
+	All teams will be asked to report the data and resources they used for each submitted run.</p>
+<p>
+	&nbsp;</p>
+<p>
+	&nbsp;</p>
+<p>
+	<strong>Datasets</strong></p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	<br>
+	Two datasets of ~550 reviews of laptops and restaurants annotated with opinion tuples (as shown in Fig. 2) will be provided for training. Additional datasets will be provided to evaluate the participating systems in Subtask 1 (in-domain ABSA). Information about the domain adaptation dataset of Subtask 2 (out-of-domain ABSA) will be provided in advance.</p>
+<p style="text-align: justify;">
+	&nbsp;</p>
+<p>
+	<strong>Organizers</strong></p>
+<p>
+	&nbsp;</p>
+<p>
+	Ion Androutsopoulos (Athens University of Economics and Business, Greece)<br>
+	Dimitris Galanis (“Athena” Research Center, Greece)<br>
+	Suresh Manandhar (University of York, UK)<br>
+	Harris Papageorgiou ("Athena" Research Center, Greece)<br>
+	John Pavlopoulos (Athens University of Economics and Business, Greece)<br>
+	Maria Pontiki (“Athena” Research Center, Greece)</p>
+<p>
+	&nbsp;</p>
+<p>
+	<strong>References</strong></p>
+<p>
+	&nbsp;</p>
+<p style="text-align: justify;">
+	J. Blitzer, M. Dredze, and F.&nbsp; Pereira. Biographies, Bollywood, Boomboxes and Blenders: Domain Adaptation for Sentiment Classification. ACL, pages 440–447, Prague, Czech Republic, June 2007<br>
+	G. Ganu, N. Elhadad, and A. Marian, “Beyond the stars: Improving rating predictions using review text content”. Proceedings of the 12th International Workshop on the Web and Databases, Providence, Rhode Island, 2009.<br>
+	X. Glorot, A. Bordes, and Y. Bengio. Domain Adaptation for LargeScale Sentiment Classification: A Deep Learning Approach. ICML, 2011.<br>
+	M. Hu and B. Liu, “Mining and summarizing customer reviews”. Proceedings of the 10th KDD, pp. 168–177, Seattle, WA, 2004.<br>
+	S.M. Kim and E. Hovy, “Extracting opinions, opinion holders, and topics expressed in online news media text”. Proceedings of the Workshop on Sentiment and Subjectivity in Text, pp. 1– 8, Sydney, Australia, 2006.<br>
+	B. Liu, Sentiment Analysis and Opinion Mining. Synthesis Lectures on Human Language Technologies. Morgan &amp; Claypool, 2012.<br>
+	B. Liu, Sentiment analysis and subjectivity. In Handbook of Natural Language Processing, Second Edition, N. Indurkhya and F.J. Damerau, Editors. 2010<br>
+	S. Moghaddam and M. Ester, “Opinion digger: an unsupervised opinion miner from unstructured product reviews”. Proceedings of the 19th CIKM, pp. 1825–1828, Toronto, ON, 2010.<br>
+	J. Pavlopoulos and I. Androutsopoulos, “Multi-granular aspect aggregation in aspect-based sentiment analysis”. Proceedings of the 14th EACL, Gothenburg, Sweden, pp. 78-87, 2014.<br>
+	S. Tan, X. Cheng, Y. Wang, and H. Xu. Adapting Naive Bayes to Domain Adaptation for Sentiment Analysis. ECIR, LNCS 5478, pp. 337–349, 2009.<br>
+	M. Tsytsarau and T. Palpanas. “Survey on mining subjective data on the web”. Data Mining and Knowledge Discovery, 24(3):478–514, 2012.<br>
+	Z. Zhai, B. Liu, H. Xu, and P. Jia. “Clustering product features for opinion mining”. Proceedings of the 4th International Conference of WSDM, pp. 347–354, Hong Kong, 2011.<br>
+	M. Pontiki, D. Galanis, J. Pavlopoulos, H. Papageorgiou, I. Androutsopoulos, S. Manandhar. SemEval-2014 Task 4: Aspect Based Sentiment Analysis. Proceedings of the 8th SemEval, 2014.</p>
+			</div>
+			<div class="cleared"></div>
+			<div class="bhm-postfootericons bhm-metadata-icons">
+			<span class="bhm-postcategoryicon"></span></div>
+			</div><div class="cleared"></div>
+			</div></div><div class="cleared"></div></div>
+			<div class="bhm-layout-cell bhm-sidebar1">						
+			<!------>
+				<div class="bhm-box bhm-block">
+				<div class="bhm-box-body bhm-block-body">
+				<div class="bhm-bar bhm-blockheader">
+				<h3 class="t">Contact Info</h3>
+				</div>
+					<div class="bhm-box bhm-blockcontent">
+					<div class="bhm-box-body bhm-blockcontent-body">
+					<div>
+					<h4>Organizers</h4>
+<br>
+<ul>
+	<li><a href="http://www.aueb.gr/users/ion/">Ion Androutsopoulos</a> (Athens University of Economics and Business, Greece)</li>
+	<li><a href="http://www.ilsp.gr/en/profile/staff?view=member&amp;task=show&amp;id=116">Dimitris Galanis</a> (“Athena” Research Center, Greece)</li>
+	<li><a href="http://www.cs.york.ac.uk/~suresh">Suresh Manandhar</a> (University of York, UK) <strong>[Primary Contact]</strong></li>
+	<li><a href="http://www.ilsp.gr/en/profile/staff?view=member&amp;task=show&amp;id=49">Harris Papageorgiou</a> ("Athena" Research Center, Greece)</li>
+	<li><a href="http://nlp.cs.aueb.gr/people.html">John Pavlopoulos</a> (Athens University of Economics and Business, Greece)</li>
+	<li><a href="http://www.ilsp.gr/en/profile/staff?view=member&amp;task=show&amp;id=114">Maria Pontiki</a> (“Athena” Research Center, Greece)</li>
+</ul>
+
+<br> 
+<b>email:</b>
+<i>semeval-absa@googlegroups.com </i>
+					</div>
+					<div class="cleared"></div></div></div>
+					<div class="cleared"></div></div></div>
+				<div class="bhm-box bhm-block">
+				<div class="bhm-box-body bhm-block-body">
+				<div class="bhm-bar bhm-blockheader">
+				<h3 class="t">Other Info</h3></div>
+				<div class="bhm-box bhm-blockcontent">
+				<div class="bhm-box-body bhm-blockcontent-body"><div>
+				<h4>Announcements</h4>
+<br>
+<ul>
+  <li>November 3, 2014: Train and Trial data updated!</li>
+</ul>
+<ul>
+  <li>October 31, 2014: Annotation Guidelines Released!</li>
+</ul>
+<ul>
+  <li>October 31, 2014: Task description updated!</li>
+</ul>
+<ul>
+  <li>August 1, 2014: Task description updated!</li>
+</ul>
+<ul>
+  <li>August 1, 2014: Trial data updated!</li>
+</ul>
+<ul>
+  <li>August 1, 2014: Restaurants training data released!</li>
+</ul>
+<ul>
+  <li>Trial data released!</li>
+</ul>				</div><div class="cleared"></div></div></div>
+				<div class="cleared"></div></div></div>                
+				<div class="cleared"></div>
+
+                                <div class="bhm-box bhm-block">
+				<div class="bhm-box-body bhm-block-body">
+				<div class="bhm-bar bhm-blockheader">
+				<h3 class="t">Last updated on</h3></div>
+				<div class="bhm-box bhm-blockcontent">
+				<div class="bhm-box-body bhm-blockcontent-body"><div>
+				03/11/2014				</div><div class="cleared"></div></div></div>
+				<div class="cleared"></div></div></div>                
+				<div class="cleared"></div>
+			<!----->
+		<div class="cleared"></div>
+		</div></div></div></div>
+		<div class="cleared"></div>
+		<div class="bhm-footer">
+		<div class="bhm-footer-body">
+		<div class="bhm-footer-text">
+		Copyright 2022 - <strong>SemEval-2015 Task 12. All Right Reserved
+		</strong></div><strong>
+		<div class="cleared"></div>
+		</strong></div></div><div class="cleared"></div></div></div><strong>
+	<div class="cleared"></div>
+	<!-- Please don't remove this link -->
+	<p class="bhm-page-footer">Designed by <a href="http://www.balinesehandmade.com/">BhMad Studio</a> &nbsp;|&nbsp; <a href="http://get-simple.info/">Powered by  GetSimple</a></p>
+	<!-- end -->
+	<div class="cleared"></div>
+</strong></div></body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>

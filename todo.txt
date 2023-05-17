@@ -1,0 +1,18 @@
+What's the difference between train_V2 and the train files in semeval folders?
+We can consider ,aspect, category as ,latent, since no where they occurr?!
+
+Next:
+- run for neurallda and ctm.zeroshot
+
+- skip: word alignment
+- skip: prep on the back-translated versions
+- refactor quality metrics as octis offers many
+
+- training w/ augmentation
+    - where to put the aos of back-translated version for supervised
+
+- visualization
+
+add category to review objects
+split: stratified on category, but how about aspect term? we cannot do since term could be anything!
+
