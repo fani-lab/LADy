@@ -20,6 +20,7 @@ def load(input, output):
     except (FileNotFoundError, EOFError) as e:
         print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
         from cmn.semeval import SemEvalReview
+        #from cmn.mams import MAMSReview
         reviews = SemEvalReview.load(input)
         print(f'(#reviews: {len(reviews)})')
         print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
