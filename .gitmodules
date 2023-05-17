@@ -1,3 +1,6 @@
 [submodule "src/octis"]
 	path = src/octis
 	url = https://github.com/fani-lab/OCTIS.git
+[submodule "src/hast"]
+	path = src/hast
+	url = https://github.com/fani-lab/HAST.git
