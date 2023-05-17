@@ -3,6 +3,7 @@ We can consider ,aspect, category as ,latent, since no where they occurr?!
 
 Next:
 - run for neurallda and ctm.zeroshot
+- update readme for octis
 
 - skip: word alignment
 - skip: prep on the back-translated versions
