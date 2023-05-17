@@ -15,4 +15,4 @@ nltk==3.7
 pytrec-eval-terrier
 bitermplus==0.6.10          #install it if you want to use btm model in the aspect modeling layer
 contextualized_topic_models==2.5.0 #install it if you want to use ctm model in the aspect modeling layer
-octis # #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
+# octis # #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
