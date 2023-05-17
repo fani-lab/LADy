@@ -85,16 +85,10 @@ class Nrl(AbstractAspectModel):
             reviews_aspects.append(r_aspects)
             reviews_test_.append(r_)
 
-        from sklearn.feature_extraction.text import CountVectorizer
-        from octis.models.pytorchavitm import datasets
-
-        vocab2id = {w: i for i, w in enumerate(self.mdl.vocab)}
-        vec = CountVectorizer(vocabulary=vocab2id, token_pattern=r'(?u)\b\w+\b')
-        test = [r.get_txt() for r in reviews_test_]
-        vec.fit(test)
-        idx2token = {v: k for (k, v) in vec.vocabulary_.items()}
-        test = vec.transform(test)
-        test = datasets.BOWDataset(test.toarray(), idx2token)
+        #like in ctm (isinstance(self, CTM))
+        if 'bert_model' in settings: _, test, input_size = self.mdl.preprocess(self.mdl.vocab, [], test=[r.get_txt() for r in reviews_test_], bert_model=settings['bert_model'])
+        # like in neurallda isinstance(self, NeuralLDA)
+        else: _, test, input_size = self.mdl.preprocess(self.mdl.vocab, [], test=[r.get_txt() for r in reviews_test_])
         test = self.mdl.inference(test)
 
         reviews_pred_aspects = [test['test-topic-document-matrix'][:, rdx] for rdx, _ in enumerate(reviews_test_)]

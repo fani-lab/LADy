@@ -46,6 +46,12 @@ python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
 ```
 
+Further, we reused [`octis`](https://github.com/MIND-Lab/OCTIS) as `submodule` for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://github.com/estebandito22/PyTorchAVITM):
+```bash
+cd src/octis
+python setup.py install
+```
+
 ## 2. [Quickstart](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 You can run `LADy` by:
