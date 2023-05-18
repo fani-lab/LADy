@@ -138,9 +138,9 @@ Here is the codebase folder structure:
 |   |   ├── rnd.py      -> random aspect model that randomly predicts aspects
 |   |   ├── lda.py      -> unsupervised aspect detection based on LDA
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
-|   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling
-|   |   ├── nrl.py      -> 
-|   ├── params.py        -> running settings of the pipeline
+|   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling (neural)
+|   |   ├── nrl.py      -> unsupervised aspect detection based on neural topic modeling
+|   ├── params.py       -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
 
