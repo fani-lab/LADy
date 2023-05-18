@@ -4,7 +4,7 @@ from scipy.spatial.distance import cosine
 class Review(object):
     translator_mdl = None; translator_tokenizer = None
     semantic_mdl = None
-    def __init__(self, id, sentences, time=None, author=None, aos=None, lempos=None, parent=None, lang='eng_Latn'):
+    def __init__(self, id, sentences, time=None, author=None, aos=None, lempos=None, parent=None, lang='eng_Latn', category=None):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
         self.time = time
@@ -12,6 +12,7 @@ class Review(object):
         self.aos = aos #list of list of aspect_opinion_sentiment triples for per sentence, e.g., [[([7,8], [10, 11, 12], -1), ([15,17], [20], +1)]]
         self.lempos = lempos
         self.lang = lang
+        self.category = category
 
         self.parent = parent
         self.augs = {} #distionary of translated and backtranslated augmentations of this review in object format, e.g.,

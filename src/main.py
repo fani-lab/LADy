@@ -198,6 +198,7 @@ def main(args):
 
 # {CUDA_VISIBLE_DEVICES=0,1} won't work https://discuss.pytorch.org/t/using-torch-data-prallel-invalid-device-string/166233
 # TOKENIZERS_PARALLELISM=true
+# TOKENIZERS_PARALLELISM=true CUDA_VISIBLE_DEVICES=0 python -u main.py -am lda -naspect 5 -data ../data/raw/semeval/SemEval-14/Laptop_Train_v2.xml -output ../output/semeval+/SemEval-14/Laptop_Train_v2.xml 2>&1 | tee ../output/semeval+/SemEval-14/Laptop_Train_v2.xml/log.txt &
 # TOKENIZERS_PARALLELISM=true CUDA_VISIBLE_DEVICES=0 python -u main.py -am lda -naspect 5 -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml 2>&1 | tee ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/log.txt &
 # TOKENIZERS_PARALLELISM=true CUDA_VISIBLE_DEVICES=0 python -u main.py -am lda -naspect 5 -data ../data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml -output ../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml 2>&1 | tee ../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml/log.txt &
 # TOKENIZERS_PARALLELISM=true CUDA_VISIBLE_DEVICES=0 python -u main.py -am lda -naspect 5 -data ../data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml -output ../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml 2>&1 | tee ../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml/log.txt &
