@@ -97,6 +97,7 @@ class SemEvalReview(Review):
         tokens = sentence.split()
         # to fix ",a b c," to "a b c"
         # to fix '"sales" team' to 'sales team' => semeval-14-labptop-<sentence id="1316">
+        # todo: fix 'Food-awesome.' to 'food awesome' => semeval-14-restaurant-<sentence id="1817">
         for i, (idxlist, o, s, aspect_token) in enumerate(aos):
             for j, idx in enumerate(idxlist): tokens[idx] = aspect_token.split()[j].replace('"', '')
             aos[i] = (idxlist, o, s)

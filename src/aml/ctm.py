@@ -35,7 +35,7 @@ class Ctm(AbstractAspectModel):
         corpus_train = [' '.join(doc) for doc in corpus_train]
 
         self._seed(settings['seed'])
-        self.tp = TopicModelDataPreparation(settings['pretrained_contextual_mdl'])
+        self.tp = TopicModelDataPreparation(settings['bert_model'])
 
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_train, stopwords_list=[]).preprocess()#we already preproccess corpus in super()
         training_dataset = self.tp.fit(text_for_contextual=unprocessed, text_for_bow=processed)
