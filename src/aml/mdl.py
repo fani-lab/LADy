@@ -12,7 +12,7 @@ class AbstractAspectModel:
         self.perplexity = 0.00
 
     def name(self): return self.__class__.__name__.lower()
-    def load(self, path, settings): pass
+    def load(self, path): pass
     def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
         corpus, self.dict = AbstractAspectModel.preprocess(doctype, reviews_train, no_extremes)
         self.dict.save(f'{output}model.dict')
@@ -28,7 +28,7 @@ class AbstractAspectModel:
     def get_aspects_words(self, nwords): pass
     def get_aspect_words(self, aspect_id, nwords): pass
     def infer(self, review, doctype): pass
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         pairs = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]

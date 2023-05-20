@@ -27,7 +27,7 @@ class Nrl(AbstractAspectModel):
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.deterministic = True
 
-    def load(self, path, settings):
+    def load(self, path):
         self.mdl_out = load_model_output(f'{path}model.out.npz', vocabulary_path=None, top_words=self.nwords)
         self.mdl = pd.read_pickle(f'{path}model')
         self.dict = pd.read_pickle(f'{path}model.dict')
@@ -74,7 +74,7 @@ class Nrl(AbstractAspectModel):
         for w in word_list: probs.append(self.mdl_out['topic-word-matrix'][aspect_id][self.dict.index(w)])
         return list(zip(word_list, probs))
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         reviews_test_ = []
         reviews_aspects = []
         for r in reviews_test:

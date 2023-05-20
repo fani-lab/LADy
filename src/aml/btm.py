@@ -16,12 +16,12 @@ from .mdl import AbstractAspectModel
 class Btm(AbstractAspectModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
-    def load(self, path, settings):
+    def load(self, path):
         self.mdl = pd.read_pickle(f'{path}model')
         assert self.mdl.topics_num_ == self.naspects
         self.dict = pd.read_pickle(f'{path}model.dict')
-        with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
-        with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
     def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
         corpus, self.dict = super(Btm, self).preprocess(doctype, reviews_train, no_extremes)
@@ -62,7 +62,7 @@ class Btm(AbstractAspectModel):
         words = list(top_words[f'topic{aspect_id}'])
         return list(zip(words, probs))
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         reviews_test_ = []; reviews_aspects = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]

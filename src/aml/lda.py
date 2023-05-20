@@ -18,12 +18,12 @@ from .mdl import AbstractAspectModel
 class Lda(AbstractAspectModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
-    def load(self, path, settings):
+    def load(self, path):
         self.mdl = gensim.models.LdaModel.load(f'{path}model')
         assert self.mdl.num_topics == self.naspects
         self.dict = gensim.corpora.Dictionary.load(f'{path}model.dict')
-        with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
-        with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
     def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
         reviews_, self.dict = super(Lda, self).preprocess(doctype, reviews_train, no_extremes)

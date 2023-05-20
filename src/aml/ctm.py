@@ -9,7 +9,10 @@ from contextualized_topic_models.evaluation.measures import CoherenceUMASS
 from .mdl import AbstractAspectModel
 
 class Ctm(AbstractAspectModel):
-    def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
+    def __init__(self, naspects, nwords, contextual_size, nsamples):
+        super().__init__(naspects, nwords)
+        self.contextual_size = contextual_size
+        self.nsamples = nsamples
 
     def _seed(self, seed):
         torch.manual_seed(seed)
@@ -19,9 +22,9 @@ class Ctm(AbstractAspectModel):
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.deterministic = True
 
-    def load(self, path, settings):
+    def load(self, path):
         self.tp = pd.read_pickle(f'{path}model.tp')
-        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=settings['contextual_size'], n_components=self.naspects)
+        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=self.contextual_size, n_components=self.naspects)
         files = list(os.walk(f'{path}model'))
         print(f'{files[-1][0]}/{files[-1][-1][-1]}')
         self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_', '').replace('.pth', '')))
@@ -73,7 +76,7 @@ class Ctm(AbstractAspectModel):
 
     def get_aspect_words(self, aspect_id, nwords): return self.mdl.get_word_distribution_by_topic_id(aspect_id)[:nwords]
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         reviews_test_ = []
         reviews_aspects = []
         for r in reviews_test:
@@ -89,7 +92,7 @@ class Ctm(AbstractAspectModel):
 
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_test, stopwords_list=[]).preprocess()
         testing_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
-        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=settings['num_samples'])
+        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=self.nsamples)
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
             r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
