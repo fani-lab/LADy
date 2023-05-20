@@ -20,7 +20,12 @@ class Review(object):
         #               Review2(self.id, 'this is a review', None, None, None, None, self, 'eng_Latn'))
 
     def to_dict(self, w_augs=False):
-        result = [{'id': self.id, 'text': self.get_txt(), 'sentences': self.sentences, 'aos': self.get_aos(), 'lang': self.lang, 'orig': False if self.parent else True}]
+        result = [{'id': self.id,
+                   'text': self.get_txt(),
+                   'sentences': self.sentences,
+                   'aos': self.parent.get_aos() if self.parent else self.get_aos(),#todo: after the word-alignment module, we need to remove it
+                   'lang': self.lang,
+                   'orig': False if self.parent else True}]
         if not w_augs: return result
         for k in self.augs:
             #result += self.augs[k][0].to_dict()
@@ -30,6 +35,9 @@ class Review(object):
     def get_aos(self):
         r = []
         if not self.aos: return r
+        # for backtranslated version, the parent j index may not be valid.
+        # e.g., when the backtranslated is shorter!
+        # for now, we always return the parent.get_aos(). Look at self.to_dict() for todo item
         for i, aos in enumerate(self.aos): r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
         return r
 
@@ -91,6 +99,7 @@ class Review(object):
             r_ = self.augs[lang][1].get_txt()
             # r_ = r #for testing purpose => should be 1 for all metrics
             result[lang + '_r_backtrans_ntoken'] = len(r_.split())
+            result[lang + '_semsim'] = self.augs[lang][2]
             result[lang + '_bleu'] = np.mean(nltk.translate.bleu_score.sentence_bleu([r.split()], r_.split(), weights=[(1 / bleu_no,) * bleu_no for bleu_no in range(1, min(4, result['r_ntoken'] + 1))]))
             # https://pypi.org/project/rouge/
             result[lang + '_rouge_f'] = np.mean([v['f'] for k, v in Rouge(metrics=[f'rouge-{i+1}' for i in range(0, min(5, len(r.split())))]).get_scores(r_, r)[0].items()])

@@ -1,9 +1,10 @@
 What's the difference between train_V2 and the train files in semeval folders?
-We can consider ,aspect, category as ,latent, since no where they occurr?!
+We can consider ,aspect, category as ,latent, since no where they occurre?!
 
 Next:
-- run for neurallda and ctm.zeroshot
-- update readme for octis
+- function for Alice website https://github.com/fani-lab/LADy/issues/32
+- stat code and mams
+- update readme for stats ...
 
 - skip: word alignment
 - skip: prep on the back-translated versions
