@@ -12,11 +12,11 @@ if __name__ == '__main__':
     for data in datasets:
         stats = Review.get_stats(f'{data}/reviews.pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn.pkl', data, plot=False, plot_title=None)
         df = pd.DataFrame.from_dict([stats['*avg_lang_stats']])
-        df['*nreviews'] = stats['*nreviews']
-        df['*naspects'] = stats['*naspects']
-        df['*ntokens'] = stats['*ntokens']
-        df['*avg_ntokens_review'] = stats['*avg_ntokens_review']
-        df['*avg_naspects_review'] = stats['*avg_naspects_review']
+        df['nreviews'] = stats['*nreviews']
+        df['naspects'] = stats['*naspects']
+        df['ntokens'] = stats['*ntokens']
+        df['avg_ntokens_review'] = stats['*avg_ntokens_review']
+        df['avg_naspects_review'] = stats['*avg_naspects_review']
         df['dataset'] = data
         df.set_index('dataset', inplace=True)
         dff = pd.concat([dff, df])
