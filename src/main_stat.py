@@ -2,11 +2,11 @@ import pandas as pd
 
 from cmn.review import Review
 if __name__ == '__main__':
-    datasets = ['../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml',
-                '../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml',
-                '../output/semeval+/SemEval-14/Laptop_Train_v2.xml',
-                '../output/semeval+/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml',
-                '../output/semeval+/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml'
+    datasets = ['../output/toy.2016SB5',
+                '../output/SemEval-14/Restaurants',
+                '../output/SemEval-14/Laptop',
+                '../output/2015SB12',
+                '../output/2016SB5'
             ]
     dff = pd.DataFrame()
     for data in datasets:

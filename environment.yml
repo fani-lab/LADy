@@ -27,6 +27,7 @@ dependencies:
       - bitermplus==0.6.10    #install it if you want to use btm model in the aspect modeling layer
       - contextualized_topic_models #install it if you want to use ctm model in the aspect modeling layer
       - rouge
+      - natsort
 #      - octis #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
 #    - pyLDAvis
 #    - seaborn==0.12.2

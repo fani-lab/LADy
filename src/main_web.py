@@ -11,7 +11,7 @@ if __name__ == '__main__':
         for naspects in [5, 10, 15, 20, 25]:
             for backtrans_lang in ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']:
                 for domain in ['restaurant']:#, 'laptop']:
-                    model_path = '../output/semeval+/SemEval-14/Semeval-14-Restaurants_Train.xml' if domain == 'restaurant' else '../output/semeval+/SemEval-14/Laptop_Train_v2.xml'
+                    model_path = '../output/SemEval-14/Restaurants' if domain == 'restaurant' else '../output/SemEval-14/Laptop'
 
                     if "rnd" == model_name: from aml.rnd import Rnd; am = Rnd(naspects, nwords)
                     if "lda" == model_name: from aml.lda import Lda; am = Lda(naspects, nwords)

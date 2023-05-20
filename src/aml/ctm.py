@@ -23,11 +23,13 @@ class Ctm(AbstractAspectModel):
         torch.backends.cudnn.deterministic = True
 
     def load(self, path):
+        from natsort import natsorted
         self.tp = pd.read_pickle(f'{path}model.tp')
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=self.contextual_size, n_components=self.naspects)
         files = list(os.walk(f'{path}model'))
-        print(f'{files[-1][0]}/{files[-1][-1][-1]}')
-        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_', '').replace('.pth', '')))
+
+        print(f"{files[-1][0]}/{natsorted(files[-1][-1])[-1]}")
+        self.mdl.load(files[-1][0], epoch=int(natsorted(files[-1][-1])[-1].replace('epoch_', '').replace('.pth', '')))
         # self.mdl.load(files[-1][0], epoch=settings['num_epochs'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
         self.dict = pd.read_pickle(f'{path}model.dict')
         self.cas = pd.read_pickle(f'{path}model.perf.cas')
