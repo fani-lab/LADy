@@ -97,7 +97,7 @@ class Review(object):
         result['r_ntoken'] = len(r.split())
         for lang in self.augs.keys():
             r_ = self.augs[lang][1].get_txt()
-            # r_ = r #for testing purpose => should be 1 for all metrics
+            # r_ = r #for testing purpose => should be very close to 1 for all metrics
             result[lang + '_r_backtrans_ntoken'] = len(r_.split())
             result[lang + '_semsim'] = self.augs[lang][2]
             result[lang + '_bleu'] = np.mean(nltk.translate.bleu_score.sentence_bleu([r.split()], r_.split(), weights=[(1 / bleu_no,) * bleu_no for bleu_no in range(1, min(4, result['r_ntoken'] + 1))]))
@@ -180,7 +180,7 @@ class Review(object):
             stats['*avg_ntokens_review'] = 0
             stats['*avg_naspects_review'] = 0
             stats['*avg_lang_stats'] = pd.DataFrame.from_dict(reviews_lang_stats).mean().to_dict()
-            pd.to_pickle(stats, f'{output}/stats.pkl')
+            if output: pd.to_pickle(stats, f'{output}/stats.pkl')
             if plot: Review.plot_dist(stats, output, plot_title)
         import json
         print(json.dumps(stats, indent=4))
