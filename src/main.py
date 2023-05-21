@@ -85,7 +85,7 @@ def train(args, am, train, valid, f, output):
     print('#' * 50)
     try:
         print(f'2.1. Loading saved aspect model from {output}/f{f}. ...')
-        am.load(f'{output}/f{f}.', params.settings['train'][am.name()])
+        am.load(f'{output}/f{f}.')
     except (FileNotFoundError, EOFError) as e:
         print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
@@ -100,11 +100,11 @@ def test(am, test, f, output):
     print('#' * 50)
     try:
         print(f'\n3.1. Loading saved predictions on test set from {output}f{f}.model.pred.{params.settings["test"]["h_ratio"]} ...')
-        with open(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}', 'rb') as f: return pickle.load(f)
+        return pd.read_pickle(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
     except (FileNotFoundError, EOFError) as e:
         print(f'\n3.1. Loading saved predictions on test set failed! Predicting on the test set with {params.settings["test"]["h_ratio"] * 100}% latent aspect ...')
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
-        am.load(f'{output}/f{f}.', params.settings['train'][am.name()])
+        am.load(f'{output}/f{f}.')
         print(f'3.3. Testing aspect model ...')
         pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], settings=params.settings['train'][am.name()])
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
@@ -112,7 +112,7 @@ def test(am, test, f, output):
 def evaluate(input, output):
     print(f'\n4. Aspect model evaluation for {input} ...')
     print('#' * 50)
-    with open(input, 'rb') as f: pairs = pickle.load(f)
+    pairs = pd.read_pickle(input)
     metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
     qrel = dict(); run = dict()
     print(f'\n4.1. Building pytrec_eval input for {len(pairs)} instances ...')
