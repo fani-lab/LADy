@@ -3,7 +3,7 @@ from scipy.spatial.distance import cosine
 
 class Review(object):
     translator_mdl = None; translator_tokenizer = None
-    semantic_mdl = None
+    semantic_mdl = None; align_mdl = None
     def __init__(self, id, sentences, time=None, author=None, aos=None, lempos=None, parent=None, lang='eng_Latn', category=None):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
@@ -23,7 +23,7 @@ class Review(object):
         result = [{'id': self.id,
                    'text': self.get_txt(),
                    'sentences': self.sentences,
-                   'aos': self.parent.get_aos() if self.parent else self.get_aos(),#todo: after the word-alignment module, we need to remove it
+                   'aos': self.get_aos(), #self.parent.get_aos() if self.parent else self.get_aos(),
                    'lang': self.lang,
                    'orig': False if self.parent else True}]
         if not w_augs: return result
@@ -35,9 +35,6 @@ class Review(object):
     def get_aos(self):
         r = []
         if not self.aos: return r
-        # for backtranslated version, the parent j index may not be valid.
-        # e.g., when the backtranslated is shorter!
-        # for now, we always return the parent.get_aos(). Look at self.to_dict() for todo item
         for i, aos in enumerate(self.aos): r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
         return r
 
@@ -65,16 +62,12 @@ class Review(object):
         Review.back_translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
 
         translated_txt = Review.translator(self.get_txt())[0]['translation_text']
-        translated_obj = Review(id=self.id,
-                                sentences=[[str(t).lower() for t in translated_txt.split()]],
-                                time=None, author=None, aos=self.aos,
-                                parent=self, lang=tgt)
+        translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in translated_txt.split()]], parent=self, lang=tgt, time=None, author=None, aos=None)
+        translated_obj.aos, _ = self.semalign(translated_obj)
 
         back_translated_txt = Review.back_translator(translated_txt)[0]['translation_text']
-        back_translated_obj = Review(id=self.id,
-                                     sentences=[[str(t).lower() for t in back_translated_txt.split()]],
-                                     time=None, author=None, aos=self.aos,
-                                     parent=self, lang=src)
+        back_translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in back_translated_txt.split()]], parent=self, lang=src, time=None, author=None, aos=None)
+        back_translated_obj.aos, _ = self.semalign(back_translated_obj)
 
         self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
         return self.augs[tgt]
@@ -86,6 +79,19 @@ class Review(object):
             Review.semantic_mdl = SentenceTransformer("johngiorgi/declutr-small")
         me, you = Review.semantic_mdl.encode([self.get_txt(), other.get_txt()])
         return 1 - cosine(me, you)
+
+    def semalign(self, other):
+        if not Review.align_mdl:
+            from simalign import SentenceAligner
+            Review.align_mdl = SentenceAligner(model="bert", token_type="bpe", matching_methods="i")
+        aligns = [Review.align_mdl.get_word_aligns(s1, o1)['itermax'] for s1, o1 in zip(self.sentences, other.sentences)]
+        other_aos = []
+        for i, (aos, _) in enumerate(zip(self.aos, self.sentences)):
+            for (a, o, s) in aos:
+                other_a = [idx2 for idx in a for idx1, idx2 in aligns[i] if idx == idx1]
+                other_a.sort()
+                other_aos.append((other_a, o, s))
+        return other_aos, aligns
 
     def get_lang_stats(self):
         import nltk
