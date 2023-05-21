@@ -136,14 +136,10 @@ class Review(object):
         back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
 
         for i, r in enumerate(reviews):
-            translated_obj = Review(id=r.id,
-                                    sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]],
-                                    time=None, author=None, aos=r.aos, lempos=None, #for now, we can assume same aos for translated and back-translated versions
-                                    parent=r, lang=tgt)
-            back_translated_obj = Review(id=r.id,
-                                         sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]],
-                                         time=None, author=None, aos=r.aos, lempos=None,
-                                         parent=r, lang=src)
+            translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt, time=None, author=None, aos=None, lempos=None,)
+            translated_obj.aos, _ = r.semalign(translated_obj)
+
+            back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], parent=r, lang=src, time=None, author=None, aos=r.aos, lempos=None,)
             r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
 
     @staticmethod
