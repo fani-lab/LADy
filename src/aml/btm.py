@@ -14,17 +14,17 @@ from .mdl import AbstractAspectModel
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
 class Btm(AbstractAspectModel):
-    def __init__(self, naspects): super().__init__(naspects)
+    def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
-    def load(self, path, settings):
+    def load(self, path):
         self.mdl = pd.read_pickle(f'{path}model')
         assert self.mdl.topics_num_ == self.naspects
         self.dict = pd.read_pickle(f'{path}model.dict')
-        with open(f'{path}model.perf.cas', 'rb') as f: self.cas = pickle.load(f)
-        with open(f'{path}model.perf.perplexity', 'rb') as f: self.perplexity = pickle.load(f)
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, output):
-        corpus, self.dict = super(Btm, self).preprocess(doctype, reviews_train, settings['no_extremes'])
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
+        corpus, self.dict = super(Btm, self).preprocess(doctype, reviews_train, no_extremes)
         corpus = [' '.join(doc) for doc in corpus]
 
         logging.getLogger().handlers.clear()
@@ -34,7 +34,7 @@ class Btm(AbstractAspectModel):
         docs_vec = btm.get_vectorized_docs(corpus, self.dict)
         biterms = btm.get_biterms(docs_vec)
 
-        self.mdl = btm.BTM(doc_word_frequency, self.dict, seed=settings['seed'], T=self.naspects, M=settings['nwords'], alpha=1.0/self.naspects, beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
+        self.mdl = btm.BTM(doc_word_frequency, self.dict, T=self.naspects, M=self.nwords, alpha=1.0/self.naspects, seed=settings['seed'], beta=0.01) #https://bitermplus.readthedocs.io/en/latest/bitermplus.html#bitermplus.BTM
         self.mdl.fit(biterms, iterations=settings['iter'], verbose=True)
 
         self.cas = self.mdl.coherence_
@@ -62,7 +62,7 @@ class Btm(AbstractAspectModel):
         words = list(top_words[f'topic{aspect_id}'])
         return list(zip(words, probs))
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         reviews_test_ = []; reviews_aspects = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
@@ -78,8 +78,8 @@ class Btm(AbstractAspectModel):
         reviews_pred_aspects = self.mdl.transform(btm.get_vectorized_docs(corpus_test, self.dict))
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
-            r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
-            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, settings['nwords']))))
+            r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
+            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))
 
         return pairs
 

@@ -21,20 +21,17 @@ from .mdl import AbstractAspectModel
 
 
 class Lda(AbstractAspectModel):
-    def __init__(self, naspects): super().__init__(naspects)
+    def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
-    def load(self, path, settings):
+    def load(self, path):
         self.mdl = gensim.models.LdaModel.load(f'{path}model')
         assert self.mdl.num_topics == self.naspects
         self.dict = gensim.corpora.Dictionary.load(f'{path}model.dict')
-        with open(f'{path}model.perf.cas', 'rb') as f:
-            self.cas = pickle.load(f)
-        with open(f'{path}model.perf.perplexity', 'rb') as f:
-            self.perplexity = pickle.load(f)
+        self.cas = pd.read_pickle(f'{path}model.perf.cas')
+        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, output):
-        reviews_, self.dict = super(Lda, self).preprocess(
-            doctype, reviews_train, settings['no_extremes'])
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
+        reviews_, self.dict = super(Lda, self).preprocess(doctype, reviews_train, no_extremes)
         corpus = [self.dict.doc2bow(doc) for doc in reviews_]
 
         logging.getLogger().handlers.clear()
@@ -46,11 +43,10 @@ class Lda(AbstractAspectModel):
         # coherence_cv_logger = CoherenceMetric(corpus=corpus, logger='shell', coherence='c_v', texts=reviews_)
         # self.model = gensim.models.wrappers.LdaMallet(mallet, corpus, num_topics=self.naspects, id2word=self.dict, workers=cores, iterations=iter, callback=)
         # alpha=symetric, i.e., 1/#topics, beta=0.01
-        self.mdl = gensim.models.ldamulticore.LdaMulticore(corpus, num_topics=self.naspects, id2word=self.dict,
-                                                           workers=settings['ncore'], passes=settings['passes'], random_state=settings['seed'], per_word_topics=True)
+        self.mdl = gensim.models.ldamulticore.LdaMulticore(corpus, num_topics=self.naspects, id2word=self.dict, **settings)
 
         # TODO: quality diagram ==> https://www.meganstodel.com/posts/callbacks/
-        aspects, probs = self.get_aspects_words(settings['nwords'])
+        aspects, probs = self.get_aspects_words(self.nwords)
         # https://stackoverflow.com/questions/50607378/negative-values-evaluate-gensim-lda-with-topic-coherence
         # umass: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://aclanthology.org/D11-1024.pdf
         # [-inf, 0]: close to zero, the better

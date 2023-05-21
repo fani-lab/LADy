@@ -1,4 +1,4 @@
-#python==3.10
+#python==3.8
 pandas==1.4.4
 spacy==3.3.1
 tqdm==4.64.1
@@ -9,10 +9,12 @@ tqdm==4.64.1
 transformers==4.26.1
 torch==1.13.1
 sentence-transformers #for semantic simarlity of backtranslated review with original review
-scikit-learn
+scikit-learn>=1.0.0
 gensim==4.*
 nltk==3.7
 pytrec-eval-terrier
 bitermplus==0.6.10          #install it if you want to use btm model in the aspect modeling layer
 contextualized_topic_models==2.5.0 #install it if you want to use ctm model in the aspect modeling layer
-
+# octis # #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
+rouge
+natsort

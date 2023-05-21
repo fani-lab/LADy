@@ -3,13 +3,13 @@ channels:
   - conda-forge
   - pytorch
   - nvidia
-#  - anaconda
+  - anaconda
   - defaults
 dependencies:
   - pip
-  - python=3.10
+  - python=3.8
   - pandas==1.4.4
-  - spacy==3.3.1 
+  - spacy==3.3.1
     #spacy-transformers
     #python -m spacy download en_core_web_trf
     #python -m spacy download en_core_web_sm
@@ -17,7 +17,7 @@ dependencies:
   - transformers==4.26.1 #needed if augmentation via backtranslation
   - pytorch==1.13.1
   - pytorch-cuda=11.8 # the conda channel has issue, so pip3 install torch  --index-url https://download.pytorch.org/whl/cu118
-  - scikit-learn
+  - scikit-learn>=1.0.0
   - gensim==4.*
   - nltk==3.7
 #  - matplotlib
@@ -26,6 +26,9 @@ dependencies:
       - pytrec-eval-terrier
       - bitermplus==0.6.10    #install it if you want to use btm model in the aspect modeling layer
       - contextualized_topic_models #install it if you want to use ctm model in the aspect modeling layer
+      - rouge
+      - natsort
+#      - octis #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
 #    - pyLDAvis
 #    - seaborn==0.12.2
 #    - simalign==0.3

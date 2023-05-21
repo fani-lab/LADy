@@ -1,15 +1,16 @@
 What's the difference between train_V2 and the train files in semeval folders?
-We can consider ,aspect, category as ,latent, since no where they occurr?!
+We can consider ,aspect, category as ,latent, since no where they occurre?!
 
 Next:
+- stat code and mams
+- update readme for stats ...
+
 - skip: word alignment
-- skip: train+test: skip models nrl, brt
+- skip: prep on the back-translated versions
+- refactor quality metrics as octis offers many
 
-focus on and nrl and brt
-
-- training+test w/ augmentation
-    - where to put the aos of back-translated version (we can assume same aos as the parent) for the unsupervised
-	- but for supervised
+- training w/ augmentation
+    - where to put the aos of back-translated version for supervised
 
 - visualization
 

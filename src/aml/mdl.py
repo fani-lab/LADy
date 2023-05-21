@@ -3,23 +3,24 @@ import gensim
 
 class AbstractAspectModel:
     stop_words = None
-    def __init__(self, naspects):
+    def __init__(self, naspects, nwords):
         self.naspects = naspects
+        self.nwords = nwords
         self.dict = None
         self.mdl = None
         self.cas = 0.00
         self.perplexity = 0.00
 
     def name(self): return self.__class__.__name__.lower()
-    def load(self, path, settings): pass
-    def train(self, reviews_train, reviews_valid, settings, doctype, output):
-        corpus, self.dict = AbstractAspectModel.preprocess(doctype, reviews_train, settings['no_extremes'])
+    def load(self, path): pass
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
+        corpus, self.dict = AbstractAspectModel.preprocess(doctype, reviews_train, no_extremes)
         self.dict.save(f'{output}model.dict')
         pd.to_pickle(self.cas, f'{output}model.perf.cas')
         pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
 
     def quality(self, metric):
-        result = {"Coherence": f'{np.mean(self.cas)}\u00B1{np.std(self.cas)}', "Perplexity": self.perplexity}
+        result = {"coherence": f'{np.mean(self.cas)}\u00B1{np.std(self.cas)}', "perplexity": self.perplexity}
         return result[metric]
         # elif metric is "perplexity":
         #     return
@@ -27,7 +28,7 @@ class AbstractAspectModel:
     def get_aspects_words(self, nwords): pass
     def get_aspect_words(self, aspect_id, nwords): pass
     def infer(self, review, doctype): pass
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         pairs = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
@@ -36,7 +37,7 @@ class AbstractAspectModel:
             else: r_ = r
             r_pred_aspects = self.infer(r_, doctype)
             # removing duplicate aspect words ==> handled in metrics()
-            pairs.extend(list(zip(r_aspects, self.merge_aspects_words(r_pred_aspects, settings['nwords']))))
+            pairs.extend(list(zip(r_aspects, self.merge_aspects_words(r_pred_aspects, self.nwords))))
         return pairs
 
     def merge_aspects_words(self, r_pred_aspects, nwords):

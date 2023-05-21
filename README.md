@@ -46,6 +46,12 @@ python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
 ```
 
+Further, we reused [`octis`](https://github.com/MIND-Lab/OCTIS) as `submodule` for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://github.com/estebandito22/PyTorchAVITM):
+```bash
+cd src/octis
+python setup.py install
+```
+
 ## 2. [Quickstart](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 You can run `LADy` by:
@@ -103,7 +109,7 @@ This layer further includes realizations for different aspect modeling methods l
 
 Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/{model name}`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 
-<p align="center"><img src='./src/aml/LADy.png' width="350" >
+<p align="center"><img src='./src/aml/LADy.png' width="550" >
  <br>
   <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for aspect modeling hierarchy</a>
 </p>
@@ -132,9 +138,9 @@ Here is the codebase folder structure:
 |   |   ├── rnd.py      -> random aspect model that randomly predicts aspects
 |   |   ├── lda.py      -> unsupervised aspect detection based on LDA
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
-|   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling
-|   |   ├── nrl.py      -> 
-|   ├── params.py        -> running settings of the pipeline
+|   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling (neural)
+|   |   ├── nrl.py      -> unsupervised aspect detection based on neural topic modeling
+|   ├── params.py       -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
 

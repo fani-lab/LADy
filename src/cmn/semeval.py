@@ -58,10 +58,10 @@ class SemEvalReview(Review):
     @staticmethod
     def _parse(xsentence):
         id = xsentence.attrib["id"]
-        aos = []
+        aos = []; aos_cats = []
         for element in xsentence:
             if element.tag == 'text': sentence = element.text # we consider each sentence as a signle review
-            if element.tag == 'Opinions':#semeval-15-16
+            elif element.tag == 'Opinions':#semeval-15-16
                 #<Opinion target="place" category="RESTAURANT#GENERAL" polarity="positive" from="5" to="10"/>
                 for opinion in element:
                     if opinion.attrib["target"] == 'NULL': continue
@@ -72,9 +72,10 @@ class SemEvalReview(Review):
                     category = opinion.attrib["category"] # 'RESTAURANT#GENERAL'
                     sentiment = opinion.attrib["polarity"].replace('positive', '+1').replace('negative', '-1').replace('neutral', '0') #'+1'
                     aos.append((aspect, [], sentiment, opinion.attrib["target"]))
+                    aos_cats.append(category)
                 aos = sorted(aos, key=lambda x: int(x[0][0])) #based on start of sentence
 
-            if element.tag == 'aspectTerms':#semeval-14
+            elif element.tag == 'aspectTerms':#semeval-14
                 #<aspectTerm term="table" polarity="neutral" from="5" to="10"/>
                 for opinion in element:
                     if opinion.attrib["term"] == 'NULL': continue
@@ -87,18 +88,20 @@ class SemEvalReview(Review):
 
                 aos = sorted(aos, key=lambda x: int(x[0][0])) #based on start of sentence
 
-            if element.tag == 'aspectCategories':  # semeval-14
+            elif element.tag == 'aspectCategories':  # semeval-14
                 for opinion in element:
                     #<aspectCategory category="food" polarity="neutral"/>
-                    category = opinion.attrib["category"]
+                    aos_cats.append(opinion.attrib["category"])
 
         #sentence = nlp(sentence) # as it does some processing, it destroys the token idx for aspect term
         tokens = sentence.split()
         # to fix ",a b c," to "a b c"
+        # to fix '"sales" team' to 'sales team' => semeval-14-labptop-<sentence id="1316">
+        # todo: fix 'Food-awesome.' to 'food awesome' => semeval-14-restaurant-<sentence id="1817">
         for i, (idxlist, o, s, aspect_token) in enumerate(aos):
-            for j, idx in enumerate(idxlist): tokens[idx] = aspect_token.split()[j]
+            for j, idx in enumerate(idxlist): tokens[idx] = aspect_token.split()[j].replace('"', '')
             aos[i] = (idxlist, o, s)
         return Review(id=id, sentences=[[str(t).lower() for t in tokens]], time=None, author=None,
                       aos=[aos], lempos=None,
-                      parent=None, lang='eng_Latn') if aos else None
+                      parent=None, lang='eng_Latn', category=aos_cats) if aos else None
 

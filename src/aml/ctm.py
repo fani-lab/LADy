@@ -9,7 +9,10 @@ from contextualized_topic_models.evaluation.measures import CoherenceUMASS
 from .mdl import AbstractAspectModel
 
 class Ctm(AbstractAspectModel):
-    def __init__(self, naspects): super().__init__(naspects)
+    def __init__(self, naspects, nwords, contextual_size, nsamples):
+        super().__init__(naspects, nwords)
+        self.contextual_size = contextual_size
+        self.nsamples = nsamples
 
     def _seed(self, seed):
         torch.manual_seed(seed)
@@ -19,23 +22,25 @@ class Ctm(AbstractAspectModel):
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.deterministic = True
 
-    def load(self, path, settings):
+    def load(self, path):
+        from natsort import natsorted
         self.tp = pd.read_pickle(f'{path}model.tp')
-        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=settings['contextual_size'], n_components=self.naspects)
+        self.mdl = CombinedTM(bow_size=len(self.tp.vocab), contextual_size=self.contextual_size, n_components=self.naspects)
         files = list(os.walk(f'{path}model'))
-        print(f'{files[-1][0]}/{files[-1][-1][-1]}')
-        self.mdl.load(files[-1][0], epoch=int(files[-1][-1][-1].replace('epoch_', '').replace('.pth', '')))
-        # self.mdl.load(files[-1][0], epoch=settings['epoch'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
+
+        print(f"{files[-1][0]}/{natsorted(files[-1][-1])[-1]}")
+        self.mdl.load(files[-1][0], epoch=int(natsorted(files[-1][-1])[-1].replace('epoch_', '').replace('.pth', '')))
+        # self.mdl.load(files[-1][0], epoch=settings['num_epochs'] - 1) # based on validation set, we may have early stopping, so the final model may be saved for earlier epoch
         self.dict = pd.read_pickle(f'{path}model.dict')
         self.cas = pd.read_pickle(f'{path}model.perf.cas')
         self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
 
-    def train(self, reviews_train, reviews_valid, settings, doctype, output):
-        corpus_train, self.dict = super(Ctm, self).preprocess(doctype, reviews_train, settings['no_extremes'])
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
+        corpus_train, self.dict = super(Ctm, self).preprocess(doctype, reviews_train, no_extremes)
         corpus_train = [' '.join(doc) for doc in corpus_train]
 
         self._seed(settings['seed'])
-        self.tp = TopicModelDataPreparation(settings['pretrained_contextual_mdl'])
+        self.tp = TopicModelDataPreparation(settings['bert_model'])
 
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_train, stopwords_list=[]).preprocess()#we already preproccess corpus in super()
         training_dataset = self.tp.fit(text_for_contextual=unprocessed, text_for_bow=processed)
@@ -45,7 +50,7 @@ class Ctm(AbstractAspectModel):
         # bug when we have validation=> RuntimeError: mat1 and mat2 shapes cannot be multiplied (5x104 and 94x100)
         # File "C:\ProgramData\Anaconda3\envs\lady\lib\site-packages\contextualized_topic_models\models\ctm.py", line 457, in _validation
         if len(reviews_valid) > 0:
-            corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_valid, settings['no_extremes'])
+            corpus_valid, _ = super(Ctm, self).preprocess(doctype, reviews_valid, no_extremes)
             corpus_valid = [' '.join(doc) for doc in corpus_valid]
             processed_valid, unprocessed_valid, _, _ = WhiteSpacePreprocessingStopwords(corpus_valid, stopwords_list=[]).preprocess()
             valid_dataset = self.tp.transform(text_for_contextual=unprocessed_valid, text_for_bow=processed_valid)
@@ -53,13 +58,13 @@ class Ctm(AbstractAspectModel):
         self.mdl = CombinedTM(bow_size=len(self.tp.vocab),
                               contextual_size=settings['contextual_size'],
                               n_components=self.naspects,
-                              num_epochs=settings['epoch'],
+                              num_epochs=settings['num_epochs'],
                               num_data_loader_workers=settings['ncore'],
                               batch_size=min([settings['batch_size'], len(training_dataset), len(valid_dataset) if valid_dataset else np.inf]))
                             # drop_last=True!! So, for small train/valid sets, it raises devision by zero in val_loss /= samples_processed
 
         self.mdl.fit(train_dataset=training_dataset, validation_dataset=valid_dataset, verbose=True, save_dir=f'{output}model', )
-        self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(settings['nwords'])).score(topk=settings['nwords'], per_topic=True)
+        self.cas = CoherenceUMASS(texts=[doc.split() for doc in processed], topics=self.mdl.get_topic_lists(self.nwords)).score(topk=self.nwords, per_topic=True)
 
         # self.mdl.get_doc_topic_distribution(training_dataset, n_samples=20)
         # log_perplexity = -1 * np.mean(np.log(np.sum(bert, axis=0)))
@@ -73,7 +78,7 @@ class Ctm(AbstractAspectModel):
 
     def get_aspect_words(self, aspect_id, nwords): return self.mdl.get_word_distribution_by_topic_id(aspect_id)[:nwords]
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, settings):
+    def infer_batch(self, reviews_test, h_ratio, doctype):
         reviews_test_ = []
         reviews_aspects = []
         for r in reviews_test:
@@ -89,10 +94,10 @@ class Ctm(AbstractAspectModel):
 
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_test, stopwords_list=[]).preprocess()
         testing_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
-        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=settings['nsamples'])
+        reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=self.nsamples)
         pairs = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
-            r_pred_aspects = [[(i, v) for i, v in enumerate(r_pred_aspects)]]
-            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, settings['nwords']))))
+            r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
+            pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))
 
         return pairs
