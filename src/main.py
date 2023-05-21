@@ -166,12 +166,12 @@ def main(args):
     output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
     if not os.path.isdir(output): os.makedirs(output)
-    if "rnd" == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords'])
-    if "lda" == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
-    if "btm" == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
-    if "ctm" == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train'][am.name()]['contextual_size'], params.settings['train'][am.name()]['num_samples'])
-    if "octis.ctm" == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
-    if "octis.neurallda" == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords'])
+    if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
+    if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
+    if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
+    if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+    if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
     output = f'{output}/{am.name()}/'
 

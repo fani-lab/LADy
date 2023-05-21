@@ -35,7 +35,7 @@ if __name__ == '__main__':
         langs.extend([params.settings['prep']['langaug']])
         for lang in langs:
             params.settings['prep']['langaug'] = lang if isinstance(lang, list) else [lang]
-            for am in ['lda', 'btm', 'ctm',]:
+            for am in ['lda', 'btm', 'ctm', 'octis.neurallda', 'octis.ctm']:
                 for naspects in range(5, 30, 5):
                     for hide in range(0, 110, 10):
                         args.am = am

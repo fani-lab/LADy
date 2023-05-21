@@ -2,7 +2,6 @@ What's the difference between train_V2 and the train files in semeval folders?
 We can consider ,aspect, category as ,latent, since no where they occurre?!
 
 Next:
-- function for Alice website https://github.com/fani-lab/LADy/issues/32
 - stat code and mams
 - update readme for stats ...
 
