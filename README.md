@@ -81,7 +81,7 @@ Pickle file is later used by models for training and testing purposes. Sample pi
 where the filename `review.{list of languages}.pkl` shows the review objects also include back-translated versions in `{list of languages}`.
 
 <p align="center">
- <img src='./src/cmn/LADy.png' width="350" >
+ <img src='./src/cmn/LADy.png' width="550" >
  <br>
  <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for review</a>
 </p>
