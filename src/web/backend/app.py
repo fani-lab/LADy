@@ -24,13 +24,12 @@ CORS(app)  # Allow cross-origin requests
 
 @app.route('/api', methods=['POST'])
 def api():
-
+    nwords = 20
     text = request.json['text'] + " from backend"
     model = request.json['model']
     lang = request.json['lang']
     naspects = request.json['naspects']
 
-    path = f"./models/{naspects}.{lang if lang else ''}/{model}"
     print(text, model, lang, naspects)
 
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
@@ -38,34 +37,19 @@ def api():
                         help='user-defined number of aspects, e.g., -naspect 25')
     args = parser.parse_args()
 
-    if model == "lda": am = Lda(naspects, 20)
-    if model == "btm": am = Btm(naspects, 20)
-    if model == "ctm": am = Ctm(naspects, 20)
-    if model == "rnd": am = Rnd(naspects, 20)
-
-    try:
-        am.load(f'{path}/f0.', "")
-    except:
-        print("No model found")
-        return {}
-
-    # creating a single object for the input review after removing stop words and split()
-    r = Review(id=0, sentences=[['ree']], time=None,
-               author=None, aos=None, lempos=None, parent=None, lang='eng_Latn')
-
+    if model == "lda": am = Lda(naspects, nwords)
+    if model == "btm": am = Btm(naspects, nwords)
+    if model == "rnd": am = Rnd(naspects, nwords)
+    if model == "ctm": am = Ctm(naspects, nwords, contextual_size = 768, nsamples =10)
+    path = f"./models/{naspects}{'.'+lang if lang else ''}/{am.name()}"
+    am.load(f'{path}/f0.')
+   
+    r = Review(id=0, sentences=[text.split()], time=None, author=None, aos=[[([0],[],0)]], lempos=None, parent=None, lang='eng_Latn', category=None)
     # predicting the words as aspects in descending order
-    r_pred_aspects = am.infer(reviews_test=[r], h_ratio=0.0, doctype='snt')[0][1][:naspects]
-    # print(r_pred_aspects)
-    #top_words = am.get_aspects_words( 5)
-
-    print('top_words',r_pred_aspects)
-    
-    # word = top_words[:len(top_words)//2]
-    # value = top_words[len(top_words)//2:]
-    # print('word ', word[0])
-    # print('value ', value[0])
-    # data = dict(zip(word[0][0], value[0][0]))
-    return jsonify(r_pred_aspects)
+    r_pred_aspects = am.infer_batch(reviews_test=[r], h_ratio=0.0, doctype='snt')[0][1][:naspects]
+    resultdict = dict((x, str(y)) for x, y in r_pred_aspects)
+    print('result',resultdict)
+    return jsonify(resultdict)
 
 
 @app.route("/random", methods=['GET'])
@@ -78,4 +62,4 @@ def get_random_row_from_csv():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

@@ -31,25 +31,33 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  useToast,
 } from "@chakra-ui/react";
 const inter = Inter({ subsets: ["latin"] });
 
 //use state to store textarea value
 export default function Home() {
+  const toast = useToast();
   const [formval, setformval] = useState(
     "The food was fresh and delicious, and the best part was that the chef sent us a dessert they had created that day."
   );
   const [selectedModel, setSelectedModel] = useState("lda");
   const [selectedLang, setSelectedLang] = useState("arb_Arab");
-  const [selectedNum, setSelectedNum] = useState(5);
+  const [naspects, setnaspects] = useState(5);
 
   const [data, setData] = useState("");
   const [isLoad, setIsLoading] = useState(true);
-
+  let testing = true;
+  let apilink;
+  if (testing === true) {
+    apilink = "http://localhost:5000";
+  } else {
+    apilink = "https://lady.onrender.com";
+  }
   useEffect(() => {
     const fetchData = async () => {
       // get the data from the api
-      const data = await fetch("https://lady.onrender.com/random");
+      const data = await fetch(`${apilink}/random`);
       // convert the data to json
       const json = await data.json();
 
@@ -65,7 +73,7 @@ export default function Home() {
   }, []);
 
   const getRandomReview = async () => {
-    const response = await fetch("https://lady.onrender.com/random");
+    const response = await fetch(`${apilink}/random`);
     const json = await response.json();
 
     setformval(json[0]);
@@ -82,16 +90,22 @@ export default function Home() {
         text: formval,
         model: selectedModel,
         lang: selectedLang,
-        num: selectedNum,
+        naspects: naspects,
       }),
     };
 
-    const response = await fetch(
-      "https://lady.onrender.com/api",
-      requestOptions
-    );
+    const response = await fetch(`${apilink}/api`, requestOptions);
     const json = await response.json();
     setIsLoading(false);
+
+    if (Object.keys(json).length === 0) {
+      toast({
+        title: "Model not found",
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+    }
     setData(json);
   };
   let handleInputChange = (e) => {
@@ -102,7 +116,7 @@ export default function Home() {
 
   const labels = Object.keys(data);
   const values = Object.values(data);
-  console.log("labels", labels);
+
   values.sort(function (a, b) {
     return b - a;
   });
@@ -111,10 +125,10 @@ export default function Home() {
     labels,
     datasets: [
       {
-        label: "ree",
+        label: "Score",
         data: values,
         borderColor: "rgb(53, 162, 235)",
-        backgroundColor: "rgb(53, 162, 235)",
+        backgroundColor: "#38B2AC",
       } /*
       {
         label: "Dataset 2",
@@ -172,7 +186,7 @@ export default function Home() {
                 value={selectedLang}
                 onChange={(e) => setSelectedLang(e.target.value)}
               >
-                <option value="none">None</option>
+                <option value="">None</option>
                 <option value="pes_Arab">Persian</option>
                 <option value="zho_Hans">Chinese</option>
                 <option value="deu_Latn">German</option>
@@ -183,10 +197,11 @@ export default function Home() {
               <FormLabel>Number of aspects</FormLabel>
               <NumberInput
                 borderColor={"teal"}
-                value={selectedNum}
-                onChange={(value) => setSelectedNum(value)}
-                min={1}
-                max={5}
+                value={naspects}
+                onChange={(value) => setnaspects(value)}
+                min={5}
+                max={25}
+                step={5}
                 maxW={24}
               >
                 <NumberInputField />
