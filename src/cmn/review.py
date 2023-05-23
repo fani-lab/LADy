@@ -17,7 +17,8 @@ class Review(object):
         self.parent = parent
         self.augs = {} #distionary of translated and backtranslated augmentations of this review in object format, e.g.,
         # {'deu_Latn': (Review1(self.id, 'dies ist eine bewertung', None, None, None, None, self, 'deu_Latn'),
-        #               Review2(self.id, 'this is a review', None, None, None, None, self, 'eng_Latn'))
+        #               Review2(self.id, 'this is a review', None, None, None, None, self, 'eng_Latn'),
+        #               semantic_similarity_score)
 
     def to_dict(self, w_augs=False):
         result = [{'id': self.id,

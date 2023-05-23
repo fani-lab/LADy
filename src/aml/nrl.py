@@ -86,7 +86,7 @@ class Nrl(AbstractAspectModel):
             reviews_test_.append(r_)
 
         #like in ctm (isinstance(self, CTM))
-        if 'bert_model' in settings: _, test, input_size = self.mdl.preprocess(self.mdl.vocab, [], test=[r.get_txt() for r in reviews_test_], bert_model=settings['bert_model'])
+        if 'bert_model' in self.mdl.hyperparameters: _, test, input_size = self.mdl.preprocess(self.mdl.vocab, [], test=[r.get_txt() for r in reviews_test_], bert_model=self.mdl.hyperparameters['bert_model'])
         # like in neurallda isinstance(self, NeuralLDA)
         else: _, test, input_size = self.mdl.preprocess(self.mdl.vocab, [], test=[r.get_txt() for r in reviews_test_])
         test = self.mdl.inference(test)
