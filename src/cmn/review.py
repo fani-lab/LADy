@@ -157,9 +157,9 @@ class Review(object):
             stats = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
             asp_nreviews = Counter()        # aspects : number of reviews that contains the aspect
             token_nreviews = Counter()      # tokens : number of reviews that contains the token
-            nreviews_naspects = Counter()   # x number of reviews with 1 aspect, 2 aspects, ...
-            nreviews_ntokens = Counter()    # x number of reviews with 1 token, 2 tokens, ...
-            ncategory_nreviews = Counter()  # x number of reviews with 1 category, 2 category, ...
+            nreviews_naspects = Counter()   # v number of reviews with 1 aspect, ..., k aspects, ...
+            nreviews_ntokens = Counter()    # v number of reviews with 1 token, ...,  k tokens, ...
+            ncategory_nreviews = Counter()  # v number of reviews with 1 category, ..., k category, ...
             reviews_lang_stats = []
 
             for r in reviews:
@@ -173,15 +173,17 @@ class Review(object):
 
                 reviews_lang_stats.append(r.get_lang_stats())
 
-            naspects_nreviews = Counter(asp_nreviews.values())   # x number of aspects with 1 review, 2 reviews, ...
-            ntokens_nreviews = Counter(token_nreviews.values())  # x number of tokens with 1 review, 2 reviews, ...
+            naspects_nreviews = Counter(asp_nreviews.values())   # v number of aspects with 1 review, ..., k reviews, ...
+            ntokens_nreviews = Counter(token_nreviews.values())  # v number of tokens with 1 review, ..., k reviews, ...
+            stats["*naspects"] = len(asp_nreviews.keys()) # unique number of aspects
+            stats["*ntokens"] = len(token_nreviews.keys()) # unique number of tokens
             stats['nreviews_naspects'] = {k: v for k, v in sorted(nreviews_naspects.items(), key=lambda item: item[1], reverse=True)}
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
             stats['ntokens_nreviews'] = {k: v for k, v in sorted(ntokens_nreviews.items(), key=lambda item: item[1], reverse=True)}
             stats['ncategory_nreviews'] = {k: v / len(reviews) for k, v in sorted(ncategory_nreviews.items(), key=lambda item: item[1], reverse=True)}
-            stats['*avg_ntokens_review'] = 0
-            stats['*avg_naspects_review'] = 0
+            stats['*avg_ntokens_review'] = sum(k * v for k, v in nreviews_ntokens.items()) / sum(nreviews_ntokens.values()) # average number of tokens per review
+            stats['*avg_naspects_review'] = sum(k * v for k, v in nreviews_naspects.items()) / sum(nreviews_naspects.values()) # average number of aspects per review
             stats['*avg_lang_stats'] = pd.DataFrame.from_dict(reviews_lang_stats).mean().to_dict()
             if output: pd.to_pickle(stats, f'{output}/stats.pkl')
             if plot: Review.plot_dist(stats, output, plot_title)
