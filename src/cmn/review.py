@@ -175,8 +175,8 @@ class Review(object):
 
             naspects_nreviews = Counter(asp_nreviews.values())   # v number of aspects with 1 review, ..., k reviews, ...
             ntokens_nreviews = Counter(token_nreviews.values())  # v number of tokens with 1 review, ..., k reviews, ...
-            stats["*naspects"] = len(asp_nreviews.keys()) # unique number of aspects
-            stats["*ntokens"] = len(token_nreviews.keys()) # unique number of tokens
+            stats["*naspects"] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
+            stats["*ntokens"] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
             stats['nreviews_naspects'] = {k: v for k, v in sorted(nreviews_naspects.items(), key=lambda item: item[1], reverse=True)}
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
