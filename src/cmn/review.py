@@ -159,7 +159,7 @@ class Review(object):
             token_nreviews = Counter()      # tokens : number of reviews that contains the token
             nreviews_naspects = Counter()   # v number of reviews with 1 aspect, ..., k aspects, ...
             nreviews_ntokens = Counter()    # v number of reviews with 1 token, ...,  k tokens, ...
-            ncategory_nreviews = Counter()  # v number of categories with 1 review, ..., k reviews, ...
+            nreviews_category = Counter()  # v number of categories with 1 review, ..., k reviews, ...
             reviews_lang_stats = []
 
             for r in reviews:
@@ -169,7 +169,7 @@ class Review(object):
                 token_nreviews.update(token for token in r_tokens)
                 nreviews_naspects.update([len(r_aspects)])
                 nreviews_ntokens.update([len(r_tokens)])
-                if hasattr(r, 'category'): ncategory_nreviews.update(r.category)
+                if hasattr(r, 'category'): nreviews_category.update(r.category)
 
                 reviews_lang_stats.append(r.get_lang_stats())
 
@@ -181,7 +181,7 @@ class Review(object):
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
             stats['ntokens_nreviews'] = {k: v for k, v in sorted(ntokens_nreviews.items(), key=lambda item: item[1], reverse=True)}
-            stats['ncategory_nreviews'] = {k: v for k, v in sorted(ncategory_nreviews.items(), key=lambda item: item[1], reverse=True)}
+            stats['nreviews_category'] = {k: v for k, v in sorted(nreviews_category.items(), key=lambda item: item[1], reverse=True)}
             stats['*avg_ntokens_review'] = sum(k * v for k, v in nreviews_ntokens.items()) / sum(nreviews_ntokens.values()) # average number of tokens per review
             stats['*avg_naspects_review'] = sum(k * v for k, v in nreviews_naspects.items()) / sum(nreviews_naspects.values()) # average number of aspects per review
             stats['*avg_lang_stats'] = pd.DataFrame.from_dict(reviews_lang_stats).mean().to_dict()
