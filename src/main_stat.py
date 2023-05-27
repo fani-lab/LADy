@@ -2,8 +2,11 @@ import pandas as pd
 
 from cmn.review import Review
 if __name__ == '__main__':
-    datasets = ['../output/toy.2016SB5'
-                #,'../output/2016SB5'
+    datasets = ['../output/toy.2016SB5',
+                '../output/SemEval-14/Restaurants',
+                '../output/SemEval-14/Laptop',
+                '../output/2015SB12',
+                '../output/2016SB5'
             ]
     dff = pd.DataFrame()
     for data in datasets:
