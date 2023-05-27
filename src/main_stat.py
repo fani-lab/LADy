@@ -10,7 +10,7 @@ if __name__ == '__main__':
             ]
     dff = pd.DataFrame()
     for data in datasets:
-        stats = Review.get_stats(f'{data}/reviews.pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn.pkl', data, plot=False, plot_title=None)
+        stats = Review.get_stats(f'{data}/reviews.pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn.pkl', data, plot=True, plot_title=None)
         df = pd.DataFrame.from_dict([stats['*avg_lang_stats']])
         df['nreviews'] = stats['*nreviews']
         df['naspects'] = stats['*naspects']
