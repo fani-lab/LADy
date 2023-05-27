@@ -157,9 +157,9 @@ class Review(object):
             stats = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
             asp_nreviews = Counter()        # aspects : number of reviews that contains the aspect
             token_nreviews = Counter()      # tokens : number of reviews that contains the token
-            nreviews_naspects = Counter()   # x number of reviews with 1 aspect, 2 aspects, ...
-            nreviews_ntokens = Counter()    # x number of reviews with 1 token, 2 tokens, ...
-            ncategory_nreviews = Counter()  # x number of reviews with 1 category, 2 category, ...
+            nreviews_naspects = Counter()   # v number of reviews with 1 aspect, ..., k aspects, ...
+            nreviews_ntokens = Counter()    # v number of reviews with 1 token, ...,  k tokens, ...
+            nreviews_category = Counter()  # v number of categories with 1 review, ..., k reviews, ...
             reviews_lang_stats = []
 
             for r in reviews:
@@ -169,19 +169,21 @@ class Review(object):
                 token_nreviews.update(token for token in r_tokens)
                 nreviews_naspects.update([len(r_aspects)])
                 nreviews_ntokens.update([len(r_tokens)])
-                # if hasattr(r, 'category'): ncategory_nreviews.update([r.category])
+                if hasattr(r, 'category'): nreviews_category.update(r.category)
 
                 reviews_lang_stats.append(r.get_lang_stats())
 
-            naspects_nreviews = Counter(asp_nreviews.values())   # x number of aspects with 1 review, 2 reviews, ...
-            ntokens_nreviews = Counter(token_nreviews.values())  # x number of tokens with 1 review, 2 reviews, ...
+            naspects_nreviews = Counter(asp_nreviews.values())   # v number of aspects with 1 review, ..., k reviews, ...
+            ntokens_nreviews = Counter(token_nreviews.values())  # v number of tokens with 1 review, ..., k reviews, ...
+            stats["*naspects"] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
+            stats["*ntokens"] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
             stats['nreviews_naspects'] = {k: v for k, v in sorted(nreviews_naspects.items(), key=lambda item: item[1], reverse=True)}
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
             stats['ntokens_nreviews'] = {k: v for k, v in sorted(ntokens_nreviews.items(), key=lambda item: item[1], reverse=True)}
-            stats['ncategory_nreviews'] = {k: v / len(reviews) for k, v in sorted(ncategory_nreviews.items(), key=lambda item: item[1], reverse=True)}
-            stats['*avg_ntokens_review'] = 0
-            stats['*avg_naspects_review'] = 0
+            stats['nreviews_category'] = {k: v for k, v in sorted(nreviews_category.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_ntokens_review'] = sum(k * v for k, v in nreviews_ntokens.items()) / sum(nreviews_ntokens.values()) # average number of tokens per review
+            stats['*avg_naspects_review'] = sum(k * v for k, v in nreviews_naspects.items()) / sum(nreviews_naspects.values()) # average number of aspects per review
             stats['*avg_lang_stats'] = pd.DataFrame.from_dict(reviews_lang_stats).mean().to_dict()
             if output: pd.to_pickle(stats, f'{output}/stats.pkl')
             if plot: Review.plot_dist(stats, output, plot_title)
@@ -195,17 +197,26 @@ class Review(object):
         from matplotlib import pyplot as plt
         print("plotting distribution data ...")
         for k, v in stats.items():
-            fig = plt.figure()
-            ax = fig.add_subplot(1, 1, 1)
-            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='m')
-            ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
-            ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
-            ax.grid(True, color="#93a1a1", alpha=0.3)
-            ax.minorticks_off()
-            ax.xaxis.set_tick_params(size=2, direction='in')
-            ax.yaxis.set_tick_params(size=2, direction='in')
-            ax.xaxis.get_label().set_size(12)
-            ax.yaxis.get_label().set_size(12)
-            ax.set_title(plot_title)
-            fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
-            plt.show()
+            if (not k.startswith("*")): # the * values cannot be plotted
+                fig = plt.figure(k)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='m')
+                ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
+                ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
+                ax.grid(True, color="#93a1a1", alpha=0.3)
+                ax.minorticks_off()
+                ax.xaxis.set_tick_params(size=2, direction='in')
+                ax.yaxis.set_tick_params(size=2, direction='in')
+                
+                # wrapping labels
+                labels = []
+                for l in ax.get_xticklabels(): 
+                    l.set_text('\n#'.join(l.get_text().split("#")))
+                    labels.append(l)
+                ax.set_xticklabels(labels, rotation=-20, ha='left')
+
+                ax.xaxis.get_label().set_size(12)
+                ax.yaxis.get_label().set_size(12)
+                ax.set_title(plot_title)
+                fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
+                plt.show()
