@@ -70,11 +70,13 @@ def plot_graph(input_addresses, show=False):
     from matplotlib import pyplot as plt
     import glob
     for input in input_addresses:
+        print(f'Generating graphs for {input}...')
         folder = input.replace(".csv", "")
         address_list = glob.glob(folder + "/*.xlsx")
 
         for address in address_list:
             name = address.replace(folder, "").replace(".xlsx", "")[1:]
+            print(f'    Currently at: {name}')
             raw = pd.read_excel(address, header=None)
             n_tbl = int(raw.shape[0] / (raw[raw[0] == 'all'].index[0] + 1))
             df_list = np.array_split(raw, n_tbl)
