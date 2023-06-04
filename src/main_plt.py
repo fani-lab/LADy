@@ -96,15 +96,15 @@ def plot_graph(input_addresses, show=False):
                 plt.title(title, fontsize=12)
                 plt.legend(loc='upper right', bbox_to_anchor=(1.3, 0.99))
                 plt.tight_layout()
-                plt.savefig(f'{folder}/plot/{name}.{title}.pdf', dpi=100, bbox_inches='tight')
+                plt.savefig(f'{folder}/{folder.replace("../output", "")}.plot/{name}.{title}.pdf', dpi=100, bbox_inches='tight')
                 if show: plt.show() # do not show graph by default to save generation time
                 plt.close()
 
 if __name__ == '__main__':
-    address_list = [#'../output/agg.pred.eval.mean-14-latptop.csv',
-                    '../output/agg.pred.eval.mean-14-res.csv',
-                    '../output/agg.pred.eval.mean-15.csv',
-                    '../output/agg.pred.eval.mean-16.csv',
+    address_list = ['../output/agg.pred.eval.mean-14-latptop.csv',
+                    #'../output/agg.pred.eval.mean-14-res.csv',
+                    #'../output/agg.pred.eval.mean-15.csv',
+                    #'../output/agg.pred.eval.mean-16.csv',
                     ]
     # reformatting(address_list)
     plot_graph(address_list, show=False)
