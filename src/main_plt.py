@@ -65,10 +65,46 @@ def reformatting(address_list):
             df.to_excel(f'{output_path}{name}.xlsx', header=False, index=False)
 
 
+def plot_graph(input_addresses, show=False):
+    import numpy as np
+    from matplotlib import pyplot as plt
+    import glob
+    for input in input_addresses:
+        print(f'Generating graphs for {input}...')
+        folder = input.replace(".csv", "")
+        address_list = glob.glob(folder + "/*.xlsx")
+
+        for address in address_list:
+            name = address.replace(folder, "").replace(".xlsx", "")[1:]
+            print(f'    Currently at: {name}')
+            raw = pd.read_excel(address, header=None)
+            n_tbl = int(raw.shape[0] / (raw[raw[0] == 'all'].index[0] + 1))
+            df_list = np.array_split(raw, n_tbl)
+
+            for df in df_list:
+                marker_list = iter("^x*posPd")
+                df.columns = df.iloc[0]
+                df = df[1:] # rename column headers
+                title = list(df)[0]
+                df = df.set_index(list(df)[0]) # rename row indexes
+
+                for labl, row in df.iterrows():
+                    plt.xticks(rotation=-45, ha='left')
+                    plt.plot(row, label=labl, marker=next(marker_list))
+
+                plt.grid()
+                plt.title(title, fontsize=12)
+                plt.legend(loc='upper right', bbox_to_anchor=(1.3, 0.99))
+                plt.tight_layout()
+                plt.savefig(f'{folder}/{folder.replace("../output", "")}.plot/{name}.{title}.pdf', dpi=100, bbox_inches='tight')
+                if show: plt.show() # do not show graph by default to save generation time
+                plt.close()
+
 if __name__ == '__main__':
     address_list = ['../output/agg.pred.eval.mean-14-latptop.csv',
-                    '../output/agg.pred.eval.mean-14-res.csv',
-                    '../output/agg.pred.eval.mean-15.csv',
-                    '../output/agg.pred.eval.mean-16.csv',
+                    #'../output/agg.pred.eval.mean-14-res.csv',
+                    #'../output/agg.pred.eval.mean-15.csv',
+                    #'../output/agg.pred.eval.mean-16.csv',
                     ]
-    reformatting(address_list)
+    # reformatting(address_list)
+    plot_graph(address_list, show=False)
