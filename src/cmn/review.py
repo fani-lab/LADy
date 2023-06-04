@@ -73,7 +73,6 @@ class Review(object):
         self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
         return self.augs[tgt]
 
-
     def semsim(self, other):
         if not Review.semantic_mdl:
             from sentence_transformers import SentenceTransformer
@@ -195,6 +194,7 @@ class Review(object):
     @staticmethod
     def plot_dist(stats, output, plot_title):
         from matplotlib import pyplot as plt
+        plt.rcParams.update({'font.family': 'Consolas'})
         print("plotting distribution data ...")
         for k, v in stats.items():
             if (not k.startswith("*")): # the * values cannot be plotted
@@ -220,3 +220,44 @@ class Review(object):
                 ax.set_title(plot_title)
                 fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
                 plt.show()
+
+    @staticmethod
+    def plot_semsim_dist(datapath, output, plot_title):
+        from matplotlib import pyplot as plt
+        plt.rcParams.update({'font.family': 'Consolas'})
+        import seaborn as sns
+        reviews = pd.read_pickle(datapath)
+        def title(languge_code):
+            if languge_code == 'zho_Hans': return 'chinese'
+            elif languge_code == 'deu_Latn': return 'german'
+            elif languge_code == 'fra_Latn': return 'french'
+            elif languge_code == 'arb_Arab': return 'arabic'
+            elif languge_code == 'pes_Arab': return 'farsi'
+            elif languge_code == 'spa_Latn': return 'spanish'
+            elif languge_code == 'eng_Latn': return 'english'
+        hist_dict = [{'original': 'eng_Latn', 'target': title(k), 'score': v[2]} for r in reviews for k, v in r.augs.items()]
+        df = pd.DataFrame.from_dict(hist_dict)
+        fig = plt.figure(figsize=(6, 2))
+        ax = fig.add_subplot(1, 1, 1)
+        x_range = [i / 10 for i in range(0, 11)]
+        # ax.set_ylim([0, len(reviews)])
+        # plt.yscale('log')
+        plt.title(plot_title)
+        plt.ylabel('#reviews')
+        plt.xlabel('similarity score')
+        ax.set_title(plot_title, x=0.7, y=0.8, fontsize=11)
+        ax.set_facecolor('whitesmoke')
+        h = sns.histplot(df,
+                         x='score',
+                         hue='target',
+                         element='step', #also try 'poly'
+                         stat='density',
+                         common_norm=False)
+        sns.move_legend(ax, 'upper left')
+        h.legend_.set_title(None)
+        h.set(xticks=x_range)
+        plt.savefig(f'{output}', dpi=100, bbox_inches='tight')
+        # df.to_csv(f'{output.replace("pdf", "csv")}')
+        plt.show()
+        # plt.clf()
+
