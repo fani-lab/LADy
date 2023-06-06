@@ -9,6 +9,7 @@ dependencies:
   - pip
   - python=3.8
   - pandas==1.4.4
+  - seaborn
   - spacy==3.3.1
     #spacy-transformers
     #python -m spacy download en_core_web_trf

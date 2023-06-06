@@ -1,18 +1,14 @@
 import os
 import pandas as pd
-import openpyxl
-
+from cmn.review import Review
 
 def reformatting(address_list):
     for f in address_list:
         output_path = f'{f.replace(".csv", "")}/'
-        if not os.path.isdir(output_path):
-            os.makedirs(output_path)
+        if not os.path.isdir(output_path): os.makedirs(output_path)
         agg_df = pd.read_csv(f)
         n_aspects = ['5', '10', '15', '20', '25']
         models = ['lda', 'btm', 'octis.neurallda', 'octis.ctm', 'ctm', 'rnd']
-        langs_map = {'arb_Arab': 'ar', 'deu_Latn': 'de', 'zho_Hans': 'zh', 'pes_Arab': 'fa', 'spa_Latn': 'es',
-                     'fra_Latn': 'fr', 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn': 'all'}
 
         new_columns = []
         for col in agg_df.columns:
@@ -24,9 +20,8 @@ def reformatting(address_list):
                 col = col[:col.find('.') + 1] + 'original' + col[col.find('.'):]
                 new_columns.append(col)
                 continue
-            if lang == 'pes_Arab' and 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn' in col:
-                lang = 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn'
-            col = col.replace(lang, langs_map[lang])
+            if lang == 'pes_Arab' and 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn' in col: lang = 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn'
+            col = col.replace(lang, Review.lang_title(lang))
             new_columns.append(col)
         agg_df.columns = new_columns
 
@@ -35,13 +30,12 @@ def reformatting(address_list):
         for name in df_s:
             for (columnName, columnData) in agg_df.iteritems():
                 n_aspect, model_name = name.split('.')[0], name.split('.')[1]
-                if f'.{model_name}' in columnName and columnName.startswith(n_aspect):
-                    df_s[name] = pd.concat([df_s[name], columnData], axis=1)
+                if f'.{model_name}' in columnName and columnName.startswith(n_aspect): df_s[name] = pd.concat([df_s[name], columnData], axis=1)
             df_s[name].index = [metric.lower() for metric in agg_df.loc[:, 'metric']]
 
         for name in df_s:
             n_aspect, model_name = name.split('.')[0], name.split('.')[1]
-            langs = list(langs_map.values())
+            langs = Review.lang_title(None)
             langs.insert(0, 'original')
             df = pd.DataFrame(columns=['0'] + [f'{name}.{i / 10}' for i in range(0, 11)])
 
@@ -49,8 +43,7 @@ def reformatting(address_list):
 
             for lang in df_langs:
                 for (columnName, columnData) in df_s[name].iteritems():
-                    if lang in columnName:
-                        df_langs[lang] = pd.concat([df_langs[lang], columnData], axis=1)
+                    if lang in columnName: df_langs[lang] = pd.concat([df_langs[lang], columnData], axis=1)
                 df_langs[lang].index = df_s[name].index
 
             for metric in list(df_s[name].index.values):
@@ -59,11 +52,9 @@ def reformatting(address_list):
                 df.loc[len(df)] = row
                 for lang in df_langs:
                     row['0'] = lang
-                    for col, val in zip(list(row.keys())[1:], df_langs[lang].loc[metric]):
-                        row[col] = val
+                    for col, val in zip(list(row.keys())[1:], df_langs[lang].loc[metric]): row[col] = val
                     df.loc[len(df)] = row
-            df.to_excel(f'{output_path}{name}.xlsx', header=False, index=False)
-
+            df.to_csv(f'{output_path}{name}.csv', header=False, index=False)
 
 def plot_graph(input_addresses, show=False):
     import numpy as np
@@ -72,12 +63,12 @@ def plot_graph(input_addresses, show=False):
     for input in input_addresses:
         print(f'Generating graphs for {input}...')
         folder = input.replace(".csv", "")
-        address_list = glob.glob(folder + "/*.xlsx")
+        address_list = glob.glob(folder + "/*.csv")
 
         for address in address_list:
-            name = address.replace(folder, "").replace(".xlsx", "")[1:]
+            name = address.replace(folder, "").replace(".csv", "")[1:]
             print(f'    Currently at: {name}')
-            raw = pd.read_excel(address, header=None)
+            raw = pd.read_csv(address, header=None)
             n_tbl = int(raw.shape[0] / (raw[raw[0] == 'all'].index[0] + 1))
             df_list = np.array_split(raw, n_tbl)
 
@@ -96,15 +87,15 @@ def plot_graph(input_addresses, show=False):
                 plt.title(title, fontsize=12)
                 plt.legend(loc='upper right', bbox_to_anchor=(1.3, 0.99))
                 plt.tight_layout()
-                plt.savefig(f'{folder}/{folder.replace("../output", "")}.plot/{name}.{title}.pdf', dpi=100, bbox_inches='tight')
+                plt.savefig(f'{folder}/{name}.{title}.pdf', dpi=100, bbox_inches='tight')
                 if show: plt.show() # do not show graph by default to save generation time
                 plt.close()
 
 if __name__ == '__main__':
-    address_list = ['../output/agg.pred.eval.mean-14-latptop.csv',
-                    #'../output/agg.pred.eval.mean-14-res.csv',
-                    #'../output/agg.pred.eval.mean-15.csv',
-                    #'../output/agg.pred.eval.mean-16.csv',
+    address_list = ['../output/SemEval-14/Laptop/agg.pred.eval.mean.csv',
+                    '../output/SemEval-14/Restaurants/agg.pred.eval.mean.csv',
+                    '../output/2015SB12/agg.pred.eval.mean.csv',
+                    '../output/2016SB5/agg.pred.eval.mean.csv',
                     ]
-    # reformatting(address_list)
+    reformatting(address_list)
     plot_graph(address_list, show=False)

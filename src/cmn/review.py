@@ -198,8 +198,9 @@ class Review(object):
         print("plotting distribution data ...")
         for k, v in stats.items():
             if (not k.startswith("*")): # the * values cannot be plotted
-                fig = plt.figure(k)
+                fig = plt.figure(k, figsize=(1.5, 1.5))
                 ax = fig.add_subplot(1, 1, 1)
+                ax.set_facecolor('whitesmoke')
                 ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='m')
                 ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
                 ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
@@ -213,7 +214,7 @@ class Review(object):
                 for l in ax.get_xticklabels(): 
                     l.set_text('\n#'.join(l.get_text().split("#")))
                     labels.append(l)
-                ax.set_xticklabels(labels, rotation=-20, ha='left')
+                ax.set_xticklabels(labels, ha='left')
 
                 ax.xaxis.get_label().set_size(12)
                 ax.yaxis.get_label().set_size(12)
@@ -227,25 +228,17 @@ class Review(object):
         plt.rcParams.update({'font.family': 'Consolas'})
         import seaborn as sns
         reviews = pd.read_pickle(datapath)
-        def title(languge_code):
-            if languge_code == 'zho_Hans': return 'chinese'
-            elif languge_code == 'deu_Latn': return 'german'
-            elif languge_code == 'fra_Latn': return 'french'
-            elif languge_code == 'arb_Arab': return 'arabic'
-            elif languge_code == 'pes_Arab': return 'farsi'
-            elif languge_code == 'spa_Latn': return 'spanish'
-            elif languge_code == 'eng_Latn': return 'english'
-        hist_dict = [{'original': 'eng_Latn', 'target': title(k), 'score': v[2]} for r in reviews for k, v in r.augs.items()]
+
+        hist_dict = [{'original': 'eng_Latn', 'target': Review.lang_title(k), 'score': v[2]} for r in reviews for k, v in r.augs.items()]
         df = pd.DataFrame.from_dict(hist_dict)
         fig = plt.figure(figsize=(6, 2))
         ax = fig.add_subplot(1, 1, 1)
         x_range = [i / 10 for i in range(0, 11)]
         # ax.set_ylim([0, len(reviews)])
         # plt.yscale('log')
-        plt.title(plot_title)
         plt.ylabel('#reviews')
         plt.xlabel('similarity score')
-        ax.set_title(plot_title, x=0.7, y=0.8, fontsize=11)
+        ax.set_title(plot_title, x=0.2, y=0.8, fontsize=11)
         ax.set_facecolor('whitesmoke')
         h = sns.histplot(df,
                          x='score',
@@ -254,10 +247,25 @@ class Review(object):
                          stat='density',
                          common_norm=False)
         sns.move_legend(ax, 'upper left')
+
+        plt.legend([])
+
         h.legend_.set_title(None)
         h.set(xticks=x_range)
         plt.savefig(f'{output}', dpi=100, bbox_inches='tight')
         # df.to_csv(f'{output.replace("pdf", "csv")}')
         plt.show()
         # plt.clf()
+
+    @staticmethod
+    def lang_title(lang_code):
+        if   lang_code == 'zho_Hans': return 'chinese'
+        elif lang_code == 'deu_Latn': return 'german'
+        elif lang_code == 'fra_Latn': return 'french'
+        elif lang_code == 'arb_Arab': return 'arabic'
+        elif lang_code == 'pes_Arab': return 'farsi'
+        elif lang_code == 'spa_Latn': return 'spanish'
+        elif lang_code == 'eng_Latn': return 'english'
+        elif lang_code == 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn': return 'all'
+        elif lang_code == None: return ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn', 'all']
 

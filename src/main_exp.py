@@ -5,7 +5,6 @@ import argparse
 
 import params
 import main
-import main_octis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
@@ -44,7 +43,7 @@ if __name__ == '__main__':
                         # params.settings['train']['ratio'] = 0.999
                         # params.settings['train']['nfolds'] = 0
                         params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                        params.settings['cmd'] = ['test', 'eval']
+                        params.settings['cmd'] = ['agg']
                         # main_octis.main(args) if octis else main.main(args)
-                        main.main(args)
-            if 'agg' in params.settings['cmd']: main.agg(args.output, args.output)
+                        # main.main(args)
+        if 'agg' in params.settings['cmd']: main.agg(args.output, args.output)

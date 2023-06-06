@@ -1,5 +1,6 @@
 #python==3.8
 pandas==1.4.4
+seaborn
 spacy==3.3.1
 tqdm==4.64.1
 natsort
