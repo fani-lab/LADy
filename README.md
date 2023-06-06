@@ -176,7 +176,7 @@ Due to OOV (an aspect might be in test set which is not seen in traning set duri
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ### Authors
-Farinam Hemmatizadeh <sup>1,2</sup>, Chritine Wong<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,3</sup>
+Farinam Hemmatizadeh <sup>1,2</sup>, Christine Wong<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,3</sup>
 
 <sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
 
