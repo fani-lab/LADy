@@ -1,4 +1,4 @@
-import os, spacy
+import os
 from tqdm import tqdm
 import xml.etree.ElementTree as et
 

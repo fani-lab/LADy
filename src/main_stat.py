@@ -4,10 +4,10 @@ from cmn.review import Review
 if __name__ == '__main__':
     datasets = [
         ('../output/toy.2016SB5', 'toy'),
-         ('../output/SemEval-14/Restaurants', 'semeval-14-restaurant'),
-          ('../output/SemEval-14/Laptop', 'semeval-14-laptop'),
-           ('../output/2015SB12', 'semeval-15-laptop'),
-            ('../output/2016SB5', 'semeval-16-laptop'),
+        ('../output/SemEval-14/Laptop', 'semeval-14-laptop'),
+        ('../output/SemEval-14/Restaurants', 'semeval-14-restaurant'),
+        ('../output/2015SB12', 'semeval-15-restaurant'),
+        ('../output/2016SB5', 'semeval-16-restaurant'),
             ]
     # dff = pd.DataFrame()
     # for data, title  in datasets:

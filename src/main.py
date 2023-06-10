@@ -11,10 +11,11 @@ import params
 # import visualization
 from cmn.review import Review
 
-def load(input, output):
+def load(input, output, cache=True):
     print('\n1. Loading reviews and preprocessing ...')
     print('#' * 50)
     try:
+        if not cache: raise FileNotFoundError
         print(f'1.1. Loading existing processed reviews file {output}...')
         reviews = pd.read_pickle(output)
     except (FileNotFoundError, EOFError) as e:

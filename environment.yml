@@ -33,6 +33,3 @@ dependencies:
       - pytrec-eval-terrier
 
 #      - octis #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
-#    - pyLDAvis
-#    - seaborn==0.12.2
-#    - simalign==0.3

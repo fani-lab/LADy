@@ -63,11 +63,11 @@ class Review(object):
         Review.back_translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
 
         translated_txt = Review.translator(self.get_txt())[0]['translation_text']
-        translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in translated_txt.split()]], parent=self, lang=tgt, time=None, author=None, aos=None)
+        translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in translated_txt.split()]], parent=self, lang=tgt)
         translated_obj.aos, _ = self.semalign(translated_obj)
 
         back_translated_txt = Review.back_translator(translated_txt)[0]['translation_text']
-        back_translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in back_translated_txt.split()]], parent=self, lang=src, time=None, author=None, aos=None)
+        back_translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in back_translated_txt.split()]], parent=self, lang=src)
         back_translated_obj.aos, _ = self.semalign(back_translated_obj)
 
         self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
@@ -85,13 +85,15 @@ class Review(object):
             from simalign import SentenceAligner
             Review.align_mdl = SentenceAligner(model="bert", token_type="bpe", matching_methods="i")
         aligns = [Review.align_mdl.get_word_aligns(s1, o1)['itermax'] for s1, o1 in zip(self.sentences, other.sentences)]
-        other_aos = []
+        other_aos_all = []
         for i, (aos, _) in enumerate(zip(self.aos, self.sentences)):
+            other_aos = []
             for (a, o, s) in aos:
                 other_a = [idx2 for idx in a for idx1, idx2 in aligns[i] if idx == idx1]
                 other_a.sort()
                 other_aos.append((other_a, o, s))
-        return other_aos, aligns
+            other_aos_all.append(other_aos)
+        return other_aos_all, aligns
 
     def get_lang_stats(self):
         import nltk
@@ -136,10 +138,12 @@ class Review(object):
         back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
 
         for i, r in enumerate(reviews):
-            translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt, time=None, author=None, aos=None, lempos=None,)
+            translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt)
             translated_obj.aos, _ = r.semalign(translated_obj)
 
-            back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], parent=r, lang=src, time=None, author=None, aos=r.aos, lempos=None,)
+            back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], parent=r, lang=src)
+            back_translated_obj.aos, _ = r.semalign(back_translated_obj)
+
             r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
 
     @staticmethod
