@@ -41,12 +41,12 @@ class Review(object):
 
     def get_txt(self): return '. '.join(' '.join(s) for s in self.sentences)
 
-    def hide_aspects(self):
+    def hide_aspects(self, mask="#", mask_size=5):
         r = copy.deepcopy(self)
         for i, sent in enumerate(r.sentences):
             # [sent.pop(k) for j, _, _ in r.aos[i] for k in j]
             for j, _, _ in r.aos[i]:
-                for k in j: sent[k] = '#####'
+                for k in j: sent[k] = mask*mask_size
         return r
 
     def preprocess(self): return self # note that any removal of words breakes the aos indexing!
