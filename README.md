@@ -1,4 +1,4 @@
-# `LADy`<sup>*</sup>: A System for Latent Aspect Detection
+# 💃 `LADy`<sup>*</sup>: A System for Latent Aspect Detection
 <sup>*Suggested by [Christine!](https://github.com/Lillliant)
 
 `LADy` is an open-source platform that provides a standard and reproducible way of analyzing `unsolicited online reviews`. 
