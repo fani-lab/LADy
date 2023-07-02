@@ -35,14 +35,14 @@
 `LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
 
 ```bash
-git clone https://github.com/fani-lab/LADy.git
+git clone --recursive https://github.com/fani-lab/LADy.git
 cd LADy
 conda env create -f environment.yml
 conda activate lady
 ```
 
 ```bash
-git clone https://github.com/fani-lab/LADy.git
+git clone --recursive https://github.com/fani-lab/LADy.git
 cd LADy
 pip install -r requirements.txt
 ```
@@ -74,10 +74,10 @@ For quickstart purposes, a `toy` sample of reviews has been provided at [`./data
 You can run `LADy` by:
 ```bash
 cd ./src
-python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
+python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
 ```
-This run will produce an output folder at [`../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
-The final evaluation results are aggregated in [`../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
+This run will produce an output folder at [`../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
+The final evaluation results are aggregated in [`../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
 
 ## 3. Structure
 `LADy` has two layers: 
@@ -124,7 +124,7 @@ This layer further includes realizations for different aspect modeling methods l
 
 > [`Random`](./src/aml/rnd.py) in [`./src/aml/ctm.py`](./src/aml/rnd.py), which returns a shuffled list of tokens as a prediction for aspects of a review to provide a minimum baseline for comparison.
 
-Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/{model name}`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
+Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/{model name}`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 
 <p align="center"><img src='./src/aml/LADy.png' width="550" >
  <br>
@@ -140,7 +140,7 @@ Sample models trained on a `toy` dataset can be found [`./output/semeval+/toy.20
 
 > `-data`: the raw review file, e.g., `-data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`
 
-> `-output`: the folder to store the pipeline outputs, e.g., `-output ../output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml` including preprocessed reviews, trained models, predictions, evaluations, ...
+> `-output`: the folder to store the pipeline outputs, e.g., `-output ../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml` including preprocessed reviews, trained models, predictions, evaluations, ...
 
 `LADy` knows the methods' hyperparameters and evaluation settings from [`./src/params.py`](./src/params.py)
 
@@ -164,18 +164,18 @@ Here is the codebase folder structure:
 ### `-output {output}`
 `LADy` runs the pipleline for `['prep', 'train', 'test', 'eval', 'agg']` steps and generate outputs in the given `-output` path:
 
-> `['prep']`: loads raw reviews and generate review objects in `{output}/review.{list of languages}.pkl` like [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/)
+> `['prep']`: loads raw reviews and generate review objects in `{output}/review.{list of languages}.pkl` like [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/)
  
 > `['train']`: loads review objects and create an instance of aspect modeling (detection) method given in `-am {am}`. 
 > `LADy` splits reviews into `train` and `test` based on `params.settings['train']['ratio']` in [`./src/params.py`](./src/params.py).
 > `LADy` further splits `train` into `params.settings['train']['nfolds']` for cross-validation and model tuning during training. 
-> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd/)
+> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd/)
 ```
 ├── f{k}.model            -> saved aspect model for k-th fold
 ├── f{k}.model.dict       -> dictionary of tokens/words for k-th fold
 ```
 
-> `['test']`: 
+> `['test']`: load review objects and saved aspect model and infer the aspects from the test reviews (to be completed)
 
 > `['eval']`: 
  
