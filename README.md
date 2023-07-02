@@ -124,7 +124,7 @@ This layer further includes realizations for different aspect modeling methods l
 
 > [`Random`](./src/aml/rnd.py) in [`./src/aml/ctm.py`](./src/aml/rnd.py), which returns a shuffled list of tokens as a prediction for aspects of a review to provide a minimum baseline for comparison.
 
-Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/{model name}`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
+Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5//{model name}`](./output/toy.2016SB5/).
 
 <p align="center"><img src='./src/aml/LADy.png' width="550" >
  <br>
@@ -149,9 +149,9 @@ Here is the codebase folder structure:
 ├── src
 |   ├── cmn
 |   |   ├── review.py   -> class definition for review as object
-|   |   ├── semeval.py  -> overriden class for semeval reviews
+|   |   ├── semeval.py  -> overridden class for semeval reviews
 |   ├── aml
-|   |   ├── mdl.py      -> abstract aspect model to be overriden by baselines
+|   |   ├── mdl.py      -> abstract aspect model to be overridden by baselines
 |   |   ├── rnd.py      -> random aspect model that randomly predicts aspects
 |   |   ├── lda.py      -> unsupervised aspect detection based on LDA
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
@@ -162,20 +162,25 @@ Here is the codebase folder structure:
 ```
 
 ### `-output {output}`
-`LADy` runs the pipleline for `['prep', 'train', 'test', 'eval', 'agg']` steps and generate outputs in the given `-output` path:
+`LADy` runs the pipleline for `['prep', 'train', 'test', 'eval', 'agg']` steps and generates outputs in the given `-output` path:
 
-> `['prep']`: loads raw reviews and generate review objects in `{output}/review.{list of languages}.pkl` like [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/)
+> `['prep']`: loads raw reviews and generate review objects in `{output}/review.{list of languages}.pkl` like [`./output/toy.2016SB5/`](./output/toy.2016SB5/)
  
 > `['train']`: loads review objects and create an instance of aspect modeling (detection) method given in `-am {am}`. 
 > `LADy` splits reviews into `train` and `test` based on `params.settings['train']['ratio']` in [`./src/params.py`](./src/params.py).
 > `LADy` further splits `train` into `params.settings['train']['nfolds']` for cross-validation and model tuning during training. 
-> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/5.arb_Arab/rnd/)
+> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/toy.2016SB5/5.arb_Arab/lda`](./output/toy.2016SB5/5.arb_Arab/lda/)
 ```
 ├── f{k}.model            -> saved aspect model for k-th fold
 ├── f{k}.model.dict       -> dictionary of tokens/words for k-th fold
 ```
 
-> `['test']`: load review objects and saved aspect model and infer the aspects from the test reviews (to be completed)
+> `['test']`: predict the aspects on the test set with `params.settings["test"]["h_ratio"] * 100` % latent aspect meaning that h_ratio percentage of the aspects will be hidden in the reviews.
+Also, model will be loaded from f{k} which has been saved in the previous step (train) for testing.
+> The results of inference will be pairs of golden truth aspects with the inferred aspects sorted based on their probability that will be saved for each fold in `{output}/{naspect}/{am}/` like [`./output/toy.2016SB5/5/lda`](./output/toy.2016SB5/5/lda/)
+```
+├── f{k}.model.pred.{params.settings["test"]["h_ratio"]}         -> pairs of golden truth and inferred aspects with (h_ratio * 100) % hidden aspects
+```
 
 > `['eval']`: 
  
