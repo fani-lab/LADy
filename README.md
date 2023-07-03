@@ -69,7 +69,7 @@ cd src/octis
 python setup.py install
 ```
 
-## 2. [Quickstart](https://colab.research.google.com/drive/1aRkrnWpU43hqZvPRph59j8_dsHYHwinj?usp=sharing)
+## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/LADy/blob/main/quickstart.ipynb)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 You can run `LADy` by:
 ```bash
