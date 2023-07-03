@@ -1,3 +1,4 @@
 # Apply override to all files and directories in the directory
 data/** linguist-vendored=true
 output/** linguist-vendored=true
+quickstart.ipynb linguist-vendored=true
