@@ -62,24 +62,29 @@ python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
 ```
 
-Further, we reused [`octis`](https://aclanthology.org/2021.eacl-demos.31.pdf) as [`submodule`](https://github.com/fani-lab/OCTIS) for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://arxiv.org/pdf/1703.01488.pdf):
+Further, we reused [`octis`](https://aclanthology.org/2021.eacl-demos.31.pdf) as submodule [`./src/octis`](https://github.com/fani-lab/OCTIS) for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://arxiv.org/pdf/1703.01488.pdf):
 
 ```bash
 cd src/octis
 python setup.py install
 ```
 
-Finally, we added other recourses as our baselines which are [`BERT-E2E-ABSA`](https://aclanthology.org/D19-5505/) as a [`submodule`](https://github.com/fani-lab/BERT-E2E-ABSA), [`HAST`](https://www.ijcai.org/proceedings/2018/0583) as a [`submodule`](https://github.com/fani-lab/HAST), and [`cat`](https://aclanthology.org/2020.acl-main.290/) as as a [`submodule`](https://github.com/fani-lab/cat) for aspect detection.
+Finally, we added below state-of-the-art aspect detection baselines as submodules:
+> [`bert-e2e-absa`](https://aclanthology.org/D19-5505/) → [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA)
+
+> [`hast`](https://www.ijcai.org/proceedings/2018/0583) → [`./src/hast`](https://github.com/fani-lab/HAST)
+
+> [`cat`](https://aclanthology.org/2020.acl-main.290/) → [`./src/cat`](https://github.com/fani-lab/cat)
 
 ## 2. Quickstart[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/LADy/blob/main/quickstart.ipynb)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 You can run `LADy` by:
 ```bash
 cd ./src
-python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/
+python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/toy.2016SB5/
 ```
-This run will produce an output folder at [`../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/) and a subfolder for `rnd` aspect modeling (random) baseline.
-The final evaluation results are aggregated in [`../output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml/agg.pred.eval.mean.csv). 
+This run will produce an output folder at [`../output/toy.2016SB5/`](./output/toy.2016SB5/) and a subfolder for `rnd` aspect modeling (random) baseline.
+The final evaluation results are aggregated in [`../output/toy.2016SB5/agg.pred.eval.mean.csv`](./output/toy.2016SB5/agg.pred.eval.mean.csv). 
 
 ## 3. Structure
 `LADy` has two layers: 
