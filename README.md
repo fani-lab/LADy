@@ -169,22 +169,31 @@ Here is the codebase folder structure:
 > `['train']`: loads review objects and create an instance of aspect modeling (detection) method given in `-am {am}`. 
 > `LADy` splits reviews into `train` and `test` based on `params.settings['train']['ratio']` in [`./src/params.py`](./src/params.py).
 > `LADy` further splits `train` into `params.settings['train']['nfolds']` for cross-validation and model tuning during training. 
-> The results of this step is a collection trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/toy.2016SB5/5.arb_Arab/lda`](./output/toy.2016SB5/5.arb_Arab/lda/)
+> The result of this step is a collection of trained models for each fold in `{output}/{naspect}.{languges used for back-translation}/{am}/` like [`./output/toy.2016SB5/5.arb_Arab/lda`](./output/toy.2016SB5/5.arb_Arab/lda/)
 ```
 ├── f{k}.model            -> saved aspect model for k-th fold
 ├── f{k}.model.dict       -> dictionary of tokens/words for k-th fold
 ```
 
-> `['test']`: predict the aspects on the test set with `params.settings["test"]["h_ratio"] * 100` % latent aspect meaning that h_ratio percentage of the aspects will be hidden in the reviews.
-Also, model will be loaded from f{k} which has been saved in the previous step (train) for testing.
+> `['test']`: predicts the aspects on the test set with `params.settings["test"]["h_ratio"] * 100` % latent aspect meaning that this percentage of the aspects will be hidden in the test reviews.
+Also, the model will which has been saved in the previous step (train) will be loaded to be used for inference.
 > The results of inference will be pairs of golden truth aspects with the inferred aspects sorted based on their probability that will be saved for each fold in `{output}/{naspect}/{am}/` like [`./output/toy.2016SB5/5/lda`](./output/toy.2016SB5/5/lda/)
 ```
-├── f{k}.model.pred.{params.settings["test"]["h_ratio"]}         -> pairs of golden truth and inferred aspects with (h_ratio * 100) % hidden aspects
+├── f{k}.model.pred.{h_ratio}        -> pairs of golden truth and inferred aspects with (h_ratio * 100) % hidden aspects for k-th fold
 ```
 
-> `['eval']`: 
+> `['eval']`: evaluate the inference results in the test step and save the results for different metrics in `params.settings['eval']['metrics']` for different k in `params.settings["eval"]["topkstr"]`.
+> The result of this step will be saved for each fold in `{output}/{naspect}/{am}/` like [`./output/toy.2016SB5/5/lda`](./output/toy.2016SB5/5/lda/)
+```
+├── f{k}.model.pred.{h_ratio}       -> evaluation of inference for k-th fold with (h_ratio * 100) % hidden aspects
+├── model.pred.{h_ratio}.csv        -> mean of evaluation for all folds with (h_ratio * 100) % hidden aspects
+```
  
-> `['agg']`: 
+> `['agg']`: aggregate the inferred result in this step for all the aspect models in all the folds and for all the `h_ratio` values will be saved in a file in `{output}/` like [./output/toy.2016SB](./output/toy.2016SB5)
+
+```
+├── agg.pred.eval.mean.csv          -> aggregated file including all inferences on a specific dataset
+```
 
 ## 4. Experiment
 to be completed ...
