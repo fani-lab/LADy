@@ -15,9 +15,8 @@
 - [4. Experiment](#4-experiment)
 - [5. License](#5-license)
 - [6. Acknowledgments](#6-acknowledgments)
-- [7. Authors](#7-authors)
-- [8. Awards](#8-awards)
-- [9. Contributing](#9-contributing)
+- [7. Awards](#7-awards)
+- [8. Contributing](#8-contributing)
 
 </td>
 <td>
@@ -50,7 +49,7 @@ This command installs compatible versions of the following libraries:
 
 > [`./src/cmn`](./src/cmn): `transformers, sentence_transformers, scipy, simalign, nltk`
 
-> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus`
+> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus, contextualized_topic_models`
 
 > others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
 
@@ -63,13 +62,16 @@ python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
 ```
 
-Further, we reused [`octis`](https://github.com/MIND-Lab/OCTIS) as `submodule` for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://github.com/estebandito22/PyTorchAVITM):
+Further, we reused [`octis`](https://aclanthology.org/2021.eacl-demos.31.pdf) as [`submodule`](https://github.com/fani-lab/OCTIS) for `unsupervised` neural aspect modeling using e.g., [`neural lda`](https://arxiv.org/pdf/1703.01488.pdf):
+
 ```bash
 cd src/octis
 python setup.py install
 ```
 
-## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/LADy/blob/main/quickstart.ipynb)
+Finally, we added other recourses as our baselines which are [`BERT-E2E-ABSA`](https://aclanthology.org/D19-5505/) as a [`submodule`](https://github.com/fani-lab/BERT-E2E-ABSA), [`HAST`](https://www.ijcai.org/proceedings/2018/0583) as a [`submodule`](https://github.com/fani-lab/HAST), and [`cat`](https://aclanthology.org/2020.acl-main.290/) as as a [`submodule`](https://github.com/fani-lab/cat) for aspect detection.
+
+## 2. Quickstart[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/LADy/blob/main/quickstart.ipynb)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
 You can run `LADy` by:
 ```bash
@@ -116,12 +118,20 @@ To view the actual aspect terms (tokens), `self.get_aspect_words(aspect_id)` can
 
 This layer further includes realizations for different aspect modeling methods like, 
 
+Finally, we added other recourses as our baselines which are [`BERT-E2E-ABSA`](https://aclanthology.org/D19-5505/) as a [`submodule`](https://github.com/fani-lab/BERT-E2E-ABSA), [`HAST`](https://www.ijcai.org/proceedings/2018/0583) as a [`submodule`](https://github.com/fani-lab/HAST), and [`CAt`](https://aclanthology.org/2020.acl-main.290/) as as a [`submodule`](https://github.com/fani-lab/cat) for aspect detection.
+
 > [`Local LDA [Brody and Elhadad, NAACL2010]`](https://aclanthology.org/N10-1122/) in [`./src/aml/lda.py`](./src/aml/lda.py),
 
 > [`Biterm Topic Modeling [WWW2013]`](https://dl.acm.org/doi/10.1145/2488388.2488514) in [`./src/aml/btm.py`](./src/aml/btm.py),
 
 > [`Contextual Topic Modeling [EACL2021]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/aml/ctm.py`](./src/aml/ctm.py),
 
+> [`BERT-E2E-ABSA [W-NUT@EMNLP2019]`](https://aclanthology.org/D19-5505/) to be added,
+> 
+> [`HAST [IJCAI2018]`](https://aclanthology.org/2021.eacl-main.143/) to be added,
+> 
+> [`CAt [ACL2020]`](https://aclanthology.org/2020.acl-main.290/) to be added,
+> 
 > [`Random`](./src/aml/rnd.py) in [`./src/aml/ctm.py`](./src/aml/rnd.py), which returns a shuffled list of tokens as a prediction for aspects of a review to provide a minimum baseline for comparison.
 
 Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5//{model name}`](./output/toy.2016SB5/).
@@ -136,7 +146,7 @@ Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5//{m
 
 > `-naspects`: the number of possible aspects for a review in a domain, e.g., `-naspect 5`, like in `restaurant` we may have 5 aspects including `['food', 'staff', ...]`
 
-> `-am`: the aspect modeling (detection) method, e.g., `-am lda`, including `rnd`, `lda`,`btm`, `ctm`, `nrl`
+> `-am`: the aspect modeling (detection) method, e.g., `-am lda`, including `rnd`, `lda`,`btm`, `ctm`, `nrl`, `bert`, `hast`, `cat`
 
 > `-data`: the raw review file, e.g., `-data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`
 
@@ -189,7 +199,7 @@ Also, the model will which has been saved in the previous step (train) will be l
 ├── model.pred.{h_ratio}.csv        -> mean of evaluation for all folds with (h_ratio * 100) % hidden aspects
 ```
  
-> `['agg']`: aggregate the inferred result in this step for all the aspect models in all the folds and for all the `h_ratio` values will be saved in a file in `{output}/` like [./output/toy.2016SB](./output/toy.2016SB5)
+> `['agg']`: aggregate the inferred result in this step for all the aspect models in all the folds and for all the `h_ratio` values will be saved in a file in `{output}/` like [`./output/toy.2016SB`](./output/toy.2016SB5)
 
 ```
 ├── agg.pred.eval.mean.csv          -> aggregated file including all inferences on a specific dataset
@@ -204,14 +214,9 @@ to be completed ...
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
 ## 5. License
-©2021. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
+©2023. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
-
-## 6. Acknowledgments
-In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We would like to thank the authors of these works.
-
-## 7. Authors
-Farinam Hemmatizadeh <sup>1,3</sup>, Christine Wong<sup>1, 4</sup>, Alice Yu<sup>2, 5</sup>, and [Hossein Fani](https://hosseinfani.github.io/)<sup>1,6</sup>
+Farinam Hemmatizadeh<sup>1,3</sup>, Christine Wong<sup>1, 4</sup>, Alice Yu<sup>2, 5</sup>, and [Hossein Fani](https://hosseinfani.github.io/)<sup>1,6</sup>
 
 <sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
 <sup><sup>2</sup>Vincent Massey Secondary School, ON, Canada.</sup>
@@ -221,12 +226,16 @@ Farinam Hemmatizadeh <sup>1,3</sup>, Christine Wong<sup>1, 4</sup>, Alice Yu<sup
 <sup><sup>5</sup>[qinfengyu123@gmail.com](mailto:qinfengyu123@gmail.com)</sup>
 <sup><sup>6</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
 
-## 8. Awards
+## 6. Acknowledgments
+In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
+
+
+## 7. Awards
 
 > [`CAD$150, Silver Medalist, UWill Discover 2023`](https://www.uwindsor.ca/uwilldiscover/312/uwill-discover-awards) 👉 [`slides`](./misc/UWillDiscover23.pdf)
 > <p align="center"><img src='./misc/cs_demo_day_23april23.png' width="350" ></p>
 > <p align="center">From Left: Soroush, Atefeh, Christine, Farinam, Mohammad</p>
 
 
-## 9. Contributing
-Pull requests are highly encouraged and welcomed. However, for significant modifications, please initiate a discussion by opening an issue beforehand to clarify what modifications you intend to make.
+## 8. Contributing
+We strongly encourage and welcome pull requests from contributors. If you plan to make substantial modifications, we kindly request that you first open an issue to initiate a discussion. This will allow us to have a clear understanding of the modifications you intend to make and ensure a smooth collaboration process.
