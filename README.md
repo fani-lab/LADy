@@ -53,6 +53,13 @@ This command installs compatible versions of the following libraries:
 
 > others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
 
+The following aspect detection baselines will be also cloned as submodules:
+> [`bert-e2e-absa`](https://aclanthology.org/D19-5505/) → [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA)
+
+> [`hast`](https://www.ijcai.org/proceedings/2018/0583) → [`./src/hast`](https://github.com/fani-lab/HAST)
+
+> [`cat`](https://aclanthology.org/2020.acl-main.290/) → [`./src/cat`](https://github.com/fani-lab/cat)
+
 Additionally, the following libraries should be installed:
 > [`Microsoft C++ Build Tools`](https://visualstudio.microsoft.com/visual-cpp-build-tools/) as a requirement of biterm topic modeling in [`./src/btm.py`](./src/btm.py).
 
@@ -68,13 +75,6 @@ Further, we reused [`octis`](https://aclanthology.org/2021.eacl-demos.31.pdf) as
 cd src/octis
 python setup.py install
 ```
-
-Finally, we added below state-of-the-art aspect detection baselines as submodules:
-> [`bert-e2e-absa`](https://aclanthology.org/D19-5505/) → [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA)
-
-> [`hast`](https://www.ijcai.org/proceedings/2018/0583) → [`./src/hast`](https://github.com/fani-lab/HAST)
-
-> [`cat`](https://aclanthology.org/2020.acl-main.290/) → [`./src/cat`](https://github.com/fani-lab/cat)
 
 ## 2. Quickstart[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/LADy/blob/main/quickstart.ipynb)
 For quickstart purposes, a `toy` sample of reviews has been provided at [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml).
@@ -123,20 +123,18 @@ To view the actual aspect terms (tokens), `self.get_aspect_words(aspect_id)` can
 
 This layer further includes realizations for different aspect modeling methods like, 
 
-Finally, we added other recourses as our baselines which are [`BERT-E2E-ABSA`](https://aclanthology.org/D19-5505/) as a [`submodule`](https://github.com/fani-lab/BERT-E2E-ABSA), [`HAST`](https://www.ijcai.org/proceedings/2018/0583) as a [`submodule`](https://github.com/fani-lab/HAST), and [`CAt`](https://aclanthology.org/2020.acl-main.290/) as as a [`submodule`](https://github.com/fani-lab/cat) for aspect detection.
-
 > [`Local LDA [Brody and Elhadad, NAACL2010]`](https://aclanthology.org/N10-1122/) in [`./src/aml/lda.py`](./src/aml/lda.py),
 
 > [`Biterm Topic Modeling [WWW2013]`](https://dl.acm.org/doi/10.1145/2488388.2488514) in [`./src/aml/btm.py`](./src/aml/btm.py),
 
 > [`Contextual Topic Modeling [EACL2021]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/aml/ctm.py`](./src/aml/ctm.py),
 
-> [`BERT-E2E-ABSA [W-NUT@EMNLP2019]`](https://aclanthology.org/D19-5505/) to be added,
-> 
-> [`HAST [IJCAI2018]`](https://aclanthology.org/2021.eacl-main.143/) to be added,
-> 
-> [`CAt [ACL2020]`](https://aclanthology.org/2020.acl-main.290/) to be added,
-> 
+> [`BERT-E2E-ABSA [W-NUT@EMNLP2019]`](https://aclanthology.org/D19-5505/) in [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA)
+ 
+> [`HAST [IJCAI2018]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/hast`](https://github.com/fani-lab/HAST)
+ 
+> [`CAt [ACL2020]`](https://aclanthology.org/2020.acl-main.290/) in [`./src/cat`](https://github.com/fani-lab/cat),
+
 > [`Random`](./src/aml/rnd.py) in [`./src/aml/ctm.py`](./src/aml/rnd.py), which returns a shuffled list of tokens as a prediction for aspects of a review to provide a minimum baseline for comparison.
 
 Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5//{model name}`](./output/toy.2016SB5/).
@@ -197,7 +195,7 @@ Also, the model will which has been saved in the previous step (train) will be l
 ├── f{k}.model.pred.{h_ratio}        -> pairs of golden truth and inferred aspects with (h_ratio * 100) % hidden aspects for k-th fold
 ```
 
-> `['eval']`: evaluate the inference results in the test step and save the results for different metrics in `params.settings['eval']['metrics']` for different k in `params.settings["eval"]["topkstr"]`.
+> `['eval']`: evaluate the inference results in the test step and save the results for different metrics in [`params.settings['eval']['metrics']`](https://github.com/fani-lab/LADy/blob/main/src/params.py#L55) for different k in `params.settings["eval"]["topkstr"]`.
 > The result of this step will be saved for each fold in `{output}/{naspect}/{am}/` like [`./output/toy.2016SB5/5/lda`](./output/toy.2016SB5/5/lda/)
 ```
 ├── f{k}.model.pred.{h_ratio}       -> evaluation of inference for k-th fold with (h_ratio * 100) % hidden aspects
