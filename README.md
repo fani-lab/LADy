@@ -210,8 +210,931 @@ Also, the model will which has been saved in the previous step (train) will be l
 
 ## 4. Experiment
 to be completed ...
+
 - datasets and stats
+
+  
 - table of results
+
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">bert-tfm</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">cat</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">loclda</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">btm</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">ctm</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">neurallda</th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj"></th>
+    <th class="tg-uzvj">random</th>
+    <th class="tg-uzvj"></th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+    <td class="tg-9wq8">pr1</td>
+    <td class="tg-9wq8">rec5</td>
+    <td class="tg-9wq8">ndcg5</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8">semeval-14-laptop</td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">none</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6194}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6487}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6235}}$</td>
+    <td class="tg-9wq8">0.4591</td>
+    <td class="tg-9wq8">0.6362</td>
+    <td class="tg-9wq8">0.5598</td>
+    <td class="tg-9wq8">0.1188</td>
+    <td class="tg-9wq8">0.1536</td>
+    <td class="tg-9wq8">0.1308</td>
+    <td class="tg-9wq8">0.0705</td>
+    <td class="tg-9wq8">0.1079</td>
+    <td class="tg-9wq8">0.0908</td>
+    <td class="tg-9wq8">0.0286</td>
+    <td class="tg-9wq8">0.0459</td>
+    <td class="tg-9wq8">0.0379</td>
+    <td class="tg-9w52"><ins>0.0116</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0179}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0155}}$</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+chinese</td>
+    <td class="tg-9wq8">0.6018</td>
+    <td class="tg-9w52"><ins>0.6347</ins></td>
+    <td class="tg-9wq8">0.6102</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.5409}}$</td>
+    <td class="tg-9wq8">0.6564</td>
+    <td class="tg-9wq8">0.6082</td>
+    <td class="tg-9wq8">0.1179</td>
+    <td class="tg-9wq8">0.1680</td>
+    <td class="tg-9wq8">0.1407</td>
+    <td class="tg-9wq8">0.1080</td>
+    <td class="tg-9wq8">0.1309</td>
+    <td class="tg-9wq8">0.1173</td>
+    <td class="tg-9wq8">0.0732</td>
+    <td class="tg-9wq8">0.1003</td>
+    <td class="tg-9wq8">0.0844</td>
+    <td class="tg-9wq8">0.0054</td>
+    <td class="tg-9wq8">0.0063</td>
+    <td class="tg-9wq8">0.0059</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+farsi</td>
+    <td class="tg-9wq8">0.6074</td>
+    <td class="tg-9wq8">0.6314</td>
+    <td class="tg-9wq8">0.6092</td>
+    <td class="tg-9wq8">0.5369</td>
+    <td class="tg-9w52"><ins>0.6685</ins></td>
+    <td class="tg-9wq8">0.6112</td>
+    <td class="tg-9wq8">0.0875</td>
+    <td class="tg-9wq8">0.1390</td>
+    <td class="tg-9wq8">0.1148</td>
+    <td class="tg-9w52"><ins>0.1438</ins></td>
+    <td class="tg-9wq8">0.1321</td>
+    <td class="tg-9w52"><ins>0.1276</ins></td>
+    <td class="tg-9wq8">0.0384</td>
+    <td class="tg-9wq8">0.0593</td>
+    <td class="tg-9wq8">0.0501</td>
+    <td class="tg-9wq8">0.0054</td>
+    <td class="tg-9wq8">0.0086</td>
+    <td class="tg-9wq8">0.0066</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+arabic</td>
+    <td class="tg-9wq8">0.6018</td>
+    <td class="tg-9wq8">0.6237</td>
+    <td class="tg-9wq8">0.6039</td>
+    <td class="tg-9wq8">0.5154</td>
+    <td class="tg-9wq8">0.6537</td>
+    <td class="tg-9wq8">0.5959</td>
+    <td class="tg-9wq8">0.1000</td>
+    <td class="tg-9wq8">0.1420</td>
+    <td class="tg-9wq8">0.1194</td>
+    <td class="tg-9wq8">0.1107</td>
+    <td class="tg-9wq8">0.1342</td>
+    <td class="tg-9wq8">0.1177</td>
+    <td class="tg-9wq8">0.0464</td>
+    <td class="tg-9wq8">0.0770</td>
+    <td class="tg-9wq8">0.0608</td>
+    <td class="tg-9wq8">0.0063</td>
+    <td class="tg-9wq8">0.0085</td>
+    <td class="tg-9wq8">0.0070</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0018}}$</td>
+    <td class="tg-9wq8">0.0010</td>
+    <td class="tg-9wq8">0.0012</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+french</td>
+    <td class="tg-9w52"><ins>0.6184</ins></td>
+    <td class="tg-9wq8">0.6290</td>
+    <td class="tg-9w52"><ins>0.6112</ins></td>
+    <td class="tg-9wq8">0.5168</td>
+    <td class="tg-9w52"><ins>0.6685</ins></td>
+    <td class="tg-9wq8">0.6040</td>
+    <td class="tg-9wq8">0.1223</td>
+    <td class="tg-9w52"><ins>0.1705</ins></td>
+    <td class="tg-9w52"><ins>0.1462</ins></td>
+    <td class="tg-9wq8">0.1170</td>
+    <td class="tg-9wq8">0.1430</td>
+    <td class="tg-9wq8">0.1263</td>
+    <td class="tg-9wq8">0.0518</td>
+    <td class="tg-9wq8">0.0910</td>
+    <td class="tg-9wq8">0.0733</td>
+    <td class="tg-9wq8">0.0045</td>
+    <td class="tg-9wq8">0.0076</td>
+    <td class="tg-9wq8">0.0061</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0018}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0019}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0018}}$</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+german</td>
+    <td class="tg-9wq8">0.6055</td>
+    <td class="tg-9wq8">0.6336</td>
+    <td class="tg-9wq8">0.6096</td>
+    <td class="tg-9wq8">0.5315</td>
+    <td class="tg-9w52"><ins>0.6685</ins></td>
+    <td class="tg-9wq8">0.6103</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1411}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1890}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1621}}$</td>
+    <td class="tg-9wq8">0.1000</td>
+    <td class="tg-9wq8">0.1206</td>
+    <td class="tg-9wq8">0.1068</td>
+    <td class="tg-9w52"><ins>0.0991</ins></td>
+    <td class="tg-9w52"><ins>0.1199</ins></td>
+    <td class="tg-9w52"><ins>0.1066</ins></td>
+    <td class="tg-9wq8">0.0036</td>
+    <td class="tg-9wq8">0.0060</td>
+    <td class="tg-9wq8">0.0049</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0009</td>
+    <td class="tg-9wq8">0.0004</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+spanish</td>
+    <td class="tg-9wq8">0.6018</td>
+    <td class="tg-9wq8">0.6291</td>
+    <td class="tg-9wq8">0.6092</td>
+    <td class="tg-9wq8">0.5356</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6711}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6127}}$</td>
+    <td class="tg-9w52"><ins>0.1188</ins></td>
+    <td class="tg-9wq8">0.1669</td>
+    <td class="tg-9wq8">0.1414</td>
+    <td class="tg-9wq8">0.1045</td>
+    <td class="tg-9w52"><ins>0.1431</ins></td>
+    <td class="tg-9wq8">0.1225</td>
+    <td class="tg-9wq8">0.0500</td>
+    <td class="tg-9wq8">0.0768</td>
+    <td class="tg-9wq8">0.0638</td>
+    <td class="tg-9wq8">0.0045</td>
+    <td class="tg-9wq8">0.0048</td>
+    <td class="tg-9wq8">0.0047</td>
+    <td class="tg-9w52"><ins>0.0009</ins></td>
+    <td class="tg-9w52"><ins>0.0017</ins></td>
+    <td class="tg-9w52"><ins>0.0015</ins></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+all</td>
+    <td class="tg-9wq8">0.6028</td>
+    <td class="tg-9wq8">0.6194</td>
+    <td class="tg-9wq8">0.6025</td>
+    <td class="tg-9wq8">0.5195</td>
+    <td class="tg-9wq8">0.6510</td>
+    <td class="tg-9wq8">0.5966</td>
+    <td class="tg-9w52"><ins>0.1188</ins></td>
+    <td class="tg-9wq8">0.1549</td>
+    <td class="tg-9wq8">0.1336</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1339}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1476}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1347}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1652}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2007}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1757}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0134}}$</td>
+    <td class="tg-9w52"><ins>0.0149</ins></td>
+    <td class="tg-9w52"><ins>0.0130</ins></td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0001</td>
+    <td class="tg-9wq8">0.0001</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8">semeval-14-restaurant</td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9w52"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">none</td>
+    <td class="tg-9w52"><ins>0.6061</ins></td>
+    <td class="tg-9wq8">0.6564</td>
+    <td class="tg-9wq8">0.6293</td>
+    <td class="tg-9wq8">0.3442</td>
+    <td class="tg-9wq8">0.5478</td>
+    <td class="tg-9wq8">0.4519</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2428}}$</td>
+    <td class="tg-9wq8">0.2845</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2557}}$</td>
+    <td class="tg-9wq8">0.1717</td>
+    <td class="tg-9wq8">0.2361</td>
+    <td class="tg-9wq8">0.1995</td>
+    <td class="tg-9wq8">0.0368</td>
+    <td class="tg-9wq8">0.0941</td>
+    <td class="tg-9wq8">0.0682</td>
+    <td class="tg-9w52"><ins>0.0099</ins></td>
+    <td class="tg-9wq8">0.0307</td>
+    <td class="tg-9wq8">0.0221</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0002</td>
+    <td class="tg-9wq8">0.0001</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+chinese</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6121}}$</td>
+    <td class="tg-9w52"><ins>0.6627</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6338}}$</td>
+    <td class="tg-9wq8">0.6221</td>
+    <td class="tg-9wq8">0.8248</td>
+    <td class="tg-9wq8">0.7395</td>
+    <td class="tg-9wq8">0.1980</td>
+    <td class="tg-9wq8">0.2656</td>
+    <td class="tg-9wq8">0.2270</td>
+    <td class="tg-9wq8">0.1743</td>
+    <td class="tg-9wq8">0.2236</td>
+    <td class="tg-9wq8">0.1945</td>
+    <td class="tg-9wq8">0.2020</td>
+    <td class="tg-9wq8">0.1994</td>
+    <td class="tg-9wq8">0.1863</td>
+    <td class="tg-9wq8">0.0046</td>
+    <td class="tg-9wq8">0.0309</td>
+    <td class="tg-9wq8">0.0203</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0001</td>
+    <td class="tg-9wq8">0.0001</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+farsi</td>
+    <td class="tg-9wq8">0.5946</td>
+    <td class="tg-9wq8">0.6390</td>
+    <td class="tg-9wq8">0.6166</td>
+    <td class="tg-9wq8">0.6133</td>
+    <td class="tg-9wq8">0.8159</td>
+    <td class="tg-9wq8">0.7321</td>
+    <td class="tg-9wq8">0.1770</td>
+    <td class="tg-9wq8">0.2803</td>
+    <td class="tg-9wq8">0.2322</td>
+    <td class="tg-9wq8">0.1664</td>
+    <td class="tg-9wq8">0.2238</td>
+    <td class="tg-9wq8">0.1920</td>
+    <td class="tg-9wq8">0.1289</td>
+    <td class="tg-9wq8">0.1912</td>
+    <td class="tg-9wq8">0.1604</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0105}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0493}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0312}}$</td>
+    <td class="tg-9w52"><ins>0.0007</ins></td>
+    <td class="tg-9w52"><ins>0.0013</ins></td>
+    <td class="tg-9w52"><ins>0.0008</ins></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+arabic</td>
+    <td class="tg-9wq8">0.6054</td>
+    <td class="tg-9wq8">0.6558</td>
+    <td class="tg-9wq8">0.6286</td>
+    <td class="tg-9wq8">0.6221</td>
+    <td class="tg-9wq8">0.8265</td>
+    <td class="tg-9wq8">0.7417</td>
+    <td class="tg-9w52"><ins>0.2408</ins></td>
+    <td class="tg-9w52"><ins>0.2866</ins></td>
+    <td class="tg-9w52"><ins>0.2548</ins></td>
+    <td class="tg-9wq8">0.1678</td>
+    <td class="tg-9wq8">0.2336</td>
+    <td class="tg-9wq8">0.1980</td>
+    <td class="tg-9wq8">0.1724</td>
+    <td class="tg-9w52"><ins>0.2218</ins></td>
+    <td class="tg-9w52"><ins>0.1909</ins></td>
+    <td class="tg-9wq8">0.0026</td>
+    <td class="tg-9wq8">0.0250</td>
+    <td class="tg-9wq8">0.0153</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0007</td>
+    <td class="tg-9wq8">0.0004</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+french</td>
+    <td class="tg-9wq8">0.6040</td>
+    <td class="tg-9wq8">0.6516</td>
+    <td class="tg-9wq8">0.6253</td>
+    <td class="tg-9wq8">0.6159</td>
+    <td class="tg-9wq8">0.8274</td>
+    <td class="tg-9wq8">0.7399</td>
+    <td class="tg-9wq8">0.1645</td>
+    <td class="tg-9wq8">0.2533</td>
+    <td class="tg-9wq8">0.2068</td>
+    <td class="tg-9wq8">0.1572</td>
+    <td class="tg-9wq8">0.2090</td>
+    <td class="tg-9wq8">0.1773</td>
+    <td class="tg-9w52"><ins>0.1947</ins></td>
+    <td class="tg-9wq8">0.2036</td>
+    <td class="tg-9wq8">0.1862</td>
+    <td class="tg-9wq8">0.0086</td>
+    <td class="tg-9w52"><ins>0.0365</ins></td>
+    <td class="tg-9w52"><ins>0.0250</ins></td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+german</td>
+    <td class="tg-9wq8">0.5987</td>
+    <td class="tg-9wq8">0.6553</td>
+    <td class="tg-9wq8">0.6275</td>
+    <td class="tg-9w52"><ins>0.6257</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.8363}}$</td>
+    <td class="tg-9w52"><ins>0.7487</ins></td>
+    <td class="tg-9wq8">0.1770</td>
+    <td class="tg-9wq8">0.2876</td>
+    <td class="tg-9wq8">0.2329</td>
+    <td class="tg-9w52"><ins>0.1875</ins></td>
+    <td class="tg-9w52"><ins>0.2350</ins></td>
+    <td class="tg-9w52"><ins>0.2056</ins></td>
+    <td class="tg-9wq8">0.1467</td>
+    <td class="tg-9wq8">0.1715</td>
+    <td class="tg-9wq8">0.1474</td>
+    <td class="tg-9wq8">0.0033</td>
+    <td class="tg-9wq8">0.0272</td>
+    <td class="tg-9wq8">0.0167</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0013}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0018}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0016}}$</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+spanish</td>
+    <td class="tg-9wq8">0.6000</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6581}}$</td>
+    <td class="tg-9wq8">0.6278</td>
+    <td class="tg-uzvj">0.6319</td>
+    <td class="tg-9w52"><ins>0.8354</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7501}}$</td>
+    <td class="tg-9wq8">0.1908</td>
+    <td class="tg-9wq8">0.2853</td>
+    <td class="tg-9wq8">0.2389</td>
+    <td class="tg-9wq8">0.1638</td>
+    <td class="tg-9wq8">0.2266</td>
+    <td class="tg-9wq8">0.1947</td>
+    <td class="tg-9wq8">0.1914</td>
+    <td class="tg-9wq8">0.1922</td>
+    <td class="tg-9wq8">0.1803</td>
+    <td class="tg-9wq8">0.0007</td>
+    <td class="tg-9wq8">0.0157</td>
+    <td class="tg-9wq8">0.0108</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0003</td>
+    <td class="tg-9wq8">0.0003</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+all</td>
+    <td class="tg-9wq8">0.5865</td>
+    <td class="tg-9wq8">0.6566</td>
+    <td class="tg-9wq8">0.6254</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6319}}$</td>
+    <td class="tg-9wq8">0.8239</td>
+    <td class="tg-9wq8">0.7435</td>
+    <td class="tg-9wq8">0.1993</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2919}}$</td>
+    <td class="tg-9wq8">0.2445</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1921}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2386}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2076}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2487}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2741}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2481}}$</td>
+    <td class="tg-9wq8">0.0013</td>
+    <td class="tg-9wq8">0.0355</td>
+    <td class="tg-9wq8">0.0197</td>
+    <td class="tg-9w52"><ins>0.0007</ins></td>
+    <td class="tg-9wq8">0.0003</td>
+    <td class="tg-9wq8">0.0004</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8">semeval-15-restaurant</td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">none</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7000}}$</td>
+    <td class="tg-9wq8">0.6897</td>
+    <td class="tg-9wq8">0.6757</td>
+    <td class="tg-9wq8">0.3327</td>
+    <td class="tg-9wq8">0.5248</td>
+    <td class="tg-9wq8">0.4343</td>
+    <td class="tg-9wq8">0.2320</td>
+    <td class="tg-9wq8">0.3549</td>
+    <td class="tg-9wq8">0.2925</td>
+    <td class="tg-9wq8">0.1872</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.3133}}$</td>
+    <td class="tg-9w52"><ins>0.2500</ins></td>
+    <td class="tg-9wq8">0.0560</td>
+    <td class="tg-9wq8">0.0493</td>
+    <td class="tg-9wq8">0.0485</td>
+    <td class="tg-9wq8">0.0080</td>
+    <td class="tg-9wq8">0.0410</td>
+    <td class="tg-9wq8">0.0244</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0005</td>
+    <td class="tg-9wq8">0.0005</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+chinese</td>
+    <td class="tg-9wq8">0.6661</td>
+    <td class="tg-9wq8">0.6928</td>
+    <td class="tg-9wq8">0.6699</td>
+    <td class="tg-9wq8">0.3723</td>
+    <td class="tg-9wq8">0.5287</td>
+    <td class="tg-9wq8">0.4596</td>
+    <td class="tg-9wq8">0.1968</td>
+    <td class="tg-9wq8">0.3408</td>
+    <td class="tg-9wq8">0.2647</td>
+    <td class="tg-9wq8">0.1760</td>
+    <td class="tg-9wq8">0.2783</td>
+    <td class="tg-9wq8">0.2261</td>
+    <td class="tg-9wq8">0.0624</td>
+    <td class="tg-9wq8">0.0717</td>
+    <td class="tg-9wq8">0.0637</td>
+    <td class="tg-9wq8">0.0112</td>
+    <td class="tg-9w52"><ins>0.0575</ins></td>
+    <td class="tg-9wq8">0.0354</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0016}}$</td>
+    <td class="tg-9w52"><ins>0.0028</ins></td>
+    <td class="tg-9w52"><ins>0.0022</ins></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+farsi</td>
+    <td class="tg-9w52"><ins>0.6742</ins></td>
+    <td class="tg-9wq8">0.6707</td>
+    <td class="tg-9wq8">0.6608</td>
+    <td class="tg-9wq8">0.3703</td>
+    <td class="tg-9wq8">0.5386</td>
+    <td class="tg-9wq8">0.4592</td>
+    <td class="tg-9wq8">0.1840</td>
+    <td class="tg-9wq8">0.3494</td>
+    <td class="tg-9wq8">0.2689</td>
+    <td class="tg-9wq8">0.1776</td>
+    <td class="tg-9wq8">0.2834</td>
+    <td class="tg-9wq8">0.2303</td>
+    <td class="tg-9wq8">0.0560</td>
+    <td class="tg-9wq8">0.0823</td>
+    <td class="tg-9wq8">0.0722</td>
+    <td class="tg-9wq8">0.0096</td>
+    <td class="tg-9wq8">0.0400</td>
+    <td class="tg-9wq8">0.0253</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0002</td>
+    <td class="tg-9wq8">0.0002</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+arabic</td>
+    <td class="tg-9wq8">0.6661</td>
+    <td class="tg-9wq8">0.6898</td>
+    <td class="tg-9wq8">0.6671</td>
+    <td class="tg-9w52"><ins>0.4139</ins></td>
+    <td class="tg-9w52"><ins>0.5683</ins></td>
+    <td class="tg-9w52"><ins>0.4939</ins></td>
+    <td class="tg-9wq8">0.2000</td>
+    <td class="tg-9wq8">0.3654</td>
+    <td class="tg-9wq8">0.2887</td>
+    <td class="tg-9wq8">0.1568</td>
+    <td class="tg-9wq8">0.2956</td>
+    <td class="tg-9wq8">0.2269</td>
+    <td class="tg-9wq8">0.0592</td>
+    <td class="tg-9wq8">0.0649</td>
+    <td class="tg-9wq8">0.0577</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0271</td>
+    <td class="tg-9wq8">0.0160</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+french</td>
+    <td class="tg-9wq8">0.6565</td>
+    <td class="tg-9wq8">0.7030</td>
+    <td class="tg-9wq8">0.6734</td>
+    <td class="tg-9wq8">0.4040</td>
+    <td class="tg-9wq8">0.5584</td>
+    <td class="tg-9wq8">0.4883</td>
+    <td class="tg-9w52"><ins>0.2512</ins></td>
+    <td class="tg-9wq8">0.3577</td>
+    <td class="tg-9wq8">0.3032</td>
+    <td class="tg-9wq8">0.1968</td>
+    <td class="tg-9w52"><ins>0.3048</ins></td>
+    <td class="tg-9wq8">0.2481</td>
+    <td class="tg-9w52"><ins>0.0720</ins></td>
+    <td class="tg-9w52"><ins>0.0837</ins></td>
+    <td class="tg-9w52"><ins>0.0733</ins></td>
+    <td class="tg-9wq8">0.0176</td>
+    <td class="tg-9wq8">0.0551</td>
+    <td class="tg-9w52"><ins>0.0377</ins></td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0008</td>
+    <td class="tg-9wq8">0.0006</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+german</td>
+    <td class="tg-9wq8">0.6710</td>
+    <td class="tg-9wq8">0.6927</td>
+    <td class="tg-9wq8">0.6721</td>
+    <td class="tg-9wq8">0.3980</td>
+    <td class="tg-9wq8">0.5505</td>
+    <td class="tg-9wq8">0.4787</td>
+    <td class="tg-9wq8">0.2416</td>
+    <td class="tg-9wq8">0.3648</td>
+    <td class="tg-9wq8">0.2976</td>
+    <td class="tg-9wq8">0.1808</td>
+    <td class="tg-9wq8">0.2691</td>
+    <td class="tg-9wq8">0.2242</td>
+    <td class="tg-9wq8">0.0560</td>
+    <td class="tg-9wq8">0.0717</td>
+    <td class="tg-9wq8">0.0603</td>
+    <td class="tg-9wq8">0.0048</td>
+    <td class="tg-9wq8">0.0542</td>
+    <td class="tg-9wq8">0.0324</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0061}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0036}}$</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+spanish</td>
+    <td class="tg-9wq8">0.6645</td>
+    <td class="tg-9w52"><ins>0.7099</ins></td>
+    <td class="tg-9w52"><ins>0.6769</ins></td>
+    <td class="tg-9wq8">0.3921</td>
+    <td class="tg-9wq8">0.5663</td>
+    <td class="tg-9wq8">0.4842</td>
+    <td class="tg-9wq8">0.2224</td>
+    <td class="tg-9w52"><ins>0.3737</ins></td>
+    <td class="tg-9w52"><ins>0.3035</ins></td>
+    <td class="tg-9w52"><ins>0.2000</ins></td>
+    <td class="tg-9wq8">0.2975</td>
+    <td class="tg-9wq8">0.2466</td>
+    <td class="tg-9wq8">0.0464</td>
+    <td class="tg-9wq8">0.0531</td>
+    <td class="tg-9wq8">0.0458</td>
+    <td class="tg-9w52"><ins>0.0192</ins></td>
+    <td class="tg-9wq8">0.0314</td>
+    <td class="tg-9wq8">0.0246</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0000</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+all</td>
+    <td class="tg-9wq8">0.6613</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7182}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6823}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.5980}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7861}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7096}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2592}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.3744}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.3104}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2128}}$</td>
+    <td class="tg-9wq8">0.2986</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2515}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2192}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2470}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2263}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0224}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0731}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0478}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0016}}$</td>
+    <td class="tg-9wq8">0.0008</td>
+    <td class="tg-9wq8">0.0010</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8">semeval-16-restaurant</td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8"></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">none</td>
+    <td class="tg-9wq8">0.6844</td>
+    <td class="tg-9wq8">0.6911</td>
+    <td class="tg-9wq8">0.6806</td>
+    <td class="tg-9wq8">0.4193</td>
+    <td class="tg-9wq8">0.5496</td>
+    <td class="tg-9wq8">0.4912</td>
+    <td class="tg-9wq8">0.1699</td>
+    <td class="tg-9wq8">0.2828</td>
+    <td class="tg-9wq8">0.2248</td>
+    <td class="tg-9wq8">0.0828</td>
+    <td class="tg-9w52"><ins>0.1600</ins></td>
+    <td class="tg-9w52"><ins>0.1204</ins></td>
+    <td class="tg-9wq8">0.0226</td>
+    <td class="tg-9wq8">0.0430</td>
+    <td class="tg-9wq8">0.0352</td>
+    <td class="tg-9wq8">0.0097</td>
+    <td class="tg-9wq8">0.0389</td>
+    <td class="tg-9wq8">0.0250</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0022}}$</td>
+    <td class="tg-9wq8">0.0008</td>
+    <td class="tg-9wq8">0.0009</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+chinese</td>
+    <td class="tg-9wq8">0.6700</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7062}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6864}}$</td>
+    <td class="tg-9wq8">0.5659</td>
+    <td class="tg-9wq8">0.6904</td>
+    <td class="tg-9wq8">0.6371</td>
+    <td class="tg-9wq8">0.1538</td>
+    <td class="tg-9wq8">0.2781</td>
+    <td class="tg-9wq8">0.2173</td>
+    <td class="tg-9w52"><ins>0.0968</ins></td>
+    <td class="tg-9wq8">0.1446</td>
+    <td class="tg-9wq8">0.1189</td>
+    <td class="tg-9wq8">0.0624</td>
+    <td class="tg-9wq8">0.0891</td>
+    <td class="tg-9wq8">0.0769</td>
+    <td class="tg-9wq8">0.0129</td>
+    <td class="tg-9wq8">0.0262</td>
+    <td class="tg-9wq8">0.0196</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0014</td>
+    <td class="tg-9wq8">0.0008</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+farsi</td>
+    <td class="tg-9w52"><ins>0.6811</ins></td>
+    <td class="tg-9wq8">0.6915</td>
+    <td class="tg-9wq8">0.6783</td>
+    <td class="tg-9w52"><ins>0.5733</ins></td>
+    <td class="tg-9wq8">0.7259</td>
+    <td class="tg-9wq8">0.6634</td>
+    <td class="tg-9wq8">0.1398</td>
+    <td class="tg-9wq8">0.2716</td>
+    <td class="tg-9wq8">0.2068</td>
+    <td class="tg-9wq8">0.0731</td>
+    <td class="tg-9wq8">0.1425</td>
+    <td class="tg-9wq8">0.1063</td>
+    <td class="tg-9w52"><ins>0.0839</ins></td>
+    <td class="tg-9w52"><ins>0.1230</ins></td>
+    <td class="tg-9w52"><ins>0.1023</ins></td>
+    <td class="tg-9wq8">0.0129</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0592}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0393}}$</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0005</td>
+    <td class="tg-9wq8">0.0003</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+arabic</td>
+    <td class="tg-9wq8">0.6744</td>
+    <td class="tg-9wq8">0.6849</td>
+    <td class="tg-9wq8">0.6736</td>
+    <td class="tg-9wq8">0.5630</td>
+    <td class="tg-9wq8">0.7378</td>
+    <td class="tg-9wq8">0.6661</td>
+    <td class="tg-9wq8">0.1785</td>
+    <td class="tg-9wq8">0.2879</td>
+    <td class="tg-9wq8">0.2279</td>
+    <td class="tg-9wq8">0.0645</td>
+    <td class="tg-9wq8">0.1456</td>
+    <td class="tg-9wq8">0.1062</td>
+    <td class="tg-9wq8">0.0774</td>
+    <td class="tg-9wq8">0.1118</td>
+    <td class="tg-9wq8">0.0924</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0151}}$</td>
+    <td class="tg-9wq8">0.0316</td>
+    <td class="tg-9wq8">0.0223</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0013</td>
+    <td class="tg-9wq8">0.0008</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+french</td>
+    <td class="tg-9w52"><ins>0.0116</ins>0.6811</td>
+    <td class="tg-9wq8">0.6963</td>
+    <td class="tg-9w52"><ins>0.6834</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.5763}}$</td>
+    <td class="tg-9w52"><ins>0.7541</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6796}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2118}}$</td>
+    <td class="tg-9w52"><ins>0.2919</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2451}}$</td>
+    <td class="tg-9wq8">0.0871</td>
+    <td class="tg-9wq8">0.1473</td>
+    <td class="tg-9wq8">0.1159</td>
+    <td class="tg-9wq8">0.0602</td>
+    <td class="tg-9wq8">0.1082</td>
+    <td class="tg-9wq8">0.0868</td>
+    <td class="tg-9wq8">0.0075</td>
+    <td class="tg-9wq8">0.0451</td>
+    <td class="tg-9wq8">0.0287</td>
+    <td class="tg-9w52"><ins>0.0011</ins></td>
+    <td class="tg-9w52"><ins>0.0016</ins></td>
+    <td class="tg-9w52"><ins>0.0011</ins></td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+german</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.6856}}$</td>
+    <td class="tg-9wq8">0.6891</td>
+    <td class="tg-9wq8">0.6806</td>
+    <td class="tg-9wq8">0.5719</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.7481}}$</td>
+    <td class="tg-9w52"><ins>0.6764</ins></td>
+    <td class="tg-9wq8">0.1312</td>
+    <td class="tg-9wq8">0.2715</td>
+    <td class="tg-9wq8">0.2060</td>
+    <td class="tg-9wq8">0.0860</td>
+    <td class="tg-9wq8">0.1514</td>
+    <td class="tg-9wq8">0.1188</td>
+    <td class="tg-9wq8">0.0602</td>
+    <td class="tg-9wq8">0.1009</td>
+    <td class="tg-9wq8">0.0793</td>
+    <td class="tg-9wq8">0.0086</td>
+    <td class="tg-9wq8">0.0303</td>
+    <td class="tg-9wq8">0.0227</td>
+    <td class="tg-9w52"><ins>0.0011</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0022}}$</td>
+    <td class="tg-uzvj">0.0018</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+spanish</td>
+    <td class="tg-9wq8">0.6656</td>
+    <td class="tg-9wq8">0.6951</td>
+    <td class="tg-9wq8">0.6784</td>
+    <td class="tg-9wq8">0.5600</td>
+    <td class="tg-9wq8">0.7467</td>
+    <td class="tg-9wq8">0.6697</td>
+    <td class="tg-9w52"><ins>0.1957</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2935}}$</td>
+    <td class="tg-9w52"><ins>0.2408</ins></td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1054}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1718}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.1372}}$</td>
+    <td class="tg-9wq8">0.0656</td>
+    <td class="tg-9wq8">0.1107</td>
+    <td class="tg-9wq8">0.0879</td>
+    <td class="tg-9w52"><ins>0.0140</ins></td>
+    <td class="tg-9wq8">0.0372</td>
+    <td class="tg-9wq8">0.0279</td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0014</td>
+    <td class="tg-9wq8">0.0007</td>
+  </tr>
+  <tr>
+    <td class="tg-9wq8">+all</td>
+    <td class="tg-9wq8">0.6622</td>
+    <td class="tg-9w52"><ins>0.6992</ins></td>
+    <td class="tg-9wq8">0.6774</td>
+    <td class="tg-9wq8">0.5304</td>
+    <td class="tg-9wq8">0.7141</td>
+    <td class="tg-9wq8">0.6375</td>
+    <td class="tg-9wq8">0.1591</td>
+    <td class="tg-9wq8">0.2694</td>
+    <td class="tg-9wq8">0.2130</td>
+    <td class="tg-9wq8">0.0774</td>
+    <td class="tg-9wq8">0.1410</td>
+    <td class="tg-9wq8">0.1070</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2097}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2607}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.2272}}$</td>
+    <td class="tg-efr0">$\textcolor{green}{\textsf{0.0151}}$</td>
+    <td class="tg-9w52"><ins>0.0487</ins></td>
+    <td class="tg-9w52"><ins>0.0304</ins></td>
+    <td class="tg-9wq8">0.0000</td>
+    <td class="tg-9wq8">0.0009</td>
+    <td class="tg-9wq8">0.0006</td>
+  </tr>
+</tbody>
+</table>
+
 - link to results
 
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
