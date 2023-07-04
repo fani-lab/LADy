@@ -101,7 +101,7 @@ Important attributes of `Review` are:
 
 This layer further includes `SemEvalReview`, which is a realization of `Review` class for reviews of `SemEval` datasets.
 Specifically, this class overrides loading `SemEval`'s reviews into `Review` objects and stores it into a pickle file after preprocessing.
-Pickle file is later used by models for training and testing purposes. Sample pickle files for a `toy` dataset: [`./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./output/semeval+/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml), there are some
+Pickle file is later used by models for training and testing purposes. Sample pickle files for a `toy` dataset: [`./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./output/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml), there are some
 where the filename `review.{list of languages}.pkl` shows the review objects also include back-translated versions in `{list of languages}`.
 
 <p align="center">
@@ -211,9 +211,26 @@ Also, the model will which has been saved in the previous step (train) will be l
 ## 4. Experiment
 to be completed ...
 
-- datasets and stats
+- datasets
 
-  
+| dataset               | file (.xml)                                                                                                                                                                          |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| semeval-14-laptop     | [`./data/raw/semeval/SemEval-14/Laptop_Train_v2.xml`](./data/raw/semeval/SemEval-14/Laptop_Train_v2.xml)                                                                             |
+| semeval-14-restaurant | [`./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml`](./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml)                                                   |
+| semeval-15-restaurant | [`./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml`](./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml) |
+| semeval-16-restaurant | [`./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                                   |
+| toy                   | [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                           |
+
+- stat
+
+|                       |                              |              | exact match |        |        |        |        |         |
+|-----------------------|------------------------------|--------------|-------------|--------|--------|--------|--------|---------|
+| dataset               | #reviews after preprocessing | avg #aspects | chinese     | farsi  | arabic | french | german | spanish |
+| semeval-14-laptop     | 1,488                        | 1.5846       | 0.1763      | 0.2178 | 0.2727 | 0.3309 | 0.3214 | 0.3702  |
+| semeval-14-restaurant | 2,023                        | 1.8284       | 0.1831      | 0.2236 | 0.2929 | 0.3645 | 0.3724 | 0.4088  |
+| semeval-15-restaurant | 0,833                        | 1.5354       | 0.2034      | 0.2312 | 0.3021 | 0.3587 | 0.3907 | 0.4128  |
+| semeval-16-restaurant | 1,234                        | 1.5235       | 0.2023      | 0.2331 | 0.2991 | 0.3556 | 0.3834 | 0.4034  |
+
 - table of results
 
 <table class="tg">
@@ -269,28 +286,7 @@ to be completed ...
     <td class="tg-9wq8">ndcg5</td>
   </tr>
   <tr>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8">semeval-14-laptop</td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8" colspan="22">semeval-14-laptop</td>
   </tr>
   <tr>
     <td class="tg-9wq8">none</td>
@@ -485,28 +481,7 @@ to be completed ...
     <td class="tg-9wq8">0.0001</td>
   </tr>
   <tr>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8">semeval-14-restaurant</td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9w52"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8" colspan="22">semeval-14-restaurant</td>  
   </tr>
   <tr>
     <td class="tg-9wq8">none</td>
@@ -701,28 +676,7 @@ to be completed ...
     <td class="tg-9wq8">0.0004</td>
   </tr>
   <tr>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8">semeval-15-restaurant</td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8" colspan="22">semeval-15-restaurant</td>  
   </tr>
   <tr>
     <td class="tg-9wq8">none</td>
@@ -917,28 +871,7 @@ to be completed ...
     <td class="tg-9wq8">0.0010</td>
   </tr>
   <tr>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8">semeval-16-restaurant</td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
-    <td class="tg-9wq8"></td>
+    <td class="tg-9wq8" colspan="22">semeval-16-restaurant</td>  
   </tr>
   <tr>
     <td class="tg-9wq8">none</td>
@@ -1136,6 +1069,14 @@ to be completed ...
 </table>
 
 - link to results
+
+| dataset               | review files (english, chinese, farsi, arabic, french, german, spanish, and all) and results' directory                                                                                                                                                                                              |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| semeval-14-laptop     | [`./output/Semeval-14/Laptop/`](./output/Semeval-14/Laptop/)                                                                                                                                                                                                                                         |
+| semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`](./output/Semeval-14/Restaurants/)                                                                                                                                                                                                                              |
+| semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2015SB12&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)         |
+| semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)           |
+| toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2Ftoy%2E2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412) |
 
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
