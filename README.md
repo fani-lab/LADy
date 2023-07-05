@@ -21,10 +21,10 @@
 </td>
 <td>
   <p align="center">
-    <img src='./src/aml/LADy.png' width="550">
-<!--     <br> -->
-<!--     <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for aspect modeling hierarchy</a> -->
-  </p>
+ <img src='./src/cmn/LADy.png' width="550" >
+<!--  <br> -->
+<!--  <a href="https://lucid.app/lucidchart/fe256064-3fda-465a-9abc-036dfc40acad/edit?view_items=svRVuxyZvY9n%2CsvRVVLD91NpJ%2CxDRV-pti53Ae%2CwJRVh7la6C-y%2CBLRV4aXmE.uY%2CBLRVOyM~DMFW&invitationId=inv_6e8aa9a6-1854-4ecf-a753-e1b2e05b50fc">class diagram for review</a> -->
+</p>
 </td>
 </tr>
 </table>
@@ -209,9 +209,12 @@ Also, the model will which has been saved in the previous step (train) will be l
 ```
 
 ## 4. Experiment
-to be completed ...
 
-- datasets
+We conducted a series of experiments involving backtranslation using `six` different `natural languages` that belong to `diverse language families`. These experiments aimed to explore the effect of `backtranslation augmentation` across various aspect detection methods and domains, particularly in the context of `restaurant` and `laptop` `reviews`, where aspects may not necessarily be explicitly mentioned but are implicitly present with no surface form (`latent`). Through our findings, we observed a synergistic impact, indicating that the utilization of `backtranslation` enhances the performance of `aspect detection` whether the aspect is 'explicit' or 'latent'.
+
+### Datasets
+
+`LADy` utilizes state-of-the-art `semeval` datasets to `augment` the english datasets with `backtranslation` via different languages and evaluate `latent aspect detection`. Specifically, training sets from `semeval-14` for restaurant and laptop reviews, as well as restaurant reviews from `semeval-15` and `semeval-16` are employed. Moreover, we have created a compact and simplified version of the original datasets, referred to as a `toy dataset`, for our experimental purposes.
 
 | dataset               | file (.xml)                                                                                                                                                                          |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -221,17 +224,21 @@ to be completed ...
 | semeval-16-restaurant | [`./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                                   |
 | toy                   | [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                           |
 
-- stat
+### Statistics on original and backtranslated reviews
+
+The reviews were divided into sentences, and our experiments were conducted on each sentence treated as an individual review, assuming that each sentence represents a single aspect. The statistics of the datasets can be seen in the table below.
 
 |                       |                              |              | exact match |        |        |        |        |         |
 |-----------------------|------------------------------|--------------|-------------|--------|--------|--------|--------|---------|
-| dataset               | #reviews after preprocessing | avg #aspects | chinese     | farsi  | arabic | french | german | spanish |
-| semeval-14-laptop     | 1,488                        | 1.5846       | 0.1763      | 0.2178 | 0.2727 | 0.3309 | 0.3214 | 0.3702  |
-| semeval-14-restaurant | 2,023                        | 1.8284       | 0.1831      | 0.2236 | 0.2929 | 0.3645 | 0.3724 | 0.4088  |
-| semeval-15-restaurant | 0,833                        | 1.5354       | 0.2034      | 0.2312 | 0.3021 | 0.3587 | 0.3907 | 0.4128  |
-| semeval-16-restaurant | 1,234                        | 1.5235       | 0.2023      | 0.2331 | 0.2991 | 0.3556 | 0.3834 | 0.4034  |
+| dataset               | #reviews  | avg #aspects | chinese  | farsi  | arabic | french | german | spanish |
+| semeval-14-laptop     | 1,488     | 1.5846       | 0.1763   | 0.2178 | 0.2727 | 0.3309 | 0.3214 | 0.3702  |
+| semeval-14-restaurant | 2,023     | 1.8284       | 0.1831   | 0.2236 | 0.2929 | 0.3645 | 0.3724 | 0.4088  |
+| semeval-15-restaurant | 0,833     | 1.5354       | 0.2034   | 0.2312 | 0.3021 | 0.3587 | 0.3907 | 0.4128  |
+| semeval-16-restaurant | 1,234     | 1.5235       | 0.2023   | 0.2331 | 0.2991 | 0.3556 | 0.3834 | 0.4034  |
 
-- table of results
+### Results
+
+The average performance of 5-fold models with backtranslation is provided in the table below:
 
 <table class="tg">
 <thead>
@@ -1068,7 +1075,9 @@ to be completed ...
 </tbody>
 </table>
 
-- link to results
+
+
+The table below presents the provided links to directories that hold the remaining results of our experiment. These directories consist of diverse `aspect detection` models applied to different `datasets` and `languages`, with varying percentages of `latent` aspects.
 
 | dataset               | review files (english, chinese, farsi, arabic, french, german, spanish, and all) and results' directory                                                                                                                                                                                              |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
