@@ -978,7 +978,7 @@ The average performance of 5-fold models with backtranslation is provided in the
   </tr>
   <tr>
     <td class="tg-9wq8">+french</td>
-    <td class="tg-9w52"><ins>0.0116</ins>0.6811</td>
+    <td class="tg-9w52"><ins>0.6811</ins></td>
     <td class="tg-9wq8">0.6963</td>
     <td class="tg-9w52"><ins>0.6834</ins></td>
     <td class="tg-efr0">$\textcolor{green}{\textsf{0.5763}}$</td>
