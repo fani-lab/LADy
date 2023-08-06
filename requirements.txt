@@ -16,7 +16,7 @@ torch==1.13.1
 # backtranslation-related modules
 sentence-transformers #for semantic simarlity of backtranslated review with original review
 simalign==0.3         #for aligning words of backtranslated review to the original review
-networkx==3.1
+# networkx==3.1
 rouge                 #for evaluating backtranlated reviews vs. original review
 
 # topic modeling methods for aspect modeling
