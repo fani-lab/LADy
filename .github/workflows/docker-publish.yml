@@ -45,7 +45,12 @@ jobs:
       # Here we run a simple test
       - name: Test
         run: |
-          docker run --rm ${{ steps.lowercase-image-name.outputs.lowercase }}:${{ env.TEST_TAG }} lady python main.py -naspects 5 -am rnd -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/toy.2016SB5
+          docker run --rm ${{ steps.lowercase-image-name.outputs.lowercase }}:${{ env.TEST_TAG }} \
+            python main.py \
+            -naspects 5 \
+            -am rnd \
+            -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml \
+            -output ../output/toy.2016SB5
 
   build-and-push-image:
     runs-on: ubuntu-latest
