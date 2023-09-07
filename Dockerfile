@@ -28,3 +28,5 @@ COPY . .
 
 # Changing working directory to src for later use at commandline
 WORKDIR /app/src
+
+RUN python ./main_exp_slim.py
