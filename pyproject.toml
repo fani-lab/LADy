@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "LADy"
+version = "0.1.0"
+description = "A System for Latent Aspect Detection"
+authors = ["Farinam Hematizade <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pandas = "^1.4.4"
+spacy = "^3.3.1"
+typing_extensions = "^4.4.0"
+tqdm = "4.64.1"
+scikit-learn = "^1.0.0"
+nltk = "^3.7"
+transformers = "^4.26.1"
+torch = "^1.13.1"
+simalign = "^0.3"
+gensim = "^4.0"
+bitermplus = "^0.6.10"
+contextualized_topic_models = "2.5.0"
+natsort = "^8.4.0"
+seaborn = "^0.12.2"
+rouge = "^1.0.1"
+sentence-transformers = "^2.2.2"
+pytrec-eval-terrier = "^0.5.5"
+
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.22.1"
+
+[tool.poe.tasks]
+# This is a workaround which simalign needs networkx 2.4 and this version of nx has conflict in its
+install__networkx = "pip install networkx==3.1"
+install__spacy = "python -m spacy download en_core_web_sm"
+install__stop_words = "python -m nltk.downloader stopwords"
+install__punkt = "python -m nltk.downloader punkt"
+install__octis.shell = "cd src/octis && python setup.py install"
+
+post_install = [
+  "install__networkx",
+  "install__spacy",
+  "install__stop_words",
+  "install__punkt",
+  "install__octis",
+]
+
+dummy.shell = "cd src && python main_exp_slim.py"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
