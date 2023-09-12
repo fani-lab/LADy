@@ -6,7 +6,7 @@ authors = ["Farinam Hematizade <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "~3.8.1"
 pandas = "^1.4.4"
 spacy = "^3.3.1"
 typing_extensions = "^4.4.0"
@@ -14,7 +14,6 @@ tqdm = "4.64.1"
 scikit-learn = "^1.0.0"
 nltk = "^3.7"
 transformers = "^4.26.1"
-torch = "^1.13.1"
 simalign = "^0.3"
 gensim = "^4.0"
 bitermplus = "^0.6.10"
@@ -24,6 +23,9 @@ seaborn = "^0.12.2"
 rouge = "^1.0.1"
 sentence-transformers = "^2.2.2"
 pytrec-eval-terrier = "^0.5.5"
+torch = "^2.0.1"
+numpy = "1.23"
+pytrec-eval = "^0.5"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.22.1"

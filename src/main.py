@@ -98,7 +98,7 @@ def train(args, am, train, valid, f, output):
         am.train(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
 
         # from aml.mdl import AbstractAspectModel
-        print(f'2.2. Quality of aspects ...')
+        print('2.2. Quality of aspects ...')
         for q in params.settings['train']['qualities']: print(f'({q}: {am.quality(q)})')
 
 def test(am, test, f, output):
@@ -111,7 +111,7 @@ def test(am, test, f, output):
         print(f'\n3.1. Loading saved predictions on test set failed! Predicting on the test set with {params.settings["test"]["h_ratio"] * 100}% latent aspect ...')
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
         am.load(f'{output}/f{f}.')
-        print(f'3.3. Testing aspect model ...')
+        print('3.3. Testing aspect model ...')
         pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'])
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
@@ -146,16 +146,16 @@ def evaluate(input, output):
 def agg(path, output):
     print(f'\n5. Aggregating results in {path} in {output} ...')
     files = list()
-    for dirpath, filenames in os.walk(path):
+    for dirpath, _, filenames in os.walk(path):
         files += [
             os.path.join(os.path.normpath(dirpath), file).split(os.sep)
             for file in filenames
-            if file.startswith("model.pred.eval.mean")
+            if file.startswith('model.pred.eval.mean')
             ]
 
     column_names = []
     for f in files:
-        p = ".".join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
+        p = '.'.join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
         column_names.append(p)
     column_names.insert(0, 'metric')
 
@@ -176,13 +176,19 @@ def main(args):
     splits = split(len(reviews), args.output)
     output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
+    am = None
+
     if not os.path.isdir(output): os.makedirs(output)
-    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords'])
+    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords']) 
     if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
     if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
     if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
     if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
     if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+
+
+    if(am is None):
+        raise Exception('Failed to train model')
 
     output = f'{output}/{am.name()}/'
 
@@ -197,6 +203,7 @@ def main(args):
     # testing
     if 'test' in params.settings['cmd']:
         for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
+
 
     # evaluating
     if 'eval' in params.settings['cmd']:
