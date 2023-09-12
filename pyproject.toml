@@ -23,7 +23,7 @@ seaborn = "^0.12.2"
 rouge = "^1.0.1"
 sentence-transformers = "^2.2.2"
 pytrec-eval-terrier = "^0.5.5"
-torch = "^2.0.1"
+torch = "1.13.1"
 numpy = "1.23"
 pytrec-eval = "^0.5"
 
