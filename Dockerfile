@@ -30,3 +30,5 @@ COPY . .
 WORKDIR /app/src
 
 RUN python ./main_exp_slim.py
+
+CMD [ "/bin/bash" ]
