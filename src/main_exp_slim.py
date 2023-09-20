@@ -28,8 +28,6 @@ if __name__ == '__main__':
         params.settings['eval']['metrics'] = ['P', 'ndcg_cut']
         params.settings['eval']['topk'] = [1, 10]
 
-        # main_octis.main(args) if octis else main.main(args)
-        main.main(args)
         langs = params.settings['prep']['langaug'].copy()
         langs.extend([params.settings['prep']['langaug']])
         for lang in langs:
@@ -39,11 +37,8 @@ if __name__ == '__main__':
                     for hide in range(0, 110, 50):
                         args.am = am
                         args.naspects = naspects
-                        # # to train on entire dataset only
-                        # params.settings['train']['ratio'] = 0.999
-                        # params.settings['train']['nfolds'] = 0
+                        
                         params.settings['test']['h_ratio'] = round(hide * 0.01, 1)
-                        params.settings['cmd'] = ['agg']
-                        # main_octis.main(args) if octis else main.main(args)
-                        # main.main(args)
-        if 'agg' in params.settings['cmd']: main.agg(args.output, args.output)
+                        params.settings['cmd'] = ['prep', 'train', 'test', 'eval']
+                        
+                        main.main(args)

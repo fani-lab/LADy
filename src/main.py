@@ -1,6 +1,6 @@
-import argparse, os, pickle, multiprocessing, json, time
+import argparse, os, json, time
 from tqdm import tqdm
-import numpy as np, random, pandas as pd
+import numpy as np, pandas as pd
 
 import pytrec_eval
 from nltk.corpus import wordnet as wn
@@ -17,34 +17,39 @@ def load(input, output, cache=True):
     try:
         if not cache: raise FileNotFoundError
         print(f'1.1. Loading existing processed reviews file {output}...')
-        reviews = pd.read_pickle(output)
-    except (FileNotFoundError, EOFError) as e:
-        print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
-        from cmn.semeval import SemEvalReview
-        #from cmn.mams import MAMSReview
-        reviews = SemEvalReview.load(input)
-        print(f'(#reviews: {len(reviews)})')
-        print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
-        for lang in params.settings['prep']['langaug']:
-            if lang:
-                print(f'\n{lang} ...')
-                if params.settings['prep']['batch']:
-                    start = time.time()
-                    Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
-                    end = time.time()
-                    print(f'{lang} done all at once (batch). Time: {end - start}')
-                else:
-                    for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
+        return pd.read_pickle(output)
 
-            # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
-            output_ = output
-            for l in params.settings['prep']['langaug']:
-                if l and l != lang: output_ = output_.replace(f'{l}.', '')
-            pd.to_pickle(reviews, output_)
+    except (FileNotFoundError, EOFError) as _:
+        try:
+            from cmn.semeval import SemEvalReview
+            print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
+            #from cmn.mams import MAMSReview
+            reviews = SemEvalReview.load(input)
+            print(f'(#reviews: {len(reviews)})')
+            print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
+            for lang in params.settings['prep']['langaug']:
+                if lang:
+                    print(f'\n{lang} ...')
+                    if params.settings['prep']['batch']:
+                        start = time.time()
+                        Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
+                        end = time.time()
+                        print(f'{lang} done all at once (batch). Time: {end - start}')
+                    else:
+                        for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
 
-        print(f'\n1.3. Saving processed pickle file {output}...')
-        pd.to_pickle(reviews, output)
-    return reviews
+                # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
+                output_ = output
+                for l in params.settings['prep']['langaug']:
+                    if l and l != lang: output_ = output_.replace(f'{l}.', '')
+                pd.to_pickle(reviews, output_)
+
+            print(f'\n1.3. Saving processed pickle file {output}...')
+            pd.to_pickle(reviews, output)
+            return reviews
+        except Exception as error:
+            print(f'Error...{error}')
+            raise error
 
 def split(nsample, output):
     # We split originals into train, valid, test. So each have its own augmented versions.
@@ -87,13 +92,13 @@ def train(args, am, train, valid, f, output):
     try:
         print(f'2.1. Loading saved aspect model from {output}/f{f}. ...')
         am.load(f'{output}/f{f}.')
-    except (FileNotFoundError, EOFError) as e:
+    except (FileNotFoundError, EOFError) as _:
         print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
         am.train(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
 
-        from aml.mdl import AbstractAspectModel
-        print(f'2.2. Quality of aspects ...')
+        # from aml.mdl import AbstractAspectModel
+        print('2.2. Quality of aspects ...')
         for q in params.settings['train']['qualities']: print(f'({q}: {am.quality(q)})')
 
 def test(am, test, f, output):
@@ -102,11 +107,11 @@ def test(am, test, f, output):
     try:
         print(f'\n3.1. Loading saved predictions on test set from {output}f{f}.model.pred.{params.settings["test"]["h_ratio"]} ...')
         return pd.read_pickle(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
-    except (FileNotFoundError, EOFError) as e:
+    except (FileNotFoundError, EOFError) as _:
         print(f'\n3.1. Loading saved predictions on test set failed! Predicting on the test set with {params.settings["test"]["h_ratio"] * 100}% latent aspect ...')
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
         am.load(f'{output}/f{f}.')
-        print(f'3.3. Testing aspect model ...')
+        print('3.3. Testing aspect model ...')
         pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'])
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
@@ -133,7 +138,7 @@ def evaluate(input, output):
 
     print(f'4.2. Calling pytrec_eval for {metrics_set} ...')
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))  # qrel should not have empty entry otherwise get exception
-    print(f'4.3. Averaging ...')
+    print('4.3. Averaging ...')
     df_mean = df.mean(axis=1).to_frame('mean')
     df_mean.to_csv(output)
     return df_mean
@@ -141,11 +146,16 @@ def evaluate(input, output):
 def agg(path, output):
     print(f'\n5. Aggregating results in {path} in {output} ...')
     files = list()
-    for dirpath, dirnames, filenames in os.walk(path): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.startswith("model.pred.eval.mean")]
+    for dirpath, _, filenames in os.walk(path):
+        files += [
+            os.path.join(os.path.normpath(dirpath), file).split(os.sep)
+            for file in filenames
+            if file.startswith('model.pred.eval.mean')
+            ]
 
     column_names = []
     for f in files:
-        p = ".".join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
+        p = '.'.join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
         column_names.append(p)
     column_names.insert(0, 'metric')
 
@@ -166,13 +176,19 @@ def main(args):
     splits = split(len(reviews), args.output)
     output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
+    am = None
+
     if not os.path.isdir(output): os.makedirs(output)
-    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords'])
+    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords']) 
     if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
     if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
     if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
     if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
     if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+
+
+    if(am is None):
+        raise Exception('Failed to train model')
 
     output = f'{output}/{am.name()}/'
 
@@ -187,6 +203,7 @@ def main(args):
     # testing
     if 'test' in params.settings['cmd']:
         for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
+
 
     # evaluating
     if 'eval' in params.settings['cmd']:
