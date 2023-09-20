@@ -10,47 +10,7 @@ env:
   REGISTRY: ghcr.io
   TEST_TAG: test
 
-
 jobs:
-  build-and-test-image:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.CI_TOKEN }}
-
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
-
-      - id: lowercase-image-name
-        uses: ASzc/change-string-case-action@v5
-        with:
-          string: ${{ github.repository }}
-
-      # This step we build the image and get it ready for testing
-      - name: Build and export to Docker for test purposes
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          load: true
-          tags: ${{ steps.lowercase-image-name.outputs.lowercase }}:${{ env.TEST_TAG }}
-
-      # Here we run a simple test
-      - name: Test
-        run: |
-          docker run --rm ${{ steps.lowercase-image-name.outputs.lowercase }}:${{ env.TEST_TAG }} \
-            python main.py \
-            -naspects 5 \
-            -am rnd \
-            -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml \
-            -output ../output/toy.2016SB5
-
   build-and-push-image:
     runs-on: ubuntu-latest
     needs: [build-and-test-image]
