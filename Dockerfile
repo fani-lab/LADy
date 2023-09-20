@@ -4,31 +4,29 @@ WORKDIR /app
 
 # Installing GCC
 RUN apt update
+
 RUN apt install -y build-essential
 
 # Install dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install pipx
 
-RUN python -m spacy download en_core_web_sm
-RUN python -m nltk.downloader stopwords
-RUN python -m nltk.downloader punkt
+# RUN pipx ensurepath
+ENV PATH=/root/.local/bin:$PATH
 
-# Copy local files to the container
-COPY ./src/octis ./src/octis
+RUN pipx install poetry==1.6.0
+RUN pipx install poethepoet
 
-# Setup octis
-# It seems it has relative imports, so we need to change the working directory
-WORKDIR /app/src/octis
-RUN python setup.py install
+COPY pyproject.toml .
 
-# Get back to the root directory and copy the rest of the files
-WORKDIR /app
+RUN poetry install
+
 COPY . .
+
+RUN poe post_install
 
 # Changing working directory to src for later use at commandline
 WORKDIR /app/src
 
-RUN python ./main_exp_slim.py
+RUN poe dummy
 
 CMD [ "/bin/bash" ]
