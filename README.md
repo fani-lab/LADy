@@ -32,7 +32,7 @@
 
 
 ## 1. Setup
-`LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`:
+`LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`, `docker`:
 
 ```bash
 git clone --recursive https://github.com/fani-lab/LADy.git
@@ -45,6 +45,10 @@ conda activate lady
 git clone --recursive https://github.com/fani-lab/LADy.git
 cd LADy
 pip install -r requirements.txt
+```
+
+```bash
+docker run -it --name lady_container ghcr.io/fani-lab/lady:main
 ```
 This command installs compatible versions of the following libraries:
 
