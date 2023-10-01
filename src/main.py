@@ -21,10 +21,16 @@ def load(input, output, cache=True):
 
     except (FileNotFoundError, EOFError) as _:
         try:
-            from cmn.semeval import SemEvalReview
             print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
-            #from cmn.mams import MAMSReview
-            reviews = SemEvalReview.load(input)
+            if "semeval" in input.lower():
+                from cmn.semeval import SemEvalReview
+                reviews = SemEvalReview.load(input)
+            elif "twitter" in input.lower():
+                from cmn.twitter import TwitterReview
+                reviews = TwitterReview.load(input)
+            else:
+                # from cmn.mams import MAMSReview
+                print("No specific dataset ('semeval' or 'twitter') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
             print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
             for lang in params.settings['prep']['langaug']:
