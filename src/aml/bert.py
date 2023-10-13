@@ -1,10 +1,103 @@
+from typing import Tuple, List, TypedDict
+from argparse import Namespace
+import re
 import logging, pickle, pandas as pd, random
 import bitermplus as btm, gensim
-from argparse import Namespace
-from typing import Self, Tuple, List
-
-from .mdl import AbstractAspectModel
+from mdl import AbstractAspectModel
 from bert_e2e_absa import train, work
+
+
+class Review(TypedDict):
+    text: str
+    sentiment: float
+    aspect: List[Tuple[str, float]]
+
+def convert_review_from_lady(org_reviews: List[Review], is_test, lang):
+    reviews_list = []
+    label_list = []
+
+    for r in org_reviews:
+        if not len(r.aos[0]):
+            continue
+        else:
+            aos_list = []
+
+            if r.augs and not is_test:
+                if lang == 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn':
+                    for key, value in r.augs.items():
+
+                        aos_list = []
+
+                        text = ' '.join(r.augs[key][1].sentences[0]).strip() + '####'
+
+                        for aos_instance in r.augs[key][1].aos:
+                            aos_list.extend(aos_instance[0])
+
+                        for idx, word in enumerate(r.augs[key][1].sentences[0]):
+                            if idx in aos_list:
+                                tag = word + '=T-POS' + ' '
+                                text += tag
+                            else:
+                                tag = word + '=O' + ' '
+                                text += tag
+
+                        if len(text.rstrip()) > 511:
+                            continue
+
+                        reviews_list.append(text.rstrip())
+                else:
+                    for aos_instance in r.augs[lang][1].aos:
+                        aos_list.extend(aos_instance[0])
+
+                    text = ' '.join(r.augs[lang][1].sentences[0]).strip() + '####'
+
+                    for idx, word in enumerate(r.augs[lang][1].sentences[0]):
+                        if idx in aos_list:
+                            tag = word + '=T-POS' + ' '
+                            text += tag
+                        else:
+                            tag = word + '=O' + ' '
+                            text += tag
+
+                    if len(text.rstrip()) > 511:
+                        continue
+
+                    reviews_list.append(text.rstrip())
+
+            aos_list = []
+
+            for aos_instance in r.aos[0]:
+                aos_list.extend(aos_instance[0])
+
+            # text = ' '.join(r.sentences[0]).replace('*****', '').replace('   ', '  ').replace('  ', ' ').replace('  ', ' ') + '####'
+            # text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).replace('#####', '').strip()) + '####'
+
+            text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
+
+            for idx, word in enumerate(r.sentences[0]):
+                # if is_test and word == "#####":
+                #     continue
+                if idx in aos_list:
+                    tag = word + '=T-POS' + ' '
+                    text += tag
+                else:
+                    tag = word + '=O' + ' '
+                    text += tag
+
+            if len(text.rstrip()) > 511:
+                continue
+
+            reviews_list.append(text.rstrip())
+
+            aos_list_per_review = []
+
+            for idx, word in enumerate(r.sentences[0]):
+                if idx in aos_list:
+                    aos_list_per_review.append(word)
+
+            label_list.append(aos_list_per_review)
+
+    return reviews_list, label_list
 
 # TODO: Change these
 # @inproceedings{DBLP:conf/www/YanGLC13,
@@ -18,7 +111,8 @@ from bert_e2e_absa import train, work
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
 class BERT(AbstractAspectModel):
-    def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
+    def __init__(self, naspects, nwords): 
+        super().__init__(naspects, nwords)
 
     # TODO: What is this? should I change it?
     def load(self, path):
@@ -27,12 +121,14 @@ class BERT(AbstractAspectModel):
         self.dict = pd.read_pickle(f'{path}model.dict')
         self.cas = pd.read_pickle(f'{path}model.perf.cas')
         self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
-
-    def train(self: Self, 
-              task_name: str,
-              absa_type: str,
-              data_dir: str,
-              output: str
+    
+    def train(self,
+              reviews_train,
+              reviews_valid,
+              settings,
+              doctype,
+              no_extremes,
+              output
         ):
 
         args = {
@@ -64,22 +160,22 @@ class BERT(AbstractAspectModel):
 
 
     def predict(self, absa_home: str, task_name: str, data_dir: str) -> None:
-      args = {
-          'absa_home': f'{absa_home}',
-          'ckpt': f'{absa_home}/checkpoint-1200',
-          'model_type': 'bert',
-          'data_dir': f'{data_dir}',
-          'task_name': f'{task_name}',
-          'model_name_or_path': 'bert-base-uncased',
-          'cache_dir': 'cache',
-          'max_seq_length': 128,
-          'tagging_schema': 'BIEOS'
-      }
+        args = {
+            'absa_home': f'{absa_home}',
+            'ckpt': f'{absa_home}/checkpoint-1200',
+            'model_type': 'bert',
+            'data_dir': f'{data_dir}',
+            'task_name': f'{task_name}',
+            'model_name_or_path': 'bert-base-uncased',
+            'cache_dir': 'cache',
+            'max_seq_length': 128,
+            'tagging_schema': 'BIEOS'
+        }
 
-      predict_result = work.main(Namespace(**args))
+        predict_result = work.main(Namespace(**args))
 
-      unique_predictions = predict_result['unique_predictions']
-      gold_targets = predict_result['gold_targets']
+        unique_predictions = predict_result['unique_predictions']
+        gold_targets = predict_result['gold_targets']
 
     # TODO: I changed the predict method but is there other stuff I need to change?
     def infer_batch(self, reviews_test, h_ratio, doctype) -> None:
