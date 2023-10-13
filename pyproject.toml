@@ -10,7 +10,7 @@ python = "~3.8.1"
 pandas = "^1.4.4"
 spacy = "^3.3.1"
 typing_extensions = "^4.4.0"
-tqdm = "4.64.1"
+tqdm = ">=4.64.1"
 scikit-learn = "^1.0.0"
 nltk = "^3.7"
 transformers = "^4.26.1"
@@ -23,9 +23,10 @@ seaborn = "^0.12.2"
 rouge = "^1.0.1"
 sentence-transformers = "^2.2.2"
 pytrec-eval-terrier = "^0.5.5"
-torch = "1.13.1"
+torch = ">=2.0.0, !=2.0.1"
 numpy = "1.23"
 pytrec-eval = "^0.5"
+bert-e2e-absa = {git = "https://github.com/3ripleM/BERT-E2E-ABSA.git"}
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.22.1"
@@ -47,6 +48,8 @@ post_install = [
 ]
 
 dummy.shell = "cd src && python main_exp_slim.py"
+
+kooft = "python kooft.py"
 
 
 [build-system]
