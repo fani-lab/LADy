@@ -6,13 +6,10 @@ import bitermplus as btm, gensim
 from mdl import AbstractAspectModel
 from bert_e2e_absa import train, work
 
+from src.cmn import review
 
-class Review(TypedDict):
-    text: str
-    sentiment: float
-    aspect: List[Tuple[str, float]]
 
-def convert_review_from_lady(org_reviews: List[Review], is_test, lang):
+def convert_review_from_lady(org_reviews: List[review.Review], is_test, lang):
     reviews_list = []
     label_list = []
 
