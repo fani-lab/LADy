@@ -32,6 +32,7 @@ settings = {
                 # {'no_below': 10,   # happen less than no_below number in total
                 #  'no_above': 0.9}  # happen in no_above percent of reviews
         'rnd': {},
+        'bert': {},
         'lda': {'passes': 1000, 'workers': ncore, 'random_state': seed, 'per_word_topics': True},
         'btm': {'iter': 1000, 'ncore': ncore, 'seed': seed},
         'ctm': {'num_epochs': 1000, 'ncore': ncore, 'seed': seed,

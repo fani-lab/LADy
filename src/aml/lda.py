@@ -73,7 +73,10 @@ class Lda(AbstractAspectModel):
     def infer(self, review, doctype):
         review_aspects = []
         review_, _ = super(Lda, self).preprocess(doctype, [review])
-        for r in review_: review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
+        for r in review_:
+            review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
+        
+        print(review_aspects)
         return review_aspects
 
 

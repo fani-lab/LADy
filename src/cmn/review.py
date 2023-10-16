@@ -1,5 +1,4 @@
-from typing import Tuple, Type, NewType, List, Union, Dict, Any
-from typing_extensions import Self
+from typing import Optional, Tuple, NewType, List, Dict, Union 
 import pandas as pd, copy, numpy as np
 from scipy.spatial.distance import cosine
 
@@ -22,14 +21,14 @@ class Review(object):
 
     def __init__(self,
                  id: str,
-                 sentences,
-                 time=None,
-                 author=None,
+                 sentences: List[str],
+                 time: Optional[str] = None,
+                 author: Optional[str] = None,
                  aos: List[List[AspectOpinionSentiment]] = [],
-                 lempos=None,
-                 parent=None,
+                 lempos: Optional[str] = None,
+                 parent = None,
                  lang='eng_Latn',
-                 category=None
+                 category: Optional[str] = None
     ):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
@@ -149,7 +148,7 @@ class Review(object):
     def load(path): pass
 
     @staticmethod
-    def to_df(reviews: List[Self], w_augs=False):
+    def to_df(reviews, w_augs=False):
         return pd.DataFrame.from_dict([rr for r in reviews for rr in r.to_dict(w_augs)])
 
     @staticmethod
@@ -209,8 +208,8 @@ class Review(object):
 
             naspects_nreviews = Counter(asp_nreviews.values())   # v number of aspects with 1 review, ..., k reviews, ...
             ntokens_nreviews = Counter(token_nreviews.values())  # v number of tokens with 1 review, ..., k reviews, ...
-            stats["*naspects"] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
-            stats["*ntokens"] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
+            stats['*naspects'] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
+            stats['*ntokens'] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
             stats['nreviews_naspects'] = {k: v for k, v in sorted(nreviews_naspects.items(), key=lambda item: item[1], reverse=True)}
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
@@ -230,16 +229,16 @@ class Review(object):
     def plot_dist(stats, output, plot_title):
         from matplotlib import pyplot as plt
         plt.rcParams.update({'font.family': 'Consolas'})
-        print("plotting distribution data ...")
+        print('plotting distribution data ...')
         for k, v in stats.items():
-            if (not k.startswith("*")): # the * values cannot be plotted
+            if (not k.startswith('*')): # the * values cannot be plotted
                 fig = plt.figure(k, figsize=(1.5, 1.5))
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_facecolor('whitesmoke')
                 ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='m')
                 ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
                 ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
-                ax.grid(True, color="#93a1a1", alpha=0.3)
+                ax.grid(True, color='#93a1a1', alpha=0.3)
                 ax.minorticks_off()
                 ax.xaxis.set_tick_params(size=2, direction='in')
                 ax.yaxis.set_tick_params(size=2, direction='in')
@@ -308,7 +307,4 @@ class Review(object):
 # Typings (due to initialization)
 # --------------------------------------------------------------------------------
 
-"""
-Aumentation:: Dict<string, [Review 1, Review2, Score]>
-"""
 Augmentation = Dict[str, Tuple[Review, Review, np.float64]]

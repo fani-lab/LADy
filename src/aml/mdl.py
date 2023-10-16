@@ -1,5 +1,8 @@
 import re, numpy as np, pandas as pd, random
+from typing import List
 import gensim
+
+from cmn.review import Review
 
 class AbstractAspectModel:
     stop_words = None
@@ -27,23 +30,31 @@ class AbstractAspectModel:
 
     def get_aspects_words(self, nwords): pass
     def get_aspect_words(self, aspect_id, nwords): pass
-    def infer(self, review, doctype): pass
-    def infer_batch(self, reviews_test, h_ratio, doctype):
+    def infer(self, review: Review, doctype: str): pass
+    def infer_batch(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str):
         pairs = []
+
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
-            if len(r_aspects[0]) == 0: continue  # ??
-            if random.random() < h_ratio: r_ = r.hide_aspects()
-            else: r_ = r
+
+            if len(r_aspects[0]) == 0:
+                continue  # ??
+            if random.random() < h_ratio:
+                r_ = r.hide_aspects()
+            else:
+                r_ = r
+
             r_pred_aspects = self.infer(r_, doctype)
             # removing duplicate aspect words ==> handled in metrics()
             pairs.extend(list(zip(r_aspects, self.merge_aspects_words(r_pred_aspects, self.nwords))))
+
         return pairs
 
     def merge_aspects_words(self, r_pred_aspects, nwords):
         # Since predicted aspects are distributions over words, we need to flatten them into list of words.
         # Given a and b are two aspects, we do prob(a) * prob(a_w) for all w \in a and prob(b) * prob(b_w) for all w \in b
         # Then sort.
+        # TODO: Refactor this code (💩)
         result = []
         for subr_pred_aspects in r_pred_aspects:
             subr_pred_aspects_words = [w_p
