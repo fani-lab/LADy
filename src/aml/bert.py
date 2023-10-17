@@ -142,8 +142,6 @@ class BERT(AbstractAspectModel):
         self.mdl = pd.read_pickle(f'{path}model')
         assert self.mdl.topics_num_ == self.naspects
         self.dict = pd.read_pickle(f'{path}model.dict')
-        self.cas = pd.read_pickle(f'{path}model.perf.cas')
-        self.perplexity = pd.read_pickle(f'{path}model.perf.perplexity')
     
     def train(self,
               reviews_train: List[Review],
@@ -203,25 +201,3 @@ class BERT(AbstractAspectModel):
         }
 
         return work.main(Namespace(**args))
-
-    # TODO: What is this? should I change it?
-    def get_aspects_words(self, nwords):
-        words: List[str] = []
-        probs: List[float] = []
-
-        topic_range_idx = list(range(0, self.naspects))
-        top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
-        for i in topic_range_idx:
-            probs.append(sorted(self.mdl.matrix_topics_words_[i, :]))
-            words.append(list(top_words[f'topic{i}']))
-        return words, probs
-
-    # TODO: What is this? should I change it?
-    def get_aspect_words(self, aspect_id, nwords) -> List[Tuple[str, float]]:
-        dict_len = len(self.dict)
-        if nwords > dict_len: nwords = dict_len
-        topic_range_idx = list(range(0, self.naspects))
-        top_words = btm.get_top_topic_words(self.mdl, words_num=nwords, topics_idx=topic_range_idx)
-        probs = sorted(self.mdl.matrix_topics_words_[aspect_id, :])
-        words = list(top_words[f'topic{aspect_id}'])
-        return list(zip(words, probs))
