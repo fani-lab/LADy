@@ -12,7 +12,6 @@ import params
 # import visualization
 from cmn.review import Review
 
-
 # ------------------------------------------------
 # Testing
 # ------------------------------------------------
@@ -134,7 +133,55 @@ def test(am, test, f, output: str):
         pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=output)
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
-def evaluate(input, output):
+
+# TODO: Refactor this to convert Bert pairs to LADy pairs
+def evaluate_bert(input: str, output: str):
+    print(f'\n4. Aspect model evaluation for {input} ...')
+    print('#' * 50)
+
+    from bert_e2e_absa import Predict_Result
+
+    pairs: Predict_Result = pd.read_pickle(input)
+
+    
+    unique_predictions_result = pairs['unique_predictions']
+    gold_target_list = pairs['gold_targets']
+
+    metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
+
+    qrel = dict()
+    run = dict()
+
+    for i, sublist in enumerate(gold_target_list):
+        q_key = 'q{}'.format(i)
+        qrel[q_key] = {}
+        for j, tag in enumerate(sublist):
+            word = gold_target_list[i][j]
+            qrel[q_key][str(word).lower()] = 1
+
+    for i, sublist in enumerate(unique_predictions_result):
+        q_key = 'q{}'.format(i)
+        run[q_key] = {}
+            
+        for j, [word, _] in enumerate(sublist):
+            run[q_key][str(word).lower()] = len(sublist) - j
+
+    empty_qrel_indexes = [i for i, words in enumerate(qrel.values()) if not words]
+
+    for i in sorted(empty_qrel_indexes, reverse=True):
+        del qrel[f'q{i}']
+        del run[f'q{i}']
+
+    qrel = {f'q{i}': words for i, (_, words) in enumerate(qrel.items())}
+    run = {f'q{i}': words for i, (_, words) in enumerate(run.items())}
+
+    print(f'4.2. Calling pytrec_eval for {metrics_set} ...')
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))
+    print('4.3. Averaging ...')
+    df_mean = df.mean(axis=1).to_frame('mean')
+    df_mean.to_csv(f'{output}/pred.eval.mean.csv')
+
+def evaluate(input: str, output: str):
     print(f'\n4. Aspect model evaluation for {input} ...')
     print('#' * 50)
     pairs = pd.read_pickle(input)
@@ -142,9 +189,6 @@ def evaluate(input, output):
 
     qrel = dict()
     run = dict()
-
-    # TODO: We should define PAIR type 
-    # TODO: BERT Pair -> LADY Pair
 
     print(f'\n4.1. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
@@ -239,7 +283,10 @@ def main(args):
         df_f_means = pd.DataFrame()
         for f in splits['folds'].keys():
             input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
-            df_mean = evaluate(input, f'{input}.eval.mean.csv')
+            if am.name == 'bert':
+                df_mean = evaluate_bert(input, f'{input}.eval.mean.csv')
+            else: 
+                df_mean = evaluate(input, f'{input}.eval.mean.csv')
             df_f_means = pd.concat([df_f_means, df_mean], axis=1)
         df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
