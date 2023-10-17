@@ -1,15 +1,16 @@
-import argparse, os, json, time
-from typing import List, NewType, Tuple
+import argparse
+import os
+import json
+import time
+from typing import List, Tuple
 from tqdm import tqdm
-import numpy as np, pandas as pd
+import numpy as np
+import pandas as pd
 
 import pytrec_eval
 from nltk.corpus import wordnet as wn
-# import nltk
-# nltk.download('omw-1.4')
 
 import params
-# import visualization
 from cmn.review import Review
 
 # ------------------------------------------------
@@ -139,7 +140,7 @@ def evaluate_bert(input: str, output: str):
     print(f'\n4. Aspect model evaluation for {input} ...')
     print('#' * 50)
 
-    from bert_e2e_absa import Predict_Result
+    from bert_e2e_absa.work import Predict_Result
 
     pairs: Predict_Result = pd.read_pickle(input)
 
@@ -155,7 +156,7 @@ def evaluate_bert(input: str, output: str):
     for i, sublist in enumerate(gold_target_list):
         q_key = 'q{}'.format(i)
         qrel[q_key] = {}
-        for j, tag in enumerate(sublist):
+        for j, _ in enumerate(sublist):
             word = gold_target_list[i][j]
             qrel[q_key][str(word).lower()] = 1
 

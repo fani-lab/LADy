@@ -241,7 +241,7 @@ transformers = "^4.26.1"
 type = "git"
 url = "https://github.com/3ripleM/BERT-E2E-ABSA.git"
 reference = "HEAD"
-resolved_reference = "6fd49eca74110d7cf55343ae6feb30fbe9882c92"
+resolved_reference = "337d9c582ef48772c72d93174ca857536b2e17c7"
 
 [[package]]
 name = "bitermplus"
