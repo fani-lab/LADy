@@ -9,6 +9,10 @@ class MAMSReview(Review):
         super().__init__(self, id, sentences, time, author, aos)
 
     @staticmethod
+    def load(path):
+        return MAMSReview._xmlloader(path)
+
+    @staticmethod
     def xmlloader(path):
         reviews_list = []
         nlp = spacy.load("en_core_web_sm")
