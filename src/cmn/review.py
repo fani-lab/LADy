@@ -154,7 +154,7 @@ class Review(object):
             stats = pd.read_pickle(f'{output}/stats.pkl')
             if plot: Review.plot_dist(stats, output, plot_title)
         except FileNotFoundError:
-            print(f'File {datapath} not found! Generating stats ...')
+            print(f'File {output}/stats.pkl not found! Generating stats ...')
             reviews = pd.read_pickle(datapath)
             from collections import Counter
             stats = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
