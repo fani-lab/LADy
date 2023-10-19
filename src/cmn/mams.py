@@ -9,7 +9,11 @@ class MAMSReview(Review):
         super().__init__(self, id, sentences, time, author, aos)
 
     @staticmethod
-    def xmlloader(path):
+    def load(path):
+        return MAMSReview._xmlloader(path)
+
+    @staticmethod
+    def _xmlloader(path):
         reviews_list = []
         nlp = spacy.load("en_core_web_sm")
         tree = ET.parse(path)
