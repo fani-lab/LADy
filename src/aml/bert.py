@@ -1,12 +1,11 @@
 from typing import Optional, Tuple, List, TypedDict, Dict
-import os
-import re
-import random
+from itertools import chain 
+import os, re, random
 from argparse import Namespace
 import pandas as pd
+
 from aml.mdl import AbstractAspectModel
 from bert_e2e_absa import train, work
-
 from cmn.review import Review
 
 #--------------------------------------------------------------------------------------------------
@@ -31,34 +30,30 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     REVIEW_MAX_LENGTH = 511
 
     for r in original_reviews:
-        if not len(r.aos[0]):
-            continue
+        if not len(r.aos[0]): continue
         else:
-            aos_list = []
+            aspect_ids = []
 
-            for aos_instance in r.aos[0]:
-                aos_list.extend(aos_instance[0])
+            for aos_instance in r.aos[0]: aspect_ids.extend(aos_instance[0])
 
             text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
 
             for idx, word in enumerate(r.sentences[0]):
-                if idx in aos_list:
+                if idx in aspect_ids:
                     tag = word + '=T-POS' + ' '
                     text += tag
                 else:
                     tag = word + '=O' + ' '
                     text += tag
 
-            if len(text.rstrip()) > REVIEW_MAX_LENGTH:
-                continue
+            if len(text.rstrip()) > REVIEW_MAX_LENGTH: continue
 
             reviews_list.append(text.rstrip())
 
             aos_list_per_review = []
 
             for idx, word in enumerate(r.sentences[0]):
-                if idx in aos_list:
-                    aos_list_per_review.append(word)
+                if idx in aspect_ids: aos_list_per_review.append(word)
 
             label_list.append(aos_list_per_review)
 
@@ -69,8 +64,7 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> N
     train, _ = convert_reviews_from_lady(original_reviews)
     dev, _ = convert_reviews_from_lady(original_reviews)
 
-    if not os.path.isdir(output): 
-        os.makedirs(output)
+    if not os.path.isdir(output): os.makedirs(output)
 
     path_witout_end_dot = output[:-1]
     os.mkdir(path_witout_end_dot)
@@ -78,21 +72,18 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> N
     for h in range(0, 101, 10):
         output = f'{path_witout_end_dot}/latency-{h}'
 
-        os.mkdir(output)
+        if not os.path.isdir(output): os.makedirs(output)
 
         with open(f'{output}/dev.txt', 'w', encoding='utf-8') as file:
-            for d in dev:
-                file.write(d + '\n')
+            for d in dev: file.write(d + '\n')
 
         with open(f'{output}/train.txt', 'w', encoding='utf-8') as file:
-            for d in train:
-                file.write(d + '\n')
+            for d in train: file.write(d + '\n')
 
 def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: int, output: str) -> None:
     path_witout_end_dot = output[:-1]
 
-    if not os.path.isdir(output):
-        raise Exception(f'Output path {output} does not exist')
+    if not os.path.isdir(output): raise Exception(f'Output path {output} does not exist')
     
     _, labels = convert_reviews_from_lady(validation_reviews)
 
@@ -102,20 +93,19 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: int, ou
 
         path = f'{path_witout_end_dot}/latency-{h}'
 
-        if not os.path.isdir(path):
-            os.makedirs(path)
+        if not os.path.isdir(path): os.makedirs(path)
 
         test_hidden = []
+
         for t in range(len(validation_reviews)):
             if random.random() < hp:
                 test_hidden.append(validation_reviews[t].hide_aspects(mask='z', mask_size=5))
-            else:
-                test_hidden.append(validation_reviews[t])
+            else: test_hidden.append(validation_reviews[t])
+
         preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
 
         with open(f'{path}/test.txt', 'w', encoding='utf-8') as file:
-            for d in preprocessed_test:
-                file.write(d + '\n')
+            for d in preprocessed_test: file.write(d + '\n')
 
         pd.to_pickle(labels, f'{path}/test-labels.pk')
 #--------------------------------------------------------------------------------------------------
@@ -134,15 +124,9 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: int, ou
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
 class BERT(AbstractAspectModel):
-    def __init__(self, naspects, nwords): 
+    def __init__(self, naspects: int, nwords: int): 
         super().__init__(naspects, nwords)
 
-    # TODO: What is this? should I change it?
-    def load(self, path):
-        self.mdl = pd.read_pickle(f'{path}model')
-        assert self.mdl.topics_num_ == self.naspects
-        self.dict = pd.read_pickle(f'{path}model.dict')
-    
     def train(self,
               reviews_train: List[Review],
               reviews_valid: Optional[List[Review]],
@@ -200,4 +184,11 @@ class BERT(AbstractAspectModel):
             'tagging_schema': 'BIEOS'
         }
 
-        return work.main(Namespace(**args))
+        pairs =  work.main(Namespace(**args))
+
+        gold_targets = pairs['gold_targets']
+        unique_predictions = pairs['unique_predictions']
+        flattened_unique_predictions = list(chain(*unique_predictions))
+
+        return (gold_targets, flattened_unique_predictions)
+

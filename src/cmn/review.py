@@ -1,18 +1,21 @@
-from typing import Optional, Tuple, NewType, List, Dict, Union 
-import pandas as pd, copy, numpy as np
+from typing import Any, Optional, Tuple, List, Dict, Literal, Union
+import pandas as pd, numpy as np
+import copy
 from scipy.spatial.distance import cosine
 
-# --------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 # Typings
-# --------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
+Sentiment = Union[Literal[-1], Literal[0], Literal[1]]
 AspectOpinionSentiment = Tuple[
-                                NewType('Aspect', List[int]),
-                                NewType('Opinion', List[int]),
-                                NewType('Sentiment (-1|0|+1)', int)
+                                List[int],
+                                List[int],
+                                Sentiment
                             ]
 
-
-
+# ---------------------------------------------------------------------------------------
+# Logics
+# ---------------------------------------------------------------------------------------
 class Review(object):
     translator_mdl = None
     translator_tokenizer = None
@@ -62,7 +65,7 @@ class Review(object):
 
         return result
 
-    def get_aos(self):
+    def get_aos(self) -> List[List[AspectOpinionSentiment]]:
         r = []
         if not self.aos: return r
         for i, aos in enumerate(self.aos): r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
@@ -187,7 +190,7 @@ class Review(object):
             print(f'File {datapath} not found! Generating stats ...')
             reviews = pd.read_pickle(datapath)
             from collections import Counter
-            stats = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
+            stats: Dict[str, Any] = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
             asp_nreviews = Counter()        # aspects : number of reviews that contains the aspect
             token_nreviews = Counter()      # tokens : number of reviews that contains the token
             nreviews_naspects = Counter()   # v number of reviews with 1 aspect, ..., k aspects, ...
@@ -301,7 +304,7 @@ class Review(object):
         elif lang_code == 'spa_Latn': return 'spanish'
         elif lang_code == 'eng_Latn': return 'english'
         elif lang_code == 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn': return 'all'
-        elif lang_code == None: return ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn', 'all']
+        elif lang_code is None: return ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn', 'all']
 
 # --------------------------------------------------------------------------------
 # Typings (due to initialization)

@@ -1,11 +1,7 @@
-import argparse
-import os
-import json
-import time
 from typing import List, Tuple
+import argparse, os, json, time
 from tqdm import tqdm
-import numpy as np
-import pandas as pd
+import numpy as np, pandas as pd
 
 import pytrec_eval
 from nltk.corpus import wordnet as wn
@@ -13,16 +9,18 @@ from nltk.corpus import wordnet as wn
 import params
 from cmn.review import Review
 
-# ------------------------------------------------
-# Testing
-# ------------------------------------------------
+# ---------------------------------------------------------------------------------------
+# Typings
+# ---------------------------------------------------------------------------------------
 Aspects = List[List[str]]
 
 PredictedAspect = List[Tuple[int, float]]  # Tuple containing index and weight
 
 PairType = Tuple[Aspects, PredictedAspect]
 
-
+# ---------------------------------------------------------------------------------------
+# Logics
+# ---------------------------------------------------------------------------------------
 def load(input, output, cache=True):
     print('\n1. Loading reviews and preprocessing ...')
     print('#' * 50)
@@ -135,53 +133,6 @@ def test(am, test, f, output: str):
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
 
-# TODO: Refactor this to convert Bert pairs to LADy pairs
-def evaluate_bert(input: str, output: str):
-    print(f'\n4. Aspect model evaluation for {input} ...')
-    print('#' * 50)
-
-    from bert_e2e_absa.work import Predict_Result
-
-    pairs: Predict_Result = pd.read_pickle(input)
-
-    
-    unique_predictions_result = pairs['unique_predictions']
-    gold_target_list = pairs['gold_targets']
-
-    metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
-
-    qrel = dict()
-    run = dict()
-
-    for i, sublist in enumerate(gold_target_list):
-        q_key = 'q{}'.format(i)
-        qrel[q_key] = {}
-        for j, _ in enumerate(sublist):
-            word = gold_target_list[i][j]
-            qrel[q_key][str(word).lower()] = 1
-
-    for i, sublist in enumerate(unique_predictions_result):
-        q_key = 'q{}'.format(i)
-        run[q_key] = {}
-            
-        for j, [word, _] in enumerate(sublist):
-            run[q_key][str(word).lower()] = len(sublist) - j
-
-    empty_qrel_indexes = [i for i, words in enumerate(qrel.values()) if not words]
-
-    for i in sorted(empty_qrel_indexes, reverse=True):
-        del qrel[f'q{i}']
-        del run[f'q{i}']
-
-    qrel = {f'q{i}': words for i, (_, words) in enumerate(qrel.items())}
-    run = {f'q{i}': words for i, (_, words) in enumerate(run.items())}
-
-    print(f'4.2. Calling pytrec_eval for {metrics_set} ...')
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))
-    print('4.3. Averaging ...')
-    df_mean = df.mean(axis=1).to_frame('mean')
-    df_mean.to_csv(f'{output}/pred.eval.mean.csv')
-
 def evaluate(input: str, output: str):
     print(f'\n4. Aspect model evaluation for {input} ...')
     print('#' * 50)
@@ -284,10 +235,7 @@ def main(args):
         df_f_means = pd.DataFrame()
         for f in splits['folds'].keys():
             input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
-            if am.name == 'bert':
-                df_mean = evaluate_bert(input, f'{input}.eval.mean.csv')
-            else: 
-                df_mean = evaluate(input, f'{input}.eval.mean.csv')
+            df_mean = evaluate(input, f'{input}.eval.mean.csv')
             df_f_means = pd.concat([df_f_means, df_mean], axis=1)
         df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
