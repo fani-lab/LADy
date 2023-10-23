@@ -15,8 +15,10 @@ def flatten(xs: List[List[T]] ) -> List[T]:
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
-AspectPairType = Tuple[int, float]
-BatchPairsType = List[Tuple[List[int], List[AspectPairType]]]
+AspectId = int
+Score = float
+AspectPairType = Tuple[AspectId, Score]
+BatchPairsType = List[Tuple[List[AspectId], List[AspectPairType]]]
 QualityType = TypedDict('QualityType', {'coherence': str, 'perplexity': float})
 Metrics = Literal['coherence', 'perplexity']
 
