@@ -1,10 +1,38 @@
-import pandas as pd, copy, numpy as np
+from typing import Any, Optional, Tuple, List, Dict, Literal, Union
+import pandas as pd, numpy as np
+import copy
 from scipy.spatial.distance import cosine
 
+# ---------------------------------------------------------------------------------------
+# Typings
+# ---------------------------------------------------------------------------------------
+Sentiment = Union[Literal[-1], Literal[0], Literal[1]]
+AspectOpinionSentiment = Tuple[
+                                List[int],
+                                List[int],
+                                Sentiment
+                            ]
+
+# ---------------------------------------------------------------------------------------
+# Logics
+# ---------------------------------------------------------------------------------------
 class Review(object):
-    translator_mdl = None; translator_tokenizer = None
-    semantic_mdl = None; align_mdl = None
-    def __init__(self, id, sentences, time=None, author=None, aos=None, lempos=None, parent=None, lang='eng_Latn', category=None):
+    translator_mdl = None
+    translator_tokenizer = None
+    semantic_mdl = None
+    align_mdl = None
+
+    def __init__(self,
+                 id: str,
+                 sentences: List[str],
+                 time: Optional[str] = None,
+                 author: Optional[str] = None,
+                 aos: List[List[AspectOpinionSentiment]] = [],
+                 lempos: Optional[str] = None,
+                 parent = None,
+                 lang='eng_Latn',
+                 category: Optional[str] = None
+    ):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
         self.time = time
@@ -15,7 +43,7 @@ class Review(object):
         self.category = category
 
         self.parent = parent
-        self.augs = {} #distionary of translated and backtranslated augmentations of this review in object format, e.g.,
+        self.augs: Augmentation = {} #distionary of translated and backtranslated augmentations of this review in object format, e.g.,
         # {'deu_Latn': (Review1(self.id, 'dies ist eine bewertung', None, None, None, None, self, 'deu_Latn'),
         #               Review2(self.id, 'this is a review', None, None, None, None, self, 'eng_Latn'),
         #               semantic_similarity_score)
@@ -27,13 +55,17 @@ class Review(object):
                    'aos': self.get_aos(), #self.parent.get_aos() if self.parent else self.get_aos(),
                    'lang': self.lang,
                    'orig': False if self.parent else True}]
-        if not w_augs: return result
-        for k in self.augs:
+
+        if not w_augs: 
+            return result
+
+        for [_, reviews] in self.augs.items():
             #result += self.augs[k][0].to_dict()
-            result += self.augs[k][1].to_dict()
+            result += reviews[1].to_dict()
+
         return result
 
-    def get_aos(self):
+    def get_aos(self) -> List[List[AspectOpinionSentiment]]:
         r = []
         if not self.aos: return r
         for i, aos in enumerate(self.aos): r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
@@ -51,7 +83,7 @@ class Review(object):
 
     def preprocess(self): return self # note that any removal of words breakes the aos indexing!
 
-    def translate(self, tgt, settings):
+    def translate(self, tgt: str, settings):
         src = self.lang
         if not Review.translator_mdl:
             from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
@@ -59,31 +91,31 @@ class Review(object):
             Review.translator_tokenizer = AutoTokenizer.from_pretrained(settings['nllb'])
 
         from transformers import pipeline
-        Review.translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
-        Review.back_translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
+        Review.translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
+        Review.back_translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
 
         translated_txt = Review.translator(self.get_txt())[0]['translation_text']
-        translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in translated_txt.split()]], parent=self, lang=tgt)
+        translated_obj: Review = Review(id=self.id, sentences=[[str(t).lower() for t in translated_txt.split()]], parent=self, lang=tgt)
         translated_obj.aos, _ = self.semalign(translated_obj)
 
         back_translated_txt = Review.back_translator(translated_txt)[0]['translation_text']
-        back_translated_obj = Review(id=self.id, sentences=[[str(t).lower() for t in back_translated_txt.split()]], parent=self, lang=src)
+        back_translated_obj: Review = Review(id=self.id, sentences=[[str(t).lower() for t in back_translated_txt.split()]], parent=self, lang=src)
         back_translated_obj.aos, _ = self.semalign(back_translated_obj)
 
         self.augs[tgt] = (translated_obj, back_translated_obj, self.semsim(back_translated_obj))
         return self.augs[tgt]
 
-    def semsim(self, other):
+    def semsim(self, other) -> np.float64:
         if not Review.semantic_mdl:
             from sentence_transformers import SentenceTransformer
-            Review.semantic_mdl = SentenceTransformer("johngiorgi/declutr-small")
+            Review.semantic_mdl = SentenceTransformer('johngiorgi/declutr-small')
         me, you = Review.semantic_mdl.encode([self.get_txt(), other.get_txt()])
         return 1 - cosine(me, you)
 
     def semalign(self, other):
         if not Review.align_mdl:
             from simalign import SentenceAligner
-            Review.align_mdl = SentenceAligner(model="bert", token_type="bpe", matching_methods="i")
+            Review.align_mdl = SentenceAligner(model='bert', token_type='bpe', matching_methods='i')
         aligns = [Review.align_mdl.get_word_aligns(s1, o1)['itermax'] for s1, o1 in zip(self.sentences, other.sentences)]
         other_aos_all = []
         for i, (aos, _) in enumerate(zip(self.aos, self.sentences)):
@@ -119,7 +151,8 @@ class Review(object):
     def load(path): pass
 
     @staticmethod
-    def to_df(reviews, w_augs=False): return pd.DataFrame.from_dict([rr for r in reviews for rr in r.to_dict(w_augs)])
+    def to_df(reviews, w_augs=False):
+        return pd.DataFrame.from_dict([rr for r in reviews for rr in r.to_dict(w_augs)])
 
     @staticmethod
     def translate_batch(reviews, tgt, settings):
@@ -130,8 +163,8 @@ class Review(object):
             Review.translator_tokenizer = AutoTokenizer.from_pretrained(settings['nllb'])
 
         from transformers import pipeline
-        translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
-        back_translator = pipeline("translation", model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
+        translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
+        back_translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
 
         reviews_txt = [r.get_txt() for r in reviews]
         translated_txt = translator(reviews_txt)
@@ -157,7 +190,7 @@ class Review(object):
             print(f'File {output}/stats.pkl not found! Generating stats ...')
             reviews = pd.read_pickle(datapath)
             from collections import Counter
-            stats = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
+            stats: Dict[str, Any] = {'*nreviews': len(reviews), '*naspects': 0, '*ntokens': 0}
             asp_nreviews = Counter()        # aspects : number of reviews that contains the aspect
             token_nreviews = Counter()      # tokens : number of reviews that contains the token
             nreviews_naspects = Counter()   # v number of reviews with 1 aspect, ..., k aspects, ...
@@ -178,8 +211,8 @@ class Review(object):
 
             naspects_nreviews = Counter(asp_nreviews.values())   # v number of aspects with 1 review, ..., k reviews, ...
             ntokens_nreviews = Counter(token_nreviews.values())  # v number of tokens with 1 review, ..., k reviews, ...
-            stats["*naspects"] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
-            stats["*ntokens"] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
+            stats['*naspects'] = len(asp_nreviews.keys()) # unique. Non-unique number of aspects: sum(asp_nreviews.values())
+            stats['*ntokens'] = len(token_nreviews.keys()) # unique. Non-unique number of tokens: sum(token_nreviews.values())
             stats['nreviews_naspects'] = {k: v for k, v in sorted(nreviews_naspects.items(), key=lambda item: item[1], reverse=True)}
             stats['nreviews_ntokens'] = {k: v for k, v in sorted(nreviews_ntokens.items(), key=lambda item: item[1], reverse=True)}
             stats['naspects_nreviews'] = {k: v for k, v in sorted(naspects_nreviews.items(), key=lambda item: item[1], reverse=True)}
@@ -199,16 +232,16 @@ class Review(object):
     def plot_dist(stats, output, plot_title):
         from matplotlib import pyplot as plt
         plt.rcParams.update({'font.family': 'Consolas'})
-        print("plotting distribution data ...")
+        print('plotting distribution data ...')
         for k, v in stats.items():
-            if (not k.startswith("*")): # the * values cannot be plotted
+            if (not k.startswith('*')): # the * values cannot be plotted
                 fig = plt.figure(k, figsize=(1.5, 1.5))
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_facecolor('whitesmoke')
                 ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='m')
                 ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
                 ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
-                ax.grid(True, color="#93a1a1", alpha=0.3)
+                ax.grid(True, color='#93a1a1', alpha=0.3)
                 ax.minorticks_off()
                 ax.xaxis.set_tick_params(size=2, direction='in')
                 ax.yaxis.set_tick_params(size=2, direction='in')
@@ -271,5 +304,10 @@ class Review(object):
         elif lang_code == 'spa_Latn': return 'spanish'
         elif lang_code == 'eng_Latn': return 'english'
         elif lang_code == 'pes_Arab.zho_Hans.deu_Latn.arb_Arab.fra_Latn.spa_Latn': return 'all'
-        elif lang_code == None: return ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn', 'all']
+        elif lang_code is None: return ['pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn', 'all']
 
+# --------------------------------------------------------------------------------
+# Typings (due to initialization)
+# --------------------------------------------------------------------------------
+
+Augmentation = Dict[str, Tuple[Review, Review, np.float64]]

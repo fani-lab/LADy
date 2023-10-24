@@ -2,32 +2,44 @@
 import random
 import csv
 from flask_cors import CORS
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask import Flask
 
 import sys
 import os
 import argparse
 import torch
+
 # needs to be before importing Review and Lda
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', '..',)))
 
 from cmn.review import Review
-from aml.lda import Lda
 from aml.btm import Btm
 from aml.ctm import Ctm
+from aml.lda import Lda
 from aml.rnd import Rnd
+
+
+__dirname = os.path.dirname(__file__)
+
 app = Flask(__name__)
 CORS(app)  # Allow cross-origin requests
-os.environ["CUDA_VISIBLE_DEVICES"]=""
+
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
 @app.route('/api', methods=['POST'])
 def api():
     nwords = 20
-    text = request.json['text'] + " from backend"
-    model = request.json['model']
-    lang = request.json['lang']
-    naspects = request.json['naspects']
+    req = request.json
+
+    if(req is None):
+        return jsonify({'error': 'Invalid request params'})
+
+    text = req['text'] + ' from backend'
+    model = req['model']
+    lang = req['lang']
+    naspects = req['naspects']
     print(text, model, lang, naspects)
 
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
@@ -35,14 +47,21 @@ def api():
                         help='user-defined number of aspects, e.g., -naspect 25')
     args = parser.parse_args()
 
-    if model == "lda": am = Lda(naspects, nwords)
-    if model == "btm": am = Btm(naspects, nwords)
-    if model == "rnd": am = Rnd(naspects, nwords)
-    if model == "ctm": am = Ctm(naspects, nwords, contextual_size = 768, nsamples =10)
-    path = f"./models/{naspects}{'.'+lang if lang else ''}/{am.name()}"
+    am = None
+
+    if model == 'lda': am = Lda(naspects, nwords)
+    if model == 'btm': am = Btm(naspects, nwords)
+    if model == 'rnd': am = Rnd(naspects, nwords)
+    if model == 'ctm': am = Ctm(naspects, nwords, contextual_size = 768, nsamples =10)
+
+    if(am is None):
+        return jsonify({'error': 'Model not found'})
+
+    path = os.path.join(__dirname, f"models/{naspects}{'.'+lang if lang else ''}/{am.name()}")
+
     am.load(f'{path}/f0.')
    
-    r = Review(id=0, sentences=[text.split()], time=None, author=None, aos=[[([0],[],0)]], lempos=None, parent=None, lang='eng_Latn', category=None)
+    r = Review(id='0', sentences=[text.split()], time=None, author=None, aos=([[([0],[], 0)]]), lempos=None, parent=None, lang='eng_Latn', category=None)
   
     # settings = {'nllb': 'facebook/nllb-200-distilled-600M', 'max_l': 1024, 'device': 'cpu'}
     # res = r.translate('pes_Arab', settings)
@@ -59,14 +78,17 @@ def api():
     return jsonify(resultdict)
 
 
-@app.route("/random", methods=['GET'])
+@app.route('/random', methods=['GET'])
 def get_random_row_from_csv():
-    file_path = 'reviews.csv'
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file)
-        rows = list(reader)
-        return jsonify(random.choice(rows))
+    file_path = os.path.join(__dirname, 'reviews.csv')
+    try:
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            rows = list(reader)
+            return jsonify(random.choice(rows))
+    except FileNotFoundError:
+        return jsonify({'error': '[Server]: reviews.csv not found'}), 500
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

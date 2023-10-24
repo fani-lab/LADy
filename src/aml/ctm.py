@@ -1,4 +1,5 @@
-import pickle, numpy as np, pandas as pd, random, os
+import numpy as np, pandas as pd, random, os
+from typing import List
 
 import torch
 from contextualized_topic_models.models.ctm import CombinedTM
@@ -6,7 +7,8 @@ from contextualized_topic_models.utils.data_preparation import TopicModelDataPre
 from contextualized_topic_models.utils.preprocessing import WhiteSpacePreprocessingStopwords
 from contextualized_topic_models.evaluation.measures import CoherenceUMASS
 
-from .mdl import AbstractAspectModel
+from cmn.review import Review
+from .mdl import AbstractAspectModel, BatchPairsType
 
 class Ctm(AbstractAspectModel):
     def __init__(self, naspects, nwords, contextual_size, nsamples):
@@ -78,14 +80,16 @@ class Ctm(AbstractAspectModel):
 
     def get_aspect_words(self, aspect_id, nwords): return self.mdl.get_word_distribution_by_topic_id(aspect_id)[:nwords]
 
-    def infer_batch(self, reviews_test, h_ratio, doctype):
+    def infer_batch(self, reviews_test: List[Review], h_ratio, doctype):
         reviews_test_ = []
-        reviews_aspects = []
+        reviews_aspects: List[List[List[int]]] = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+
             if len(r_aspects[0]) == 0: continue  # ??
             if random.random() < h_ratio: r_ = r.hide_aspects()
             else: r_ = r
+
             reviews_aspects.append(r_aspects)
             reviews_test_.append(r_)
 
@@ -95,7 +99,7 @@ class Ctm(AbstractAspectModel):
         processed, unprocessed, vocab, _ = WhiteSpacePreprocessingStopwords(corpus_test, stopwords_list=[]).preprocess()
         testing_dataset = self.tp.transform(text_for_contextual=unprocessed, text_for_bow=processed)
         reviews_pred_aspects = self.mdl.get_doc_topic_distribution(testing_dataset, n_samples=self.nsamples)
-        pairs = []
+        pairs: BatchPairsType = []
         for i, r_pred_aspects in enumerate(reviews_pred_aspects):
             r_pred_aspects = [[(j, v) for j, v in enumerate(r_pred_aspects)]]
             pairs.extend(list(zip(reviews_aspects[i], self.merge_aspects_words(r_pred_aspects, self.nwords))))

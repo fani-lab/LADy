@@ -1,5 +1,5 @@
 select = ["E", "F", "Q"]
-ignore = ["E501"]
+ignore = ["E501", "E401", "E701"]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

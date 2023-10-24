@@ -1,16 +1,26 @@
+from typing import List, Tuple
 import argparse, os, json, time
 from tqdm import tqdm
 import numpy as np, pandas as pd
 
 import pytrec_eval
 from nltk.corpus import wordnet as wn
-# import nltk
-# nltk.download('omw-1.4')
 
 import params
-# import visualization
 from cmn.review import Review
 
+# ---------------------------------------------------------------------------------------
+# Typings
+# ---------------------------------------------------------------------------------------
+Aspects = List[List[str]]
+
+PredictedAspect = List[Tuple[int, float]]  # Tuple containing index and weight
+
+PairType = Tuple[Aspects, PredictedAspect]
+
+# ---------------------------------------------------------------------------------------
+# Logics
+# ---------------------------------------------------------------------------------------
 def load(input, output, cache=True):
     print('\n1. Loading reviews and preprocessing ...')
     print('#' * 50)
@@ -47,7 +57,8 @@ def load(input, output, cache=True):
                 # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
                 output_ = output
                 for l in params.settings['prep']['langaug']:
-                    if l and l != lang: output_ = output_.replace(f'{l}.', '')
+                    if l and l != lang:
+                        output_ = output_.replace(f'{l}.', '')
                 pd.to_pickle(reviews, output_)
 
             print(f'\n1.3. Saving processed pickle file {output}...')
@@ -107,7 +118,7 @@ def train(args, am, train, valid, f, output):
         print('2.2. Quality of aspects ...')
         for q in params.settings['train']['qualities']: print(f'({q}: {am.quality(q)})')
 
-def test(am, test, f, output):
+def test(am, test, f, output: str):
     print(f'\n3. Aspect model testing for {am.name()} ...')
     print('#' * 50)
     try:
@@ -118,15 +129,19 @@ def test(am, test, f, output):
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
         am.load(f'{output}/f{f}.')
         print('3.3. Testing aspect model ...')
-        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'])
+        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=output)
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
-def evaluate(input, output):
+
+def evaluate(input: str, output: str):
     print(f'\n4. Aspect model evaluation for {input} ...')
     print('#' * 50)
     pairs = pd.read_pickle(input)
     metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
-    qrel = dict(); run = dict()
+
+    qrel = dict()
+    run = dict()
+
     print(f'\n4.1. Building pytrec_eval input for {len(pairs)} instances ...')
     for i, pair in enumerate(pairs):
         if params.settings['eval']['syn']:
@@ -135,12 +150,14 @@ def evaluate(input, output):
                 syn_list.add(p_instance)
                 syn_list.update(set([lemma.name() for syn in wn.synsets(p_instance) for lemma in syn.lemmas()]))
             qrel['q' + str(i)] = {w: 1 for w in syn_list}
-        else: qrel['q' + str(i)] = {w: 1 for w in pair[0]}
+        else:
+            qrel['q' + str(i)] = {w: 1 for w in pair[0]}
 
         # the prediction list may have duplicates
         run['q' + str(i)] = {}
         for j, (w, p) in enumerate(pair[1]):
-            if w not in run['q' + str(i)].keys(): run['q' + str(i)][w] = len(pair[1]) - j
+            if w not in run['q' + str(i)].keys():
+                run['q' + str(i)][w] = len(pair[1]) - j
 
     print(f'4.2. Calling pytrec_eval for {metrics_set} ...')
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics_set).evaluate(run))  # qrel should not have empty entry otherwise get exception
@@ -189,6 +206,7 @@ def main(args):
     if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
     if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
     if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
+    if 'bert' == args.am: from aml.bert import BERT; am = BERT(args.naspects, params.settings['train']['nwords'])
     if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
     if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
@@ -208,7 +226,8 @@ def main(args):
 
     # testing
     if 'test' in params.settings['cmd']:
-        for f in splits['folds'].keys(): pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
+        for f in splits['folds'].keys():
+            pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
 
 
     # evaluating
