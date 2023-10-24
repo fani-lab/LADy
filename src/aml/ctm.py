@@ -80,7 +80,7 @@ class Ctm(AbstractAspectModel):
 
     def get_aspect_words(self, aspect_id, nwords): return self.mdl.get_word_distribution_by_topic_id(aspect_id)[:nwords]
 
-    def infer_batch(self, reviews_test: List[Review], h_ratio, doctype):
+    def infer_batch(self, reviews_test: List[Review], h_ratio, doctype, output):
         reviews_test_ = []
         reviews_aspects: List[List[List[int]]] = []
         for r in reviews_test:

@@ -74,7 +74,7 @@ class Nrl(AbstractAspectModel):
         for w in word_list: probs.append(self.mdl_out['topic-word-matrix'][aspect_id][self.dict.index(w)])
         return list(zip(word_list, probs))
 
-    def infer_batch(self, reviews_test, h_ratio, doctype):
+    def infer_batch(self, reviews_test, h_ratio, doctype, output):
         reviews_test_ = []
         reviews_aspects = []
         for r in reviews_test:

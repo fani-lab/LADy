@@ -62,7 +62,7 @@ class Btm(AbstractAspectModel):
         words = list(top_words[f'topic{aspect_id}'])
         return list(zip(words, probs))
 
-    def infer_batch(self, reviews_test, h_ratio, doctype):
+    def infer_batch(self, reviews_test, h_ratio, doctype, output):
         reviews_test_ = []; reviews_aspects = []
         for r in reviews_test:
             r_aspects = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
