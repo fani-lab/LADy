@@ -1,6 +1,5 @@
-import gensim, logging, pickle, pandas as pd
+import gensim, logging, pandas as pd
 
-from gensim.models.callbacks import PerplexityMetric, ConvergenceMetric, CoherenceMetric
 from gensim.models.coherencemodel import CoherenceModel
 
 from .mdl import AbstractAspectModel
@@ -30,7 +29,7 @@ class Lda(AbstractAspectModel):
         corpus = [self.dict.doc2bow(doc) for doc in reviews_]
 
         logging.getLogger().handlers.clear()
-        logging.basicConfig(filename=f'{output}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
+        logging.basicConfig(filename=f'{output}model.train.log', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.NOTSET)
         # callback functions cannot be applied in parallel lda, only for LdaModel()
         # perplexity_logger = PerplexityMetric(corpus=corpus, logger='shell')
         # convergence_logger = ConvergenceMetric(logger='shell')
@@ -76,7 +75,6 @@ class Lda(AbstractAspectModel):
         for r in review_:
             review_aspects.append(self.mdl.get_document_topics(self.dict.doc2bow(r), minimum_probability=self.mdl.minimum_probability))
         
-        print(review_aspects)
         return review_aspects
 
 
