@@ -27,3 +27,5 @@ contextualized_topic_models==2.5.0 #install it if you want to use ctm model in t
 # octis # #use Fani's Lab! fork at https://github.com/fani-lab/OCTIS followed by "cd src/octis/; python setup.py install"
 
 pytrec-eval-terrier
+
+bert-e2e-absa @ git+https://github.com/fani-lab/BERT-E2E-ABSA.git@master

@@ -26,7 +26,7 @@ pytrec-eval-terrier = "^0.5.5"
 torch = ">=1.6.0, <2.0.0"
 numpy = "1.23"
 pytrec-eval = "^0.5"
-bert-e2e-absa = { git = "https://github.com/3ripleM/BERT-E2E-ABSA.git" }
+bert-e2e-absa = { git = "https://github.com/fani-lab/BERT-E2E-ABSA.git" }
 flask-cors = "^4.0.0"
 flask = "^3.0.0"
 
