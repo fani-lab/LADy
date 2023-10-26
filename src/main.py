@@ -211,8 +211,7 @@ def main(args):
     if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
 
-    if(am is None):
-        raise Exception('Failed to train model')
+    if(am is None): raise Exception('Model not found!')
 
     output = f'{output}/{am.name()}/'
 

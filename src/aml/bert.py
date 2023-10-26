@@ -7,6 +7,7 @@ import pandas as pd
 from aml.mdl import AbstractAspectModel
 from bert_e2e_absa import train, work
 from cmn.review import Review
+from params import settings
 
 #--------------------------------------------------------------------------------------------------
 # Typings
@@ -64,13 +65,8 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> N
     train, _ = convert_reviews_from_lady(original_reviews)
     dev, _ = convert_reviews_from_lady(original_reviews)
 
-    if not os.path.isdir(output): os.makedirs(output)
-
-    path_witout_end_dot = output[:-1]
-    os.mkdir(path_witout_end_dot)
-
     for h in range(0, 101, 10):
-        output = f'{path_witout_end_dot}/latency-{h}'
+        output = f'{output}/latency-{h}'
 
         if not os.path.isdir(output): os.makedirs(output)
 
@@ -80,18 +76,15 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> N
         with open(f'{output}/train.txt', 'w', encoding='utf-8') as file:
             for d in train: file.write(d + '\n')
 
-def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: int, output: str) -> None:
-    path_witout_end_dot = output[:-1]
-
-    if not os.path.isdir(output): raise Exception(f'Output path {output} does not exist')
+def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> None:
+    if not os.path.isdir(output): os.makedirs(output)
     
     _, labels = convert_reviews_from_lady(validation_reviews)
 
-
-    for h in range(0, h_ratio * 100 + 1, 10):
+    for h in range(0, int(h_ratio * 100 + 1), 10):
         hp = h / 100
 
-        path = f'{path_witout_end_dot}/latency-{h}'
+        path = f'{output}/latency-{h}'
 
         if not os.path.isdir(path): os.makedirs(path)
 
@@ -126,63 +119,54 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: int, ou
 class BERT(AbstractAspectModel):
     def __init__(self, naspects: int, nwords: int): 
         super().__init__(naspects, nwords)
+    
+    # TODO: Change this
+    def load(self, path):
+        raise FileNotFoundError('')
 
     def train(self,
               reviews_train: List[Review],
-              reviews_valid: Optional[List[Review]],
+              reviews_validation: Optional[List[Review]],
               am: str,
               doctype: Optional[str],
               no_extremes: Optional[bool],
               output: str
     ):
         try:
+            output = output[:-1]
+            cache_dir = f'{output}/cache'
+
+            if(not os.path.isdir(output)): os.makedirs(output)
+
             save_train_reviews_to_file(reviews_train, output)
 
-            args = {
-            'model_type': 'bert',
-            'absa_type': 'tfm',
-            'tfm_mode': 'finetune',
-            'fix_tfm': 0,
-            'model_name_or_path': 'bert-base-uncased',
-            'data_dir': output,
-            'task_name': 'lady',
-            'per_gpu_train_batch_size': 16,
-            'per_gpu_eval_batch_size': 8,
-            'learning_rate': 2e-5,
-            'do_train': True,
-            'do_eval': True,
-            'do_lower_case': True,
-            'tagging_schema': 'BIEOS',
-            'overfit': 0,
-            'overwrite_output_dir': True,
-            'eval_all_checkpoints': True,
-            'MASTER_ADDR': 'localhost',
-            'MASTER_PORT': 28512,
-            'max_steps': 1500
-            }
+            if (reviews_validation is None) or (len(reviews_validation) == 0): raise Exception('Validation set is empty')
 
-            model = train.main(Namespace(**args))
+            save_test_reviews_to_file(reviews_validation, settings['test']['h_ratio'],output)
 
-            pd.to_pickle(model, f'{output}model')
+            args = settings['train']['bert']
+
+            for h in range(0, 101, 10):
+                output_ = f'{output}/latency-{h}'
+
+                args['data_dir'] = output_
+                args['output_dir'] = output_
+
+                model = train.main(Namespace(**args))
+
+                pd.to_pickle(model, f'{output_}model')
+
+
         except Exception as e:
             raise RuntimeError(f'Error in training BERT model: {e}')
 
     def infer_batch(self, reviews_test, h_ratio, doctype, output):
-        save_test_reviews_to_file(reviews_test, h_ratio, output)
+        args = settings['train']['bert']
 
-        absa_home = 'CHANGE_ME'
-        args = {
-            # TODO: change this to the model directory
-            'absa_home': f'{absa_home}',
-            'ckpt': f'{absa_home}/checkpoint-1200',
-            'model_type': 'bert',
-            'data_dir': f'{output}',
-            'task_name': 'lady',
-            'model_name_or_path': 'bert-base-uncased',
-            'cache_dir': 'cache',
-            'max_seq_length': 128,
-            'tagging_schema': 'BIEOS'
-        }
+        args['data_dir'] = output
+        args['output_dir'] = output
+        args['absa_home'] = output
+        args['ckpt'] = f'{output}checkpoint-1200'
 
         pairs =  work.main(Namespace(**args))
 
