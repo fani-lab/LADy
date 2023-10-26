@@ -24,7 +24,6 @@ splits = split(len(reviews), output)
 am = Fast(naspects=5, nwords=params.settings['train']['nwords'])
 
 for f in splits['folds'].keys():
-    # TODO: bug fix - reduce the redundant preprocessing that adds too many label tags
     reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
     reviews_valid = np.array(reviews)[splits['folds'][f]['valid']].tolist()
     am.train(reviews_train, reviews_valid, params.settings['train']['fast'], 

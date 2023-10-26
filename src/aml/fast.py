@@ -1,3 +1,4 @@
+import copy
 import re
 from typing import List
 import numpy as np
@@ -10,10 +11,11 @@ from cmn.review import Review
 
 # Utility functions
 def add_label(r):
-    for i, s in enumerate(r.sentences):
+    r_ = copy.deepcopy(r)
+    for i, s in enumerate(r_.sentences):
         for j, _, _ in r.aos[i]: # j is the index of aspect words in sentence s
             for k in j: s[k] = "__label__" + s[k]
-    return r
+    return r_
 
 def review_formatted_file(path, corpus):
     with open(path, 'w') as f:
