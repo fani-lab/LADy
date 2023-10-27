@@ -5,7 +5,7 @@ import pandas as pd
 import fasttext
 import gensim
 
-from .mdl import AbstractAspectModel
+from .mdl import AbstractReviewAnalysisModel
 from cmn.review import Review
 
 # Utility functions
@@ -20,7 +20,7 @@ def review_formatted_file(path, corpus):
         for r in corpus: f.write(' '.join(r) + '\n')
 
 
-class Fast(AbstractAspectModel):
+class Fast(AbstractReviewAnalysisModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):
@@ -44,14 +44,14 @@ class Fast(AbstractAspectModel):
     
     @staticmethod
     def preprocess(doctype, reviews, settings=None):
-        if not AbstractAspectModel.stop_words:
+        if not AbstractReviewAnalysisModel.stop_words:
             import nltk
-            AbstractAspectModel.stop_words = nltk.corpus.stopwords.words('english')
+            AbstractReviewAnalysisModel.stop_words = nltk.corpus.stopwords.words('english')
     
         reviews_ = []
         if doctype == 'rvw': reviews_ = [np.concatenate(add_label(r).sentences) for r in reviews]
         elif doctype == 'snt': reviews_ = [s for r in reviews for s in add_label(r).sentences]
-        reviews_ = [[word for word in doc if word not in AbstractAspectModel.stop_words and len(word) > 3 
+        reviews_ = [[word for word in doc if word not in AbstractReviewAnalysisModel.stop_words and len(word) > 3 
                      and (re.match('[a-zA-Z]+', word) or re.search('__label__', word))] for doc in reviews_]
         dict = gensim.corpora.Dictionary(reviews_)
         if settings: dict.filter_extremes(no_below=settings['no_below'], no_above=settings['no_above'], keep_n=100000)

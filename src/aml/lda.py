@@ -2,7 +2,7 @@ import gensim, logging, pandas as pd
 
 from gensim.models.coherencemodel import CoherenceModel
 
-from .mdl import AbstractAspectModel
+from .mdl import AbstractReviewAnalysisModel
 
 # @inproceedings{DBLP:conf/naacl/BrodyE10,
 #   author       = {Samuel Brody and Noemie Elhadad},
@@ -14,7 +14,7 @@ from .mdl import AbstractAspectModel
 #   url          = {https://aclanthology.org/N10-1122/},
 #   biburl       = {https://dblp.org/rec/conf/naacl/BrodyE10.bib},
 # }
-class Lda(AbstractAspectModel):
+class Lda(AbstractReviewAnalysisModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):

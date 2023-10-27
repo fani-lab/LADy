@@ -9,10 +9,10 @@ from octis.preprocessing.preprocessing import Preprocessing
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 from octis.evaluation_metrics.coherence_metrics import Coherence
 
-from .mdl import AbstractAspectModel
+from .mdl import AbstractReviewAnalysisModel
 from cmn.review import Review
 
-class Nrl(AbstractAspectModel):
+class Nrl(AbstractReviewAnalysisModel):
     def __init__(self, octis_mdl, naspects, nwords, metrics):
         super().__init__(naspects, nwords)
         self.mdl = octis_mdl

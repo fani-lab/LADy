@@ -4,8 +4,8 @@ import os, re, random
 from argparse import Namespace
 import pandas as pd
 
-from aml.mdl import AbstractAspectModel
-from bert_e2e_absa import train, work
+from aml.mdl import AbstractReviewAnalysisModel, ExtractionCapabilities
+from bert_e2e_absa import work, main as train
 from cmn.review import Review
 from params import settings
 
@@ -23,6 +23,12 @@ class Split(TypedDict):
 #--------------------------------------------------------------------------------------------------
 # Utilities
 #--------------------------------------------------------------------------------------------------
+
+def write_list_to_file(path: str, data: List[str]) -> None:
+    with open(file=path, mode='w', encoding='utf-8') as file:
+        for d in data: file.write(d + '\n')
+
+
 def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str], List[List[str]]]:
     reviews_list = []
     label_list = []
@@ -61,24 +67,25 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     return reviews_list, label_list
 
 
-def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> None:
+def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> List[str]:
     train, _ = convert_reviews_from_lady(original_reviews)
-    dev, _ = convert_reviews_from_lady(original_reviews)
 
-    for h in range(0, 101, 10):
-        output = f'{output}/latency-{h}'
+    write_list_to_file(f'{output}/dev.txt', train)
+    write_list_to_file(f'{output}/train.txt', train)
+    
+    return train
+    # for h in range(0, 101, 10):
+    #     path = f'{output}/latency-{h}'
 
-        if not os.path.isdir(output): os.makedirs(output)
+    #     if not os.path.isdir(path): os.makedirs(path)
 
-        with open(f'{output}/dev.txt', 'w', encoding='utf-8') as file:
-            for d in dev: file.write(d + '\n')
+    #     with open(f'{path}/dev.txt', 'w', encoding='utf-8') as file:
+    #         for d in dev: file.write(d + '\n')
 
-        with open(f'{output}/train.txt', 'w', encoding='utf-8') as file:
-            for d in train: file.write(d + '\n')
+    #     with open(f'{path}/train.txt', 'w', encoding='utf-8') as file:
+    #         for d in train: file.write(d + '\n')
 
 def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> None:
-    if not os.path.isdir(output): os.makedirs(output)
-    
     _, labels = convert_reviews_from_lady(validation_reviews)
 
     for h in range(0, int(h_ratio * 100 + 1), 10):
@@ -97,8 +104,7 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
 
         preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
 
-        with open(f'{path}/test.txt', 'w', encoding='utf-8') as file:
-            for d in preprocessed_test: file.write(d + '\n')
+        write_list_to_file(f'{path}/test.txt', preprocessed_test)
 
         pd.to_pickle(labels, f'{path}/test-labels.pk')
 #--------------------------------------------------------------------------------------------------
@@ -116,9 +122,11 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
 #   url          = {https://doi.org/10.1145/2488388.2488514},
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
-class BERT(AbstractAspectModel):
-    def __init__(self, naspects: int, nwords: int): 
-        super().__init__(naspects, nwords)
+class BERT(AbstractReviewAnalysisModel):
+    capabilities: ExtractionCapabilities  = ['aspect_detection', 'sentiment_analysis']
+
+    def __init__(self, naspects, nwords): 
+        super().__init__(naspects, nwords, self.capabilities)
     
     # TODO: Change this
     def load(self, path):
@@ -134,7 +142,6 @@ class BERT(AbstractAspectModel):
     ):
         try:
             output = output[:-1]
-            cache_dir = f'{output}/cache'
 
             if(not os.path.isdir(output)): os.makedirs(output)
 
@@ -146,15 +153,17 @@ class BERT(AbstractAspectModel):
 
             args = settings['train']['bert']
 
-            for h in range(0, 101, 10):
-                output_ = f'{output}/latency-{h}'
+            args['data_dir'] = output
 
-                args['data_dir'] = output_
-                args['output_dir'] = output_
+            args['output_dir'] = output
+            # for h in range(0, 101, 10):
+            #     output_ = f'{output}/latency-{h}'
 
-                model = train.main(Namespace(**args))
+            #     args['data_dir'] = output_
 
-                pd.to_pickle(model, f'{output_}model')
+            model = train.main(Namespace(**args))
+
+            pd.to_pickle(model, f'{output}.model')
 
 
         except Exception as e:

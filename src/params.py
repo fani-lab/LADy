@@ -38,13 +38,13 @@ settings = {
             'tfm_mode': 'finetune',
             'fix_tfm': 0,
             'model_name_or_path': 'bert-base-uncased',
-            'data_dir': '#dynamic_value__bert_py',
+            'data_dir': '/output/run', # This param will updated dynamically in bert.py
             'task_name': 'lady',
             'per_gpu_train_batch_size': 16,
             'per_gpu_eval_batch_size': 8,
             'learning_rate': 2e-5,
             'do_train': True,
-            'do_eval': False,
+            'do_eval': True,
             'do_lower_case': True,
             'tagging_schema': 'BIEOS',
             'overfit': 0,
@@ -52,7 +52,7 @@ settings = {
             'eval_all_checkpoints': True,
             'MASTER_ADDR': 'localhost',
             'MASTER_PORT': 28512,
-            'max_steps': 1500,
+            'max_steps': 1200,
             'gradient_accumulation_steps': 1,
             'weight_decay': 0.0,
             'adam_epsilon': 1e-8,
@@ -72,10 +72,10 @@ settings = {
             
 
             # test values
-            'absa_home': '#dynamic_value__bert_py',
-            'output_dir': '#dynamic_value__bert_py',
-            'ckpt': '#dynamic_value__bert_py/checkpoint-1200',
-            'cache_dir': 'cache',
+            'absa_home': '/output/run/', # This param will updated dynamically in bert.py
+            'output_dir': '/output/run/', # This param will updated dynamically in bert.py
+            'ckpt': '/checkpoint-1200', # This param will updated dynamically in bert.py
+            'cache_dir': 'bert_cache',
             'max_seq_length': 128,
         },
         'fast': {'epoch': 1000, 'loss': 'ova'}, # ova use independent binary classifiers for each label for multi-label classification

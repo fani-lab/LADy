@@ -1,7 +1,7 @@
 import logging, pickle, pandas as pd, random
 import bitermplus as btm, gensim
 
-from .mdl import AbstractAspectModel
+from .mdl import AbstractReviewAnalysisModel
 
 # @inproceedings{DBLP:conf/www/YanGLC13,
 #   author       = {Xiaohui Yan and Jiafeng Guo and Yanyan Lan and Xueqi Cheng},
@@ -13,7 +13,7 @@ from .mdl import AbstractAspectModel
 #   url          = {https://doi.org/10.1145/2488388.2488514},
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
-class Btm(AbstractAspectModel):
+class Btm(AbstractReviewAnalysisModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):

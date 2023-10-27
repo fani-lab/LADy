@@ -22,10 +22,10 @@ import nltk
 stop_words = nltk.corpus.stopwords.words('english')
 
 import params
-from .mdl import AbstractAspectModel
+from .mdl import AbstractReviewAnalysisModel
 
 
-class Neural(AbstractAspectModel):
+class Neural(AbstractReviewAnalysisModel):
     def __init__(self, reviews, naspects, no_extremes, output):
         super().__init__(reviews, naspects, no_extremes, output)
 
