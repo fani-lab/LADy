@@ -69,13 +69,14 @@ settings = {
             'config_name': '',
             'tokenizer_name': '',
             'evaluate_during_training': False,
-            
+            'eval_on_testset_after_training': False,
+            'no_eval_on_testset_after_training': True,
+            'cache_dir': 'bert_cache', # This param will updated dynamically in bert.py
 
             # test values
             'absa_home': '/output/run/', # This param will updated dynamically in bert.py
             'output_dir': '/output/run/', # This param will updated dynamically in bert.py
             'ckpt': '/checkpoint-1200', # This param will updated dynamically in bert.py
-            'cache_dir': 'bert_cache',
             'max_seq_length': 128,
         },
         'fast': {'epoch': 1000, 'loss': 'ova'}, # ova use independent binary classifiers for each label for multi-label classification
