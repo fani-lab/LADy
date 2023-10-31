@@ -1,10 +1,9 @@
 from typing import Optional, Tuple, List, TypedDict, Dict
-from itertools import chain 
 import os, re, random
 from argparse import Namespace
 import pandas as pd
 
-from aml.mdl import AbstractReviewAnalysisModel, ExtractionCapabilities
+from aml.mdl import AbstractReviewAnalysisModel, ExtractionCapabilities, flatten
 from bert_e2e_absa import work, main as train
 from cmn.review import Review
 from params import settings
@@ -125,12 +124,19 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
 class BERT(AbstractReviewAnalysisModel):
     capabilities: ExtractionCapabilities  = ['aspect_detection', 'sentiment_analysis']
 
+    _output_dir_name = 'bert-train' # output dir should contain any train | finetune | fix | overfit
+    _data_dir_name   = 'data'
+
     def __init__(self, naspects, nwords): 
         super().__init__(naspects, nwords, self.capabilities)
     
-    # TODO: Change this
     def load(self, path):
-        raise FileNotFoundError('')
+        path = path[:-1] + f'/{self._data_dir_name}/{self._output_dir_name}/pytorch_model.bin'
+
+        if os.path.isfile(path):
+            pass
+        else:
+            raise FileNotFoundError(f'Model not found for path: {path}')
 
     def train(self,
               reviews_train: List[Review],
@@ -142,24 +148,17 @@ class BERT(AbstractReviewAnalysisModel):
     ):
         try:
             output = output[:-1]
+            data_dir = output + f'/{self._data_dir_name}'
 
-            if(not os.path.isdir(output)): os.makedirs(output)
+            if(not os.path.isdir(data_dir)): os.makedirs(data_dir)
 
-            save_train_reviews_to_file(reviews_train, output)
-
-            if (reviews_validation is None) or (len(reviews_validation) == 0): raise Exception('Validation set is empty')
-
-            save_test_reviews_to_file(reviews_validation, settings['test']['h_ratio'],output)
+            save_train_reviews_to_file(reviews_train, data_dir)
 
             args = settings['train']['bert']
 
-            args['data_dir'] = output
+            args['data_dir'] = data_dir
 
-            args['output_dir'] = output
-            # for h in range(0, 101, 10):
-            #     output_ = f'{output}/latency-{h}'
-
-            #     args['data_dir'] = output_
+            args['output_dir'] = data_dir + f'/{self._output_dir_name}'
 
             model = train.main(Namespace(**args))
 
@@ -170,18 +169,30 @@ class BERT(AbstractReviewAnalysisModel):
             raise RuntimeError(f'Error in training BERT model: {e}')
 
     def infer_batch(self, reviews_test, h_ratio, doctype, output):
+        output        = f'{output}/{self._data_dir_name}'
+        test_data_dir = output + '/tests'
+        output_dir    = output + f'/{self._output_dir_name}'
+
         args = settings['train']['bert']
 
-        args['data_dir'] = output
-        args['output_dir'] = output
-        args['absa_home'] = output
-        args['ckpt'] = f'{output}checkpoint-1200'
+        save_test_reviews_to_file(reviews_test, settings['test']['h_ratio'], test_data_dir)
 
-        pairs =  work.main(Namespace(**args))
+        args['output_dir'] = output_dir
+        args['absa_home'] = output_dir
+        args['ckpt'] = f'{output_dir}/checkpoint-1200'
 
-        gold_targets = pairs['gold_targets']
-        unique_predictions = pairs['unique_predictions']
-        flattened_unique_predictions = list(chain(*unique_predictions))
+        pairs = []
 
-        return (gold_targets, flattened_unique_predictions)
+        for h in range(0, int(h_ratio * 100 + 1), 10):
+            path = f'{test_data_dir}/latency-{h}'
+
+            args['data_dir'] = path 
+            result =  work.main(Namespace(**args))
+
+            gold_targets = result['gold_targets']
+            unique_predictions = result['unique_predictions']
+
+            pairs.append((flatten(gold_targets), flatten(unique_predictions)))
+
+        return pairs
 

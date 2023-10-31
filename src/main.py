@@ -129,7 +129,7 @@ def test(am, test, f, output: str):
         print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
         am.load(f'{output}/f{f}.')
         print('3.3. Testing aspect model ...')
-        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=output)
+        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=f'{output}/f{f}')
         pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
 
 
