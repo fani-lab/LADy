@@ -8,9 +8,9 @@ from contextualized_topic_models.utils.preprocessing import WhiteSpacePreprocess
 from contextualized_topic_models.evaluation.measures import CoherenceUMASS
 
 from cmn.review import Review
-from .mdl import AbstractReviewAnalysisModel, BatchPairsType
+from .mdl import AbstractAspectModel, BatchPairsType
 
-class Ctm(AbstractReviewAnalysisModel):
+class Ctm(AbstractAspectModel):
     def __init__(self, naspects, nwords, contextual_size, nsamples):
         super().__init__(naspects, nwords)
         self.contextual_size = contextual_size

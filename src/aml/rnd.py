@@ -1,8 +1,8 @@
 import gensim, pandas as pd, random
 
-from .mdl import AbstractReviewAnalysisModel
+from .mdl import AbstractAspectModel
 
-class Rnd(AbstractReviewAnalysisModel):
+class Rnd(AbstractAspectModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):

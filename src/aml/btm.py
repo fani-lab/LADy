@@ -1,7 +1,7 @@
-import logging, pickle, pandas as pd, random
-import bitermplus as btm, gensim
+import logging, pandas as pd, random
+import bitermplus as btm
 
-from .mdl import AbstractReviewAnalysisModel
+from .mdl import AbstractAspectModel
 
 # @inproceedings{DBLP:conf/www/YanGLC13,
 #   author       = {Xiaohui Yan and Jiafeng Guo and Yanyan Lan and Xueqi Cheng},
@@ -13,7 +13,7 @@ from .mdl import AbstractReviewAnalysisModel
 #   url          = {https://doi.org/10.1145/2488388.2488514},
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
-class Btm(AbstractReviewAnalysisModel):
+class Btm(AbstractAspectModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):
@@ -28,7 +28,7 @@ class Btm(AbstractReviewAnalysisModel):
         corpus = [' '.join(doc) for doc in corpus]
 
         logging.getLogger().handlers.clear()
-        logging.basicConfig(filename=f'{output}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
+        logging.basicConfig(filename=f'{output}model.train.log', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.NOTSET)
         # doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(corpus)
         doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(corpus, **{'vocabulary': self.dict.token2id})
         docs_vec = btm.get_vectorized_docs(corpus, self.dict)

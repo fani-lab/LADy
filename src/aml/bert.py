@@ -3,8 +3,11 @@ import os, re, random
 from argparse import Namespace
 import pandas as pd
 
-from aml.mdl import AbstractReviewAnalysisModel, ExtractionCapabilities, flatten
 from bert_e2e_absa import work, main as train
+from bert_e2e_absa.work import Aspect_With_Sentiment
+
+from utils import remove_duplicates_from_list, flatten
+from aml.mdl import AbstractSentimentModel, ExtractionCapabilities, AbstractAspectModel
 from cmn.review import Review
 from params import settings
 
@@ -23,10 +26,12 @@ class Split(TypedDict):
 # Utilities
 #--------------------------------------------------------------------------------------------------
 
+def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment):
+    return x['aspect'] == y['aspect'] and x['indices'][0] == x['indices'][0] and x['indices'][1] == y['indices'][1]
+
 def write_list_to_file(path: str, data: List[str]) -> None:
     with open(file=path, mode='w', encoding='utf-8') as file:
         for d in data: file.write(d + '\n')
-
 
 def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str], List[List[str]]]:
     reviews_list = []
@@ -64,7 +69,6 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
             label_list.append(aos_list_per_review)
 
     return reviews_list, label_list
-
 
 def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> List[str]:
     train, _ = convert_reviews_from_lady(original_reviews)
@@ -106,6 +110,7 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
         write_list_to_file(f'{path}/test.txt', preprocessed_test)
 
         pd.to_pickle(labels, f'{path}/test-labels.pk')
+
 #--------------------------------------------------------------------------------------------------
 # Class Definition
 #--------------------------------------------------------------------------------------------------
@@ -121,14 +126,14 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
 #   url          = {https://doi.org/10.1145/2488388.2488514},
 #   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
 # }
-class BERT(AbstractReviewAnalysisModel):
+class BERT(AbstractAspectModel, AbstractSentimentModel):
     capabilities: ExtractionCapabilities  = ['aspect_detection', 'sentiment_analysis']
 
     _output_dir_name = 'bert-train' # output dir should contain any train | finetune | fix | overfit
     _data_dir_name   = 'data'
 
     def __init__(self, naspects, nwords): 
-        super().__init__(naspects, nwords, self.capabilities)
+        super().__init__(naspects=naspects, nwords=nwords, capabilities=self.capabilities)
     
     def load(self, path):
         path = path[:-1] + f'/{self._data_dir_name}/{self._output_dir_name}/pytorch_model.bin'
@@ -182,6 +187,7 @@ class BERT(AbstractReviewAnalysisModel):
         args['ckpt'] = f'{output_dir}/checkpoint-1200'
 
         pairs = []
+        aspects: List[List[Aspect_With_Sentiment]] = []
 
         for h in range(0, int(h_ratio * 100 + 1), 10):
             path = f'{test_data_dir}/latency-{h}'
@@ -191,8 +197,11 @@ class BERT(AbstractReviewAnalysisModel):
 
             gold_targets = result['gold_targets']
             unique_predictions = result['unique_predictions']
+            aspects.append(result['aspects'])
 
             pairs.append((flatten(gold_targets), flatten(unique_predictions)))
 
+            
+        unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
+        print(unique_aspects[0]['aspect'])
         return pairs
-
