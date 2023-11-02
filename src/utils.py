@@ -1,6 +1,10 @@
 import operator
 import functools
-from typing import Callable, List, TypeVar
+from typing import Callable, List, TypeVar, Optional
+from more_itertools import first_true
+from returns import maybe, pipeline
+from returns.pipeline import pipe
+from returns.curry import curry
 
 T = TypeVar('T')
 
@@ -30,3 +34,5 @@ def flatten(xs: List[List[T]] ) -> List[T]:
         List[T]: Flattened
     """
     return functools.reduce(operator.iconcat, xs, [])
+
+def find_first(xs: List[T], compare: Callable[[T], bool]) -> Optional[T]:  return first_true(xs, default=None, pred=compare)

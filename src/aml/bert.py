@@ -1,19 +1,29 @@
-from typing import Optional, Tuple, List
+from typing import Literal, Optional, Tuple, List
 import os, re, random
 from argparse import Namespace
 import pandas as pd
+import pampy
 
 from bert_e2e_absa import work, main as train
 from bert_e2e_absa.work import Aspect_With_Sentiment
 
 from utils import remove_duplicates_from_list, flatten
-from aml.mdl import AbstractSentimentModel, ExtractionCapabilities, AbstractAspectModel
-from cmn.review import Review
+from aml.mdl import AbstractSentimentModel, AspectId, ExtractionCapabilities, AbstractAspectModel
+from cmn.review import Review, Sentiment
 from params import settings
 
 #--------------------------------------------------------------------------------------------------
 # Utilities
 #--------------------------------------------------------------------------------------------------
+
+def sentiment_from_number(sentiment: Sentiment) -> Literal:
+    return pampy.match(sentiment,
+        1 , 'POS',
+        0 , 'NEU',
+        -1, 'NEG',
+        pampy._, Exception('Not a valid sentiment number')
+    )
+    
 
 def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment) -> bool:
     return x.aspect == y.aspect and x.indices[0] == x.indices[0] and x.indices[1] == y.indices[1]
@@ -32,14 +42,19 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     for r in original_reviews:
         if not len(r.aos[0]): continue
         else:
-            aspect_ids = []
+            aspects: dict[AspectId, Sentiment] = {}
 
-            for aos_instance in r.aos[0]: aspect_ids.extend(aos_instance[0])
+            for aos_instance in r.aos[0]: 
+                aspect, _, sentiment = aos_instance
+
+                aspects.update(aspect, sentiment)
 
             text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
 
             for idx, word in enumerate(r.sentences[0]):
-                if idx in aspect_ids:
+                if idx in aspects.keys():
+                    # T-NEG T-POS T-NEU
+                    sentiemnt = aspects[idx]
                     tag = word + '=T-POS' + ' '
                     text += tag
                 else:
@@ -53,7 +68,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
             aos_list_per_review = []
 
             for idx, word in enumerate(r.sentences[0]):
-                if idx in aspect_ids: aos_list_per_review.append(word)
+                if idx in aspects: aos_list_per_review.append(word)
 
             label_list.append(aos_list_per_review)
 
@@ -80,25 +95,22 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> L
 def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> None:
     _, labels = convert_reviews_from_lady(validation_reviews)
 
-    for h in range(0, int(h_ratio * 100 + 1), 10):
-        hp = h / 100
+    path = f'{output}/latency-{h_ratio}'
 
-        path = f'{output}/latency-{h}'
+    if not os.path.isdir(path): os.makedirs(path)
 
-        if not os.path.isdir(path): os.makedirs(path)
+    test_hidden = []
 
-        test_hidden = []
+    for t in range(len(validation_reviews)):
+        if random.random() < h_ratio:
+            test_hidden.append(validation_reviews[t].hide_aspects(mask='z', mask_size=5))
+        else: test_hidden.append(validation_reviews[t])
 
-        for t in range(len(validation_reviews)):
-            if random.random() < hp:
-                test_hidden.append(validation_reviews[t].hide_aspects(mask='z', mask_size=5))
-            else: test_hidden.append(validation_reviews[t])
+    preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
 
-        preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
+    write_list_to_file(f'{path}/test.txt', preprocessed_test)
 
-        write_list_to_file(f'{path}/test.txt', preprocessed_test)
-
-        pd.to_pickle(labels, f'{path}/test-labels.pk')
+    pd.to_pickle(labels, f'{path}/test-labels.pk')
 
 #--------------------------------------------------------------------------------------------------
 # Class Definition
@@ -169,7 +181,7 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
         args = settings['train']['bert']
 
-        save_test_reviews_to_file(reviews_test, settings['test']['h_ratio'], test_data_dir)
+        save_test_reviews_to_file(reviews_test, h_ratio, test_data_dir)
 
         args['output_dir'] = output_dir
         args['absa_home'] = output_dir
@@ -178,20 +190,20 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
         pairs = []
         aspects: List[List[Aspect_With_Sentiment]] = []
 
-        for h in range(0, int(h_ratio * 100 + 1), 10):
-            path = f'{test_data_dir}/latency-{h}'
+        path = f'{test_data_dir}/latency-{h_ratio}'
 
-            args['data_dir'] = path 
-            result = work.main(Namespace(**args))
+        args['data_dir'] = path 
+        result = work.main(Namespace(**args))
 
-            pair = (flatten(result.gold_targets), flatten(result.unique_predictions))
+        pair = (flatten(result.gold_targets), flatten(result.unique_predictions))
 
-            pairs.append(pair)
-            aspects.append(result.aspects)
+        pairs.append(pair)
+        aspects.append(result.aspects)
 
             
         unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
         print(unique_aspects)
+        print(pairs)
 
         return pairs
     

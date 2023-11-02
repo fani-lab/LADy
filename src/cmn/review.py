@@ -7,9 +7,11 @@ from scipy.spatial.distance import cosine
 # Typings
 # ---------------------------------------------------------------------------------------
 Sentiment = Union[Literal[-1], Literal[0], Literal[1]]
+Aspect = str
+Opinion = str
 AspectOpinionSentiment = Tuple[
-                                List[int],
-                                List[int],
+                                Aspect,
+                                Opinion,
                                 Sentiment
                             ]
 

@@ -28,6 +28,9 @@ bert-e2e-absa = { git = "https://github.com/fani-lab/BERT-E2E-ABSA.git" }
 flask-cors = "^4.0.0"
 flask = "^3.0.0"
 torch = { version = "1.13.1", source = "pytorch" }
+pampy = "^0.3.0"
+more-itertools = "^10.1.0"
+returns = "^0.22.0"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.22.1"
