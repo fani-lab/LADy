@@ -1,4 +1,4 @@
-from ast import operator
+import operator
 import functools
 from typing import Callable, List, TypeVar
 

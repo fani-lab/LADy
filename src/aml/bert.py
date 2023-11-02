@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List, TypedDict, Dict
+from typing import Optional, Tuple, List
 import os, re, random
 from argparse import Namespace
 import pandas as pd
@@ -12,22 +12,11 @@ from cmn.review import Review
 from params import settings
 
 #--------------------------------------------------------------------------------------------------
-# Typings
-#--------------------------------------------------------------------------------------------------
-class FoldItem(TypedDict):
-    train: List[int]
-    valid: List[int]
-
-class Split(TypedDict):
-    folds: Dict[str, FoldItem]
-    test: List[int]
-
-#--------------------------------------------------------------------------------------------------
 # Utilities
 #--------------------------------------------------------------------------------------------------
 
-def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment):
-    return x['aspect'] == y['aspect'] and x['indices'][0] == x['indices'][0] and x['indices'][1] == y['indices'][1]
+def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment) -> bool:
+    return x.aspect == y.aspect and x.indices[0] == x.indices[0] and x.indices[1] == y.indices[1]
 
 def write_list_to_file(path: str, data: List[str]) -> None:
     with open(file=path, mode='w', encoding='utf-8') as file:
@@ -193,15 +182,16 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
             path = f'{test_data_dir}/latency-{h}'
 
             args['data_dir'] = path 
-            result =  work.main(Namespace(**args))
+            result = work.main(Namespace(**args))
 
-            gold_targets = result['gold_targets']
-            unique_predictions = result['unique_predictions']
-            aspects.append(result['aspects'])
+            pair = (flatten(result.gold_targets), flatten(result.unique_predictions))
 
-            pairs.append((flatten(gold_targets), flatten(unique_predictions)))
+            pairs.append(pair)
+            aspects.append(result.aspects)
 
             
         unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
-        print(unique_aspects[0]['aspect'])
+        print(unique_aspects)
+
         return pairs
+    
