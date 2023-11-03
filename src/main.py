@@ -207,6 +207,7 @@ def main(args):
     if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
     if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
     if 'bert' == args.am: from aml.bert import BERT; am = BERT(args.naspects, params.settings['train']['nwords'])
+    if 'fast' == args.am: from aml.fast import Fast; am = Fast(args.naspects, params.settings['train']['nwords'])
     if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
     if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
