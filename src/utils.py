@@ -34,7 +34,7 @@ def flatten(xs: List[List[T]] ) -> List[T]:
     return functools.reduce(operator.iconcat, xs, [])
 
 def find_first(xs: List[T], prediction: Callable[[T], bool]) -> Maybe[T]:
-    """ Find first occurence in the list of T by prediction function 
+    """ Find first occurrence in the list of T by prediction function 
 
     Args: 
         xs (List[T])

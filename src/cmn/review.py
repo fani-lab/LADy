@@ -75,7 +75,7 @@ class Review(object):
 
     def get_txt(self): return '. '.join(' '.join(s) for s in self.sentences)
 
-    def hide_aspects(self, mask="#", mask_size=5):
+    def hide_aspects(self, mask='#', mask_size=5):
         r = copy.deepcopy(self)
         for i, sent in enumerate(r.sentences):
             # [sent.pop(k) for j, _, _ in r.aos[i] for k in j]

@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Tuple, List, cast
+from typing import Literal, Optional, Tuple, List, Dict
 import os, re, random
 from argparse import Namespace
 import pandas as pd
@@ -16,7 +16,6 @@ from params import settings
 #--------------------------------------------------------------------------------------------------
 # Utilities
 #--------------------------------------------------------------------------------------------------
-
 def raise_exception(exception: str):
     raise Exception(exception)
 
@@ -29,7 +28,9 @@ def sentiment_from_number(sentiment: int) -> Maybe[Literal['POS', 'NEU', 'NEG']]
                 ) # type: ignore
 
 def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment) -> bool:
-    return x.aspect == y.aspect and x.indices[0] == x.indices[0] and x.indices[1] == y.indices[1]
+    return x.aspect == y.aspect \
+           and x.indices[0] == x.indices[0] \
+           and x.indices[1] == y.indices[1]
 
 def write_list_to_file(path: str, data: List[str]) -> None:
     with open(file=path, mode='w', encoding='utf-8') as file:
@@ -45,7 +46,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     for r in original_reviews:
         if not len(r.aos[0]): continue
         else:
-            aspects: dict[AspectId, Sentiment] = dict()
+            aspects: Dict[AspectId, Sentiment] = dict()
 
             for aos_instance in r.aos[0]: 
                 aspect_ids, _, sentiment = aos_instance
@@ -57,7 +58,8 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
 
             for idx, word in enumerate(r.sentences[0]):
                 if idx in list(aspects.keys()):
-                    sentiment = sentiment_from_number(aspects[idx]).or_else_call(lambda : raise_exception('Invalid Sentiment input'))
+                    sentiment = sentiment_from_number(aspects[idx]) \
+                                .or_else_call(lambda : raise_exception('Invalid Sentiment input'))
 
                     tag = word + f'=T-{sentiment}' + ' '
                     text += tag
@@ -95,10 +97,10 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
 
     test_hidden = []
 
-    for t in range(len(validation_reviews)):
+    for index in range(len(validation_reviews)):
         if random.random() < h_ratio:
-            test_hidden.append(validation_reviews[t].hide_aspects(mask='z', mask_size=5))
-        else: test_hidden.append(validation_reviews[t])
+            test_hidden.append(validation_reviews[index].hide_aspects(mask='z', mask_size=5))
+        else: test_hidden.append(validation_reviews[index])
 
     preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
 
@@ -164,7 +166,6 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
             pd.to_pickle(model, f'{output}.model')
 
-
         except Exception as e:
             raise RuntimeError(f'Error in training BERT model: {e}')
 
@@ -175,11 +176,11 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
         args = settings['train']['bert']
 
-        save_test_reviews_to_file(reviews_test, h_ratio, test_data_dir)
-
         args['output_dir'] = output_dir
-        args['absa_home'] = output_dir
-        args['ckpt'] = f'{output_dir}/checkpoint-1200'
+        args['absa_home']  = output_dir
+        args['ckpt']       = f'{output_dir}/checkpoint-1200'
+
+        save_test_reviews_to_file(reviews_test, h_ratio, test_data_dir)
 
         pairs = []
         aspects: List[List[Aspect_With_Sentiment]] = []
@@ -196,8 +197,8 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
             
         unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
-        # print(unique_aspects)
-        # print(pairs)
+        print(unique_aspects)
+        print(pairs)
 
         return pairs
     
