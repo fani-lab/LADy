@@ -1,8 +1,9 @@
-from typing import Literal, Optional, Tuple, List
+from typing import Literal, Optional, Tuple, List, cast
 import os, re, random
 from argparse import Namespace
 import pandas as pd
 import pampy
+from returns.maybe import Maybe, Some, Nothing
 
 from bert_e2e_absa import work, main as train
 from bert_e2e_absa.work import Aspect_With_Sentiment
@@ -16,14 +17,16 @@ from params import settings
 # Utilities
 #--------------------------------------------------------------------------------------------------
 
-def sentiment_from_number(sentiment: Sentiment) -> Literal:
-    return pampy.match(sentiment,
-        1 , 'POS',
-        0 , 'NEU',
-        -1, 'NEG',
-        pampy._, Exception('Not a valid sentiment number')
-    )
-    
+def raise_exception(exception: str):
+    raise Exception(exception)
+
+def sentiment_from_number(sentiment: int) -> Maybe[Literal['POS', 'NEU', 'NEG']]:
+    return pampy.match(int(sentiment),
+                    1 , Some('POS'),
+                    0 , Some('NEU'),
+                    -1, Some('NEG'),
+                    pampy._, Nothing
+                ) # type: ignore
 
 def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment) -> bool:
     return x.aspect == y.aspect and x.indices[0] == x.indices[0] and x.indices[1] == y.indices[1]
@@ -42,20 +45,21 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     for r in original_reviews:
         if not len(r.aos[0]): continue
         else:
-            aspects: dict[AspectId, Sentiment] = {}
+            aspects: dict[AspectId, Sentiment] = dict()
 
             for aos_instance in r.aos[0]: 
-                aspect, _, sentiment = aos_instance
+                aspect_ids, _, sentiment = aos_instance
 
-                aspects.update(aspect, sentiment)
+                for aspect_id in aspect_ids:
+                    aspects[aspect_id] = sentiment
 
             text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
 
             for idx, word in enumerate(r.sentences[0]):
-                if idx in aspects.keys():
-                    # T-NEG T-POS T-NEU
-                    sentiemnt = aspects[idx]
-                    tag = word + '=T-POS' + ' '
+                if idx in list(aspects.keys()):
+                    sentiment = sentiment_from_number(aspects[idx]).or_else_call(lambda : raise_exception('Invalid Sentiment input'))
+
+                    tag = word + f'=T-{sentiment}' + ' '
                     text += tag
                 else:
                     tag = word + '=O' + ' '
@@ -81,16 +85,6 @@ def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> L
     write_list_to_file(f'{output}/train.txt', train)
     
     return train
-    # for h in range(0, 101, 10):
-    #     path = f'{output}/latency-{h}'
-
-    #     if not os.path.isdir(path): os.makedirs(path)
-
-    #     with open(f'{path}/dev.txt', 'w', encoding='utf-8') as file:
-    #         for d in dev: file.write(d + '\n')
-
-    #     with open(f'{path}/train.txt', 'w', encoding='utf-8') as file:
-    #         for d in train: file.write(d + '\n')
 
 def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> None:
     _, labels = convert_reviews_from_lady(validation_reviews)
@@ -202,8 +196,8 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
             
         unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
-        print(unique_aspects)
-        print(pairs)
+        # print(unique_aspects)
+        # print(pairs)
 
         return pairs
     

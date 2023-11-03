@@ -1,10 +1,8 @@
 import operator
 import functools
-from typing import Callable, List, TypeVar, Optional
+from typing import Callable, List, TypeVar
 from more_itertools import first_true
-from returns import maybe, pipeline
-from returns.pipeline import pipe
-from returns.curry import curry
+from returns.maybe import Maybe
 
 T = TypeVar('T')
 
@@ -35,4 +33,15 @@ def flatten(xs: List[List[T]] ) -> List[T]:
     """
     return functools.reduce(operator.iconcat, xs, [])
 
-def find_first(xs: List[T], compare: Callable[[T], bool]) -> Optional[T]:  return first_true(xs, default=None, pred=compare)
+def find_first(xs: List[T], prediction: Callable[[T], bool]) -> Maybe[T]:
+    """ Find first occurence in the list of T by prediction function 
+
+    Args: 
+        xs (List[T])
+        prediction: determine if the element is the one that we want given an item and returns boolean
+
+
+    Return:
+        Maybe[T]: maybe found or not
+    """
+    return Maybe.from_optional(first_true(xs, default=None, pred=prediction))
