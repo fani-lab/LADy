@@ -6,7 +6,7 @@ import pandas as pd
 import fasttext
 import gensim
 
-from .mdl import AbstractAspectModel
+from .mdl import AbstractAspectModel, AspectPairType, BatchPairsType
 from cmn.review import Review
 
 # Utility functions
@@ -62,3 +62,14 @@ class Fast(AbstractAspectModel):
         if settings: dict.filter_extremes(no_below=settings['no_below'], no_above=settings['no_above'], keep_n=100000)
         dict.compactify()
         return reviews_, dict
+    
+    def merge_aspects_words(self, r_pred_aspects, nwords):
+        result: List[List[AspectPairType]] = []
+
+        subr_pred_aspects = r_pred_aspects[0]
+        subr_pred_probs = r_pred_aspects[1]
+
+        for i in range(len(subr_pred_aspects)):
+            result.append(sorted(zip(subr_pred_aspects[i], subr_pred_probs[i]), reverse=True, key=lambda t: t[1]))
+
+        return result
