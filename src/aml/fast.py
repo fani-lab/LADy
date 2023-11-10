@@ -26,10 +26,13 @@ class Fast(AbstractAspectModel):
     def __init__(self, naspects, nwords): super().__init__(naspects, nwords)
 
     def load(self, path):
-        self.mdl = fasttext.load_model(f'{path}model')
-        # assert self.mdl.topics_num_ == self.naspects
-        # TODO: see how to incorporate naspects
-        self.dict = pd.read_pickle(f'{path}model.dict')
+        try:
+            self.mdl = fasttext.load_model(f'{path}model')
+            # assert self.mdl.topics_num_ == self.naspects
+            self.dict = pd.read_pickle(f'{path}model.dict')
+        except ValueError:
+            raise FileNotFoundError(f'{path}model')
+        
 
     def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
         corpus, self.dict = self.preprocess(doctype, reviews_train, no_extremes)
