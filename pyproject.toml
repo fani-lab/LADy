@@ -64,9 +64,6 @@ dummy.shell = "cd src && python main_exp_slim.py"
 start_web_back.shell = "python src/web/backend/app.py"
 start_web_front.shell = "cd src/web/frontend && npm run dev"
 
-kooft.shell = "cd src && python main.py -naspects 5 -am bert -data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/berti_simple"
-
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
