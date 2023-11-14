@@ -1,19 +1,34 @@
 from typing import Any, Optional, Tuple, List, Dict, Literal, Union
 import pandas as pd, numpy as np
+from returns.maybe import Maybe, Nothing, Some
+import pampy
 import copy
 from scipy.spatial.distance import cosine
 
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
-Sentiment = Union[Literal[-1], Literal[0], Literal[1]]
-AspectId = int
+Aspect = str
+Score = float
+Sentiment = Literal[-1, 0, 1]
+Sentiment_String = Literal['POS', 'NEU', 'NEG']
 OpinionId = int
 AspectOpinionSentiment = Tuple[
-                                List[AspectId],
+                                List[Aspect],
                                 List[OpinionId],
                                 Sentiment
                             ]
+
+# ---------------------------------------------------------------------------------------
+# Utils
+# ---------------------------------------------------------------------------------------
+def sentiment_from_number(sentiment: int) -> Maybe[Sentiment_String]:
+    return pampy.match(sentiment,
+                    1 , Some('POS'),
+                    0 , Some('NEU'),
+                    -1, Some('NEG'),
+                    pampy._, Nothing,
+                ) #type: ignore
 
 # ---------------------------------------------------------------------------------------
 # Logics

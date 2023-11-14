@@ -3,19 +3,18 @@ from typing import List, Tuple, TypedDict, Literal
 import gensim
 from utils import flatten
 
-from cmn.review import Review
+from cmn.review import Aspect, Review, Score
 
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
-AspectId = int
-Score = float
-AspectPairType = Tuple[AspectId, Score]
-BatchPairsType = List[Tuple[List[AspectId], List[AspectPairType]]]
+AspectPairType = Tuple[Aspect, Score]
+BatchPairsType = List[Tuple[List[Aspect], List[AspectPairType]]]
 QualityType = TypedDict('QualityType', {'coherence': str, 'perplexity': float})
 Metrics = Literal['coherence', 'perplexity']
 
-ExtractionCapabilities = List[Literal['aspect_detection', 'sentiment_analysis']]
+ModelCapability = Literal['aspect_detection', 'sentiment_analysis']
+ModelCapabilities = List[ModelCapability]
 
 # ---------------------------------------------------------------------------------------
 # Logics
@@ -24,9 +23,9 @@ class _AbstractReviewAnalysisModel:
     """Private Review Model class to make other sub classes like sentiment and aspect detection."""
 
     stop_words = None
-    capabilities: ExtractionCapabilities = ['aspect_detection']
+    capabilities: ModelCapabilities = ['aspect_detection']
 
-    def __init__(self, naspects: int, nwords: int, capabilities: ExtractionCapabilities=['aspect_detection']):
+    def __init__(self, naspects: int, nwords: int, capabilities: ModelCapabilities=['aspect_detection']):
         self.naspects = naspects
         self.nwords = nwords
         self.dict = None
@@ -50,22 +49,6 @@ class _AbstractReviewAnalysisModel:
         #     return
 
     def infer(self, review: Review, doctype: str) -> List[List[AspectPairType]]: pass # type: ignore
-    def infer_batch(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str) -> BatchPairsType:
-        pairs: BatchPairsType = []
-
-        for r in reviews_test:
-            r_aspect_ids = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
-
-            if len(r_aspect_ids[0]) == 0: continue  # ??
-            if random.random() < h_ratio: r_ = r.hide_aspects()
-            else: r_ = r
-
-            r_pred_aspects = self.infer(r_, doctype)
-            # removing duplicate aspect words ==> handled in metrics()
-
-            pairs.extend(list(zip(r_aspect_ids, self.merge_aspects_words(r_pred_aspects, self.nwords))))
-
-        return pairs
 
     @staticmethod
     def preprocess(doctype, reviews, settings=None):
@@ -97,13 +80,30 @@ class _AbstractReviewAnalysisModel:
     #     plt.clf()
 
 class AbstractAspectModel(_AbstractReviewAnalysisModel):
-    def __init__(self, naspects: int, nwords: int, capabilities: ExtractionCapabilities=['aspect_detection']):
+    def __init__(self, naspects: int, nwords: int, capabilities: ModelCapabilities=['aspect_detection']):
         super().__init__(naspects, nwords, capabilities)
         self.naspects = naspects
         self.nwords = nwords
 
+    def infer_batch(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str) -> BatchPairsType:
+        pairs: BatchPairsType = []
+
+        for r in reviews_test:
+            r_aspect_ids = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+
+            if len(r_aspect_ids[0]) == 0: continue  # ??
+            if random.random() < h_ratio: r_ = r.hide_aspects()
+            else: r_ = r
+
+            r_pred_aspects = self.infer(r_, doctype)
+            # removing duplicate aspect words ==> handled in metrics()
+
+            pairs.extend(list(zip(r_aspect_ids, self.merge_aspects_words(r_pred_aspects, self.nwords))))
+
+        return pairs
+
     def get_aspects_words(self, nwords): pass
-    def get_aspect_words(self, aspect_id: int, nwords: int) -> List[AspectPairType]: pass # type: ignore
+    def get_aspect_words(self, aspect_id: Aspect, nwords: int) -> List[AspectPairType]: pass # type: ignore
     def merge_aspects_words(self, r_pred_aspects: List[List[AspectPairType]], nwords: int) -> List[List[AspectPairType]]:
         # Since predicted aspects are distributions over words, we need to flatten them into list of words.
         # Given a and b are two aspects, we do prob(a) * prob(a_w) for all w \in a and prob(b) * prob(b_w) for all w \in b
@@ -119,7 +119,24 @@ class AbstractAspectModel(_AbstractReviewAnalysisModel):
 
 
 class AbstractSentimentModel(_AbstractReviewAnalysisModel):
-    def __init__(self, naspects: int, nwords: int, capabilities: ExtractionCapabilities=['sentiment_analysis']):
+    def __init__(self, naspects: int, nwords: int, capabilities: ModelCapabilities=['sentiment_analysis']):
         super().__init__(naspects, nwords, capabilities)
         self.naspects = naspects
         self.nwords = nwords
+
+    def infer_batch_sentiment(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str) -> BatchPairsType:
+        pairs: BatchPairsType = []
+
+        for r in reviews_test:
+            r_aspect_ids = [[w for a, o, s in sent for w in a] for sent in r.get_aos()]  # [['service', 'food'], ['service'], ...]
+
+            if len(r_aspect_ids[0]) == 0: continue  # ??
+            if random.random() < h_ratio: r_ = r.hide_aspects()
+            else: r_ = r
+
+            r_pred_aspects = self.infer(r_, doctype)
+            # removing duplicate aspect words ==> handled in metrics()
+
+            pairs.extend(list(zip(r_aspect_ids, r_pred_aspects)))
+
+        return pairs

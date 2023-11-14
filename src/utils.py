@@ -45,3 +45,6 @@ def find_first(xs: List[T], prediction: Callable[[T], bool]) -> Maybe[T]:
         Maybe[T]: maybe found or not
     """
     return Maybe.from_optional(first_true(xs, default=None, pred=prediction))
+
+def raise_exception_fn(exception: str):
+    raise Exception(exception)

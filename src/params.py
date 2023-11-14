@@ -7,7 +7,7 @@ ncore = multiprocessing.cpu_count()
 def to_range(range_str): return range(int(range_str.split(':')[0]), int(range_str.split(':')[2]), int(range_str.split(':')[1]))
 
 settings = {
-    'cmd': ['prep', 'train', 'test'], # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
+    'cmd': ['prep', 'train', 'test', 'eval', 'agg'], # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
     'prep': {
         'doctype': 'snt', # 'rvw' # if 'rvw': review => [[review]] else if 'snt': review => [[subreview1], [subreview2], ...]'
         'langaug': [''],#, 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn'], #[''] for no lang augmentation
@@ -97,11 +97,17 @@ settings = {
                 'verbose': True,
                 },
         },
-    'test': {'h_ratio': 1.0},
+    'test': {'h_ratio': 0.5},
     'eval': {
-        'metrics': ['P', 'recall', 'ndcg_cut', 'map_cut', 'success'],
-        'topkstr': [1, 5, 10, 100], #range(1, 100, 10),
+        'for': ['sentiment_analysis', 'aspect_detection'],
         'syn': False, #synonyms be added to evaluation
+        'aspect_detection': {
+            'metrics': ['P', 'recall', 'ndcg_cut', 'map_cut', 'success'],
+            'topkstr': [1, 5, 10, 100], #range(1, 100, 10),
+        }, 
+        'sentiment_analysis': {
+            'metrics': ['recall'],
+        }
     },
 }
 

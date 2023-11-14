@@ -1,31 +1,19 @@
-from typing import Literal, Optional, Tuple, List, Dict
+from typing import Optional, Tuple, List, Dict
 import os, re, random
 from argparse import Namespace
 import pandas as pd
-import pampy
-from returns.maybe import Maybe, Some, Nothing
 
 from bert_e2e_absa import work, main as train
 from bert_e2e_absa.work import Aspect_With_Sentiment
 
-from utils import remove_duplicates_from_list, flatten
-from aml.mdl import AbstractSentimentModel, AspectId, ExtractionCapabilities, AbstractAspectModel
-from cmn.review import Review, Sentiment
+from aml.mdl import AbstractSentimentModel, ModelCapabilities, AbstractAspectModel
+from cmn.review import Aspect, Review, Sentiment, Sentiment_String, sentiment_from_number
 from params import settings
+from utils import raise_exception_fn
 
 #--------------------------------------------------------------------------------------------------
 # Utilities
 #--------------------------------------------------------------------------------------------------
-def raise_exception(exception: str):
-    raise Exception(exception)
-
-def sentiment_from_number(sentiment: int) -> Maybe[Literal['POS', 'NEU', 'NEG']]:
-    return pampy.match(int(sentiment),
-                    1 , Some('POS'),
-                    0 , Some('NEU'),
-                    -1, Some('NEG'),
-                    pampy._, Nothing
-                ) # type: ignore
 
 def compare_aspects(x: Aspect_With_Sentiment, y: Aspect_With_Sentiment) -> bool:
     return x.aspect == y.aspect \
@@ -36,9 +24,10 @@ def write_list_to_file(path: str, data: List[str]) -> None:
     with open(file=path, mode='w', encoding='utf-8') as file:
         for d in data: file.write(d + '\n')
 
-def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str], List[List[str]]]:
-    reviews_list = []
-    label_list = []
+def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str], List[List[str]], List[List[Sentiment_String]]]:
+    reviews_list   = []
+    label_list     = []
+    sentiment_list = []
 
     # Due to model cannot handle long sentences, we need to filter out long sentences
     REVIEW_MAX_LENGTH = 511
@@ -46,7 +35,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
     for r in original_reviews:
         if not len(r.aos[0]): continue
         else:
-            aspects: Dict[AspectId, Sentiment] = dict()
+            aspects: Dict[Aspect, Sentiment] = dict()
 
             for aos_instance in r.aos[0]: 
                 aspect_ids, _, sentiment = aos_instance
@@ -55,13 +44,15 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
                     aspects[aspect_id] = sentiment
 
             text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
+            sentiments = ""
 
             for idx, word in enumerate(r.sentences[0]):
                 if idx in list(aspects.keys()):
-                    sentiment = sentiment_from_number(aspects[idx]) \
-                                .or_else_call(lambda : raise_exception('Invalid Sentiment input'))
+                    sentiment = sentiment_from_number(int(aspects[idx])) \
+                                .or_else_call(lambda : raise_exception_fn('Invalid Sentiment input'))
 
                     tag = word + f'=T-{sentiment}' + ' '
+                    sentiments += f'{sentiment},'
                     text += tag
                 else:
                     tag = word + '=O' + ' '
@@ -70,6 +61,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
             if len(text.rstrip()) > REVIEW_MAX_LENGTH: continue
 
             reviews_list.append(text.rstrip())
+            sentiment_list.append(sentiments[:-1].split(","))
 
             aos_list_per_review = []
 
@@ -78,22 +70,29 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
 
             label_list.append(aos_list_per_review)
 
-    return reviews_list, label_list
+    return reviews_list, label_list, sentiment_list
 
 def save_train_reviews_to_file(original_reviews: List[Review], output: str) -> List[str]:
-    train, _ = convert_reviews_from_lady(original_reviews)
+    train, _, _ = convert_reviews_from_lady(original_reviews)
 
     write_list_to_file(f'{output}/dev.txt', train)
     write_list_to_file(f'{output}/train.txt', train)
     
     return train
 
-def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> None:
-    _, labels = convert_reviews_from_lady(validation_reviews)
-
+def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, output: str) -> Tuple[List[List[str]], List[List[Sentiment_String]]]:
     path = f'{output}/latency-{h_ratio}'
+    txt_path = f'{path}/test.txt'
+    labels_path = f'{path}/test-labels.pk'
+    sentiment_labels_path = f'{path}/test-sentiment-labels.pk'
 
     if not os.path.isdir(path): os.makedirs(path)
+
+    if os.path.isfile(txt_path) and os.path.isfile(labels_path) and os.path.isfile(sentiment_labels_path):
+        labels = pd.read_pickle(labels_path)
+        sentiment_labels = pd.read_pickle(sentiment_labels_path)
+
+        return labels, sentiment_labels
 
     test_hidden = []
 
@@ -102,29 +101,33 @@ def save_test_reviews_to_file(validation_reviews: List[Review], h_ratio: float, 
             test_hidden.append(validation_reviews[index].hide_aspects(mask='z', mask_size=5))
         else: test_hidden.append(validation_reviews[index])
 
-    preprocessed_test, _ = convert_reviews_from_lady(test_hidden)
+    preprocessed_test, _, _ = convert_reviews_from_lady(test_hidden)
+    _, labels, sentiment_labels = convert_reviews_from_lady(validation_reviews)
 
-    write_list_to_file(f'{path}/test.txt', preprocessed_test)
+    write_list_to_file(txt_path, preprocessed_test)
 
-    pd.to_pickle(labels, f'{path}/test-labels.pk')
+    pd.to_pickle(labels, labels_path)
+    pd.to_pickle(sentiment_labels, sentiment_labels_path)
+
+    return labels, sentiment_labels
 
 #--------------------------------------------------------------------------------------------------
 # Class Definition
 #--------------------------------------------------------------------------------------------------
 
-# TODO: Change these
-# @inproceedings{DBLP:conf/www/YanGLC13,
-#   author       = {Xiaohui Yan and Jiafeng Guo and Yanyan Lan and Xueqi Cheng},
-#   title        = {A biterm topic model for short texts},
-#   booktitle    = {22nd International World Wide Web Conference, {WWW} '13, Rio de Janeiro, Brazil, May 13-17, 2013},
-#   pages        = {1445--1456},
-#   publisher    = {International World Wide Web Conferences Steering Committee / {ACM}},
-#   year         = {2013},
-#   url          = {https://doi.org/10.1145/2488388.2488514},
-#   biburl       = {https://dblp.org/rec/conf/www/YanGLC13.bib},
+# @article{li2019exploiting,
+#   author       = {Xin Li and Lidong Bing and Wenxuan Zhang and Wai Lam},
+#   title        = {Exploiting {BERT} for End-to-End Aspect-based Sentiment Analysis},
+#   journal      = {arXiv preprint arXiv:1910.00883},
+#   year         = {2019},
+#   url          = {https://doi.org/10.48550/arXiv.1910.00883},
+#   note         = {NUT workshop@EMNLP-IJCNLP-2019},
+#   archivePrefix= {arXiv},
+#   eprint       = {1910.00883},
+#   primaryClass = {cs.CL}
 # }
 class BERT(AbstractAspectModel, AbstractSentimentModel):
-    capabilities: ExtractionCapabilities  = ['aspect_detection', 'sentiment_analysis']
+    capabilities: ModelCapabilities  = ['aspect_detection', 'sentiment_analysis']
 
     _output_dir_name = 'bert-train' # output dir should contain any train | finetune | fix | overfit
     _data_dir_name   = 'data'
@@ -169,7 +172,7 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
         except Exception as e:
             raise RuntimeError(f'Error in training BERT model: {e}')
 
-    def infer_batch(self, reviews_test, h_ratio, doctype, output):
+    def get_pairs_and_test(self, reviews_test: List[Review], h_ratio: float, doctype: str, output: str):
         output        = f'{output}/{self._data_dir_name}'
         test_data_dir = output + '/tests'
         output_dir    = output + f'/{self._output_dir_name}'
@@ -180,25 +183,26 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
         args['absa_home']  = output_dir
         args['ckpt']       = f'{output_dir}/checkpoint-1200'
 
-        save_test_reviews_to_file(reviews_test, h_ratio, test_data_dir)
+        labels, sentiment_labels = save_test_reviews_to_file(reviews_test, h_ratio, test_data_dir)
 
-        pairs = []
-        aspects: List[List[Aspect_With_Sentiment]] = []
+        args['data_dir'] = f'{test_data_dir}/latency-{h_ratio}'
 
-        path = f'{test_data_dir}/latency-{h_ratio}'
-
-        args['data_dir'] = path 
         result = work.main(Namespace(**args))
 
-        pair = (flatten(result.gold_targets), flatten(result.unique_predictions))
+        aspect_pairs = list(zip(labels, result.unique_predictions))
 
-        pairs.append(pair)
-        aspects.append(result.aspects)
+        aspects_sentiments = result.aspects
 
-            
-        unique_aspects = remove_duplicates_from_list(flatten(aspects), compare=compare_aspects)
-        print(unique_aspects)
-        print(pairs)
+        sentiment_pairs = list(zip(sentiment_labels, list(map(lambda x: [(x.sentiment, 1)], aspects_sentiments))))
 
-        return pairs
+        return aspect_pairs, sentiment_pairs
+        
+    def infer_batch(self, reviews_test, h_ratio, doctype, output):
+        aspect_pairs, _ = self.get_pairs_and_test(reviews_test, h_ratio, doctype, output)
+        
+        return aspect_pairs
     
+    def infer_batch_sentiment(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str):
+        _, sentiment_pairs = self.get_pairs_and_test(reviews_test, h_ratio, doctype, output)
+
+        return sentiment_pairs

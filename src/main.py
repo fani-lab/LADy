@@ -1,13 +1,15 @@
-from typing import List, Tuple
+from typing import List, Tuple, Set, Union
 import argparse, os, json, time
 from tqdm import tqdm
 import numpy as np, pandas as pd
+import pampy
 
 import pytrec_eval
 from nltk.corpus import wordnet as wn
 
 import params
 from cmn.review import Review
+from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability
 
 # ---------------------------------------------------------------------------------------
 # Typings
@@ -118,26 +120,50 @@ def train(args, am, train, valid, f, output):
         print('2.2. Quality of aspects ...')
         for q in params.settings['train']['qualities']: print(f'({q}: {am.quality(q)})')
 
-def test(am, test, f, output: str):
-    print(f'\n3. Aspect model testing for {am.name()} ...')
+def test(am, test, f, output: str, capability: ModelCapability):
+    cp_name = get_capability_short_name(capability)
+    model_job = capability.split("_")[0].capitalize()
+
+    print(f'\n3. {model_job} model testing for {am.name()} ...')
     print('#' * 50)
     try:
-        print(f'\n3.1. Loading saved predictions on test set from {output}f{f}.model.pred.{params.settings["test"]["h_ratio"]} ...')
-        return pd.read_pickle(f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
+        print(f'\n3.1. Loading saved predictions on test set from {output}f{f}.{cp_name}.model.pred.{params.settings["test"]["h_ratio"]} ...')
+        return pd.read_pickle(f'{output}f{f}.model.{cp_name}.pred.{params.settings["test"]["h_ratio"]}')
     except (FileNotFoundError, EOFError) as _:
         print(f'\n3.1. Loading saved predictions on test set failed! Predicting on the test set with {params.settings["test"]["h_ratio"] * 100}% latent aspect ...')
-        print(f'3.2. Loading aspect model from {output}f{f}.model for testing ...')
+        print(f'3.2. Loading {model_job} model from {output}f{f}.{cp_name}.model for testing ...')
         am.load(f'{output}/f{f}.')
-        print('3.3. Testing aspect model ...')
-        pairs = am.infer_batch(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=f'{output}/f{f}')
-        pd.to_pickle(pairs, f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}')
+        print(f'3.3. Testing {model_job} model ...')
+        pairs = get_model_infer_method(am, capability)(reviews_test=test, h_ratio=params.settings['test']['h_ratio'], doctype=params.settings['prep']['doctype'], output=f'{output}/f{f}')
+        pd.to_pickle(pairs, f'{output}f{f}.model.{cp_name}.pred.{params.settings["test"]["h_ratio"]}')
+
+def get_model_infer_method(am: Union[AbstractSentimentModel, AbstractAspectModel], model_capability: ModelCapability):
+    if isinstance(am, AbstractAspectModel) and model_capability == 'aspect_detection':
+        return am.infer_batch
+    elif isinstance(am, AbstractSentimentModel) and model_capability == 'sentiment_analysis':
+        return am.infer_batch_sentiment
+    
+    raise Exception(f'Not handled model: {am.name()}')
 
 
-def evaluate(input: str, output: str):
-    print(f'\n4. Aspect model evaluation for {input} ...')
+def get_model_metrics(model_capability: ModelCapability) -> Set[str]:
+    return pampy.match(model_capability, 
+        'aspect_detection', set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["aspect_detection"]["topkstr"]])}' for m in params.settings['eval']['aspect_detection']['metrics']),
+        'sentiment_analysis', set(params.settings["eval"]["sentiment_analysis"]["metrics"]),
+    ) #type: ignore
+
+def get_capability_short_name(cp: ModelCapability) -> str:
+    return pampy.match(cp,
+        "sentiment_analysis", 'sa',
+        "aspect_detection", 'ad',
+    ) # type: ignore
+
+def evaluate(input: str, output: str, model_capability: ModelCapability):
+    model_job = model_capability.split("_")[0].capitalize()
+    print(f'\n4. {model_job} model evaluation for {input} ...')
     print('#' * 50)
     pairs = pd.read_pickle(input)
-    metrics_set = set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["topkstr"]])}' for m in params.settings['eval']['metrics'])
+    metrics_set = get_model_metrics(model_capability)
 
     qrel = dict()
     run = dict()
@@ -167,30 +193,35 @@ def evaluate(input: str, output: str):
     return df_mean
 
 def agg(path, output):
+    capabilites: ModelCapabilities = ['aspect_detection', 'sentiment_analysis']
+    cp_short_names = list(map(get_capability_short_name, capabilites))
+
     print(f'\n5. Aggregating results in {path} in {output} ...')
-    files = list()
-    for dirpath, _, filenames in os.walk(path):
-        files += [
-            os.path.join(os.path.normpath(dirpath), file).split(os.sep)
-            for file in filenames
-            if file.startswith('model.pred.eval.mean')
-            ]
 
-    column_names = []
-    for f in files:
-        p = '.'.join(f[-3:]).replace('.csv', '').replace('model.pred.eval.mean.', '')
-        column_names.append(p)
-    column_names.insert(0, 'metric')
+    for cp in cp_short_names:
+        files = list()
 
-    all_results = pd.DataFrame()
-    for i, f in enumerate(files):
-        df = pd.read_csv(os.sep.join(f))
-        if i == 0: all_results = df
-        else: all_results = pd.concat([all_results, df['mean']], axis=1)
+        for dirpath, _, filenames in os.walk(path):
+            files += [
+                os.path.join(os.path.normpath(dirpath), file).split(os.sep)
+                for file in filenames
+                if file.startswith(f'model.{cp}.pred.eval.mean')
+                ]
 
-    all_results.columns = column_names
-    all_results.to_csv(f'{output}/agg.pred.eval.mean.csv', index=False)
-    return all_results
+        column_names = []
+        for f in files:
+            p = '.'.join(f[-3:]).replace('.csv', '').replace(f'model.{cp}.pred.eval.mean.', '')
+            column_names.append(p)
+        column_names.insert(0, 'metric')
+
+        all_results = pd.DataFrame()
+        for i, f in enumerate(files):
+            df = pd.read_csv(os.sep.join(f))
+            if i == 0: all_results = df
+            else: all_results = pd.concat([all_results, df['mean']], axis=1)
+
+        all_results.columns = column_names
+        all_results.to_csv(f'{output}/agg.{cp}.pred.eval.mean.csv', index=False)
 
 def main(args):
     if not os.path.isdir(args.output): os.makedirs(args.output)
@@ -223,20 +254,27 @@ def main(args):
             train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
             print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
 
+    eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
+
     # testing
     if 'test' in params.settings['cmd']:
-        for f in splits['folds'].keys():
-            pairs = test(am, np.array(reviews)[splits['test']].tolist(), f, output)
-
+        for capability in eval_for:
+            for f in splits['folds'].keys():
+                test(am, np.array(reviews)[splits['test']].tolist(), f, output, capability)
 
     # evaluating
     if 'eval' in params.settings['cmd']:
-        df_f_means = pd.DataFrame()
-        for f in splits['folds'].keys():
-            input = f'{output}f{f}.model.pred.{params.settings["test"]["h_ratio"]}'
-            df_mean = evaluate(input, f'{input}.eval.mean.csv')
-            df_f_means = pd.concat([df_f_means, df_mean], axis=1)
-        df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
+        for capability in eval_for:
+            print(f"Evaluating for {am.name} on {capability}")
+
+            cp_name = get_capability_short_name(capability)
+
+            df_f_means = pd.DataFrame()
+            for f in splits['folds'].keys():
+                input = f'{output}f{f}.model.{cp_name}.pred.{params.settings["test"]["h_ratio"]}'
+                df_mean = evaluate(input, f'{input}.{cp_name}.eval.mean.csv', capability)
+                df_f_means = pd.concat([df_f_means, df_mean], axis=1)
+            df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.{cp_name}.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
 # {CUDA_VISIBLE_DEVICES=0,1} won't work https://discuss.pytorch.org/t/using-torch-data-prallel-invalid-device-string/166233
 # TOKENIZERS_PARALLELISM=true
