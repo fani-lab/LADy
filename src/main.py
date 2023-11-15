@@ -149,17 +149,17 @@ def get_model_infer_method(am: Union[AbstractSentimentModel, AbstractAspectModel
 def get_model_metrics(model_capability: ModelCapability) -> Set[str]:
     return pampy.match(model_capability, 
         'aspect_detection', set(f'{m}_{",".join([str(i) for i in params.settings["eval"]["aspect_detection"]["topkstr"]])}' for m in params.settings['eval']['aspect_detection']['metrics']),
-        'sentiment_analysis', set(params.settings["eval"]["sentiment_analysis"]["metrics"]),
+        'sentiment_analysis', set(params.settings['eval']['sentiment_analysis']['metrics']),
     ) #type: ignore
 
 def get_capability_short_name(cp: ModelCapability) -> str:
     return pampy.match(cp,
-        "sentiment_analysis", 'sa',
-        "aspect_detection", 'ad',
+        'sentiment_analysis', 'sa',
+        'aspect_detection', 'ad',
     ) # type: ignore
 
 def evaluate(input: str, output: str, model_capability: ModelCapability):
-    model_job = model_capability.split("_")[0].capitalize()
+    model_job = model_capability.split('_')[0].capitalize()
     print(f'\n4. {model_job} model evaluation for {input} ...')
     print('#' * 50)
     pairs = pd.read_pickle(input)
@@ -265,7 +265,7 @@ def main(args):
     # evaluating
     if 'eval' in params.settings['cmd']:
         for capability in eval_for:
-            print(f"Evaluating for {am.name} on {capability}")
+            print(f'Evaluating for {am.name} on {capability}')
 
             cp_name = get_capability_short_name(capability)
 

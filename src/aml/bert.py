@@ -44,7 +44,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
                     aspects[aspect_id] = sentiment
 
             text = re.sub(r'\s{2,}', ' ', ' '.join(r.sentences[0]).strip()) + '####'
-            sentiments = ""
+            sentiments = ''
 
             for idx, word in enumerate(r.sentences[0]):
                 if idx in list(aspects.keys()):
@@ -61,7 +61,7 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
             if len(text.rstrip()) > REVIEW_MAX_LENGTH: continue
 
             reviews_list.append(text.rstrip())
-            sentiment_list.append(sentiments[:-1].split(","))
+            sentiment_list.append(sentiments[:-1].split(','))
 
             aos_list_per_review = []
 
