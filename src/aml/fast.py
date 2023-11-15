@@ -12,7 +12,7 @@ from cmn.review import Review
 def add_label(r):
     for i, s in enumerate(r.sentences):
         for j, _, _ in r.aos[i]: # j is the index of aspect words in sentence s
-            for k in j: s[k] = "__label__" + s[k]
+            for k in j: s[k] = '__label__' + s[k]
     return r
 
 def review_formatted_file(path, corpus):

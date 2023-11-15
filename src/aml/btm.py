@@ -1,5 +1,5 @@
-import logging, pickle, pandas as pd, random
-import bitermplus as btm, gensim
+import logging, pandas as pd, random
+import bitermplus as btm
 
 from .mdl import AbstractAspectModel
 
@@ -28,7 +28,7 @@ class Btm(AbstractAspectModel):
         corpus = [' '.join(doc) for doc in corpus]
 
         logging.getLogger().handlers.clear()
-        logging.basicConfig(filename=f'{output}model.train.log', format="%(asctime)s:%(levelname)s:%(message)s", level=logging.NOTSET)
+        logging.basicConfig(filename=f'{output}model.train.log', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.NOTSET)
         # doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(corpus)
         doc_word_frequency, self.dict, vocab_dict = btm.get_words_freqs(corpus, **{'vocabulary': self.dict.token2id})
         docs_vec = btm.get_vectorized_docs(corpus, self.dict)
