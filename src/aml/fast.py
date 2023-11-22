@@ -18,7 +18,7 @@ def add_label(r):
     return r_
 
 def review_formatted_file(path, corpus):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         for r in corpus: f.write(' '.join(r) + '\n')
 
 
