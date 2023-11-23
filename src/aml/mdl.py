@@ -9,7 +9,8 @@ from cmn.review import Aspect, Review, Score
 # Typings
 # ---------------------------------------------------------------------------------------
 AspectPairType = Tuple[Aspect, Score]
-BatchPairsType = List[Tuple[List[Aspect], List[AspectPairType]]]
+PairType = Tuple[List[Aspect], List[AspectPairType]]
+BatchPairsType = List[PairType]
 QualityType = TypedDict('QualityType', {'coherence': str, 'perplexity': float})
 Metrics = Literal['coherence', 'perplexity']
 

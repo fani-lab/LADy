@@ -6,7 +6,7 @@ import pandas as pd
 from bert_e2e_absa import work, main as train
 from bert_e2e_absa.work import Aspect_With_Sentiment
 
-from aml.mdl import AbstractSentimentModel, ModelCapabilities, AbstractAspectModel
+from aml.mdl import AbstractSentimentModel, BatchPairsType, ModelCapabilities, AbstractAspectModel, PairType
 from cmn.review import Aspect, Review, Sentiment, Sentiment_String, sentiment_from_number
 from params import settings
 from utils import raise_exception_fn
@@ -191,9 +191,23 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
 
         aspect_pairs = list(zip(labels, result.unique_predictions))
 
-        aspects_sentiments = result.aspects
+        # Should map every label if array to its corresponding pred
+        # Label:: [[NEG], [POS, POS, POS], [NEG]]
+        # Pred::  [NEG,   POS,             NEG  ]
+        # Need::  [(Neg, (Neg, 1)), (Pos, (Pos, 1)), (POS, (POS, 1)), (POS, (POS, 1)), (NEG, (NEG, 1))]
 
-        sentiment_pairs = list(zip(sentiment_labels, list(map(lambda x: [(x.sentiment, 1)], aspects_sentiments))))
+        sentiment_pairs: BatchPairsType = []
+        for index, x in enumerate(sentiment_labels):
+            for y in x:
+                aspects = result.aspects[index]
+
+                if len(aspects) == 0:
+                    continue
+
+                for z in aspects:
+                    if(z):
+                        pair: PairType = ([y], [(z.sentiment, 1.0)])
+                        sentiment_pairs.append(pair)
 
         return aspect_pairs, sentiment_pairs
         
