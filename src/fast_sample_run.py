@@ -14,17 +14,16 @@ from cmn.semeval import SemEvalReview
 
 from main import split
 
-data = "../output/toy.2016SB5/reviews.pkl"
+data = "../data/raw/semeval/2016SB5/ABSA_Restaurants_Train_SB1_v2.xml"
 output = "../output/toy.2016SB5/fast/"
 
 if not os.path.isdir(output): os.makedirs(output)
 reviews = pd.read_pickle(data)
 splits = split(len(reviews), output)
 
-am = Fast(naspects=5, nwords=params.settings['train']['nwords'])
+am = Fast(naspects=25, nwords=params.settings['train']['nwords'])
 
 for f in splits['folds'].keys():
-    # TODO: bug fix - reduce the redundant preprocessing that adds too many label tags
     reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
     reviews_valid = np.array(reviews)[splits['folds'][f]['valid']].tolist()
     am.train(reviews_train, reviews_valid, params.settings['train']['fast'], 

@@ -48,8 +48,10 @@ def convert_reviews_from_lady(original_reviews: List[Review]) -> Tuple[List[str]
 
             for idx, word in enumerate(r.sentences[0]):
                 if idx in list(aspects.keys()):
+                    if aspects[idx] == 'conflict':
+                        aspects[idx] = 0
                     sentiment = sentiment_from_number(int(aspects[idx])) \
-                                .or_else_call(lambda : raise_exception_fn('Invalid Sentiment input'))
+                            .or_else_call(lambda : raise_exception_fn('Invalid Sentiment input'))
 
                     tag = word + f'=T-{sentiment}' + ' '
                     sentiments += f'{sentiment},'
