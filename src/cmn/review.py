@@ -1,17 +1,34 @@
 from typing import Any, Optional, Tuple, List, Dict, Literal, Union
 import pandas as pd, numpy as np
+from returns.maybe import Maybe, Nothing, Some
+import pampy
 import copy
 from scipy.spatial.distance import cosine
 
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
-Sentiment = Union[Literal[-1], Literal[0], Literal[1]]
+Aspect = str
+Score = float
+Sentiment = Literal[-1, 0, 1]
+Sentiment_String = Literal['POS', 'NEU', 'NEG']
+OpinionId = int
 AspectOpinionSentiment = Tuple[
-                                List[int],
-                                List[int],
+                                List[Aspect],
+                                List[OpinionId],
                                 Sentiment
                             ]
+
+# ---------------------------------------------------------------------------------------
+# Utils
+# ---------------------------------------------------------------------------------------
+def sentiment_from_number(sentiment: int) -> Maybe[Sentiment_String]:
+    return pampy.match(sentiment,
+                    1 , Some('POS'),
+                    0 , Some('NEU'),
+                    -1, Some('NEG'),
+                    pampy._, Nothing,
+                ) #type: ignore
 
 # ---------------------------------------------------------------------------------------
 # Logics
@@ -73,7 +90,7 @@ class Review(object):
 
     def get_txt(self): return '. '.join(' '.join(s) for s in self.sentences)
 
-    def hide_aspects(self, mask="#", mask_size=5):
+    def hide_aspects(self, mask='#', mask_size=5):
         r = copy.deepcopy(self)
         for i, sent in enumerate(r.sentences):
             # [sent.pop(k) for j, _, _ in r.aos[i] for k in j]

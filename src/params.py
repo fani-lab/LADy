@@ -7,10 +7,10 @@ ncore = multiprocessing.cpu_count()
 def to_range(range_str): return range(int(range_str.split(':')[0]), int(range_str.split(':')[2]), int(range_str.split(':')[1]))
 
 settings = {
-    'cmd': ['prep', 'train', 'test'], # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
+    'cmd': ['prep', 'train', 'test', 'eval', 'agg'], # steps of pipeline, ['prep', 'train', 'test', 'eval', 'agg']
     'prep': {
         'doctype': 'snt', # 'rvw' # if 'rvw': review => [[review]] else if 'snt': review => [[subreview1], [subreview2], ...]'
-        'langaug': [''],#, 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn'], #[''] for no lang augmentation
+        'langaug': ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn'],#, 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn'], #[''] for no lang augmentation
         # list of nllb language keys to augment via backtranslation from https://github.com/facebookresearch/flores/tree/main/flores200#languages-in-flores-200
         # pes_Arab (Farsi), 'zho_Hans' for Chinese (Simplified), deu_Latn (Germany), spa_Latn (Spanish), arb_Arab (Modern Standard Arabic), fra_Latn (French), ...
         'nllb': 'facebook/nllb-200-distilled-600M',
@@ -38,13 +38,13 @@ settings = {
             'tfm_mode': 'finetune',
             'fix_tfm': 0,
             'model_name_or_path': 'bert-base-uncased',
-            'data_dir': '#dynamic_value__bert_py',
+            'data_dir': '/output/run', # This param will updated dynamically in bert.py
             'task_name': 'lady',
             'per_gpu_train_batch_size': 16,
             'per_gpu_eval_batch_size': 8,
             'learning_rate': 2e-5,
             'do_train': True,
-            'do_eval': False,
+            'do_eval': True,
             'do_lower_case': True,
             'tagging_schema': 'BIEOS',
             'overfit': 0,
@@ -52,7 +52,7 @@ settings = {
             'eval_all_checkpoints': True,
             'MASTER_ADDR': 'localhost',
             'MASTER_PORT': 28512,
-            'max_steps': 1500,
+            'max_steps': 1200,
             'gradient_accumulation_steps': 1,
             'weight_decay': 0.0,
             'adam_epsilon': 1e-8,
@@ -69,13 +69,14 @@ settings = {
             'config_name': '',
             'tokenizer_name': '',
             'evaluate_during_training': False,
-            
+            'eval_on_testset_after_training': False,
+            'no_eval_on_testset_after_training': True,
+            'cache_dir': 'bert_cache', # This param will updated dynamically in bert.py
 
             # test values
-            'absa_home': '#dynamic_value__bert_py',
-            'output_dir': '#dynamic_value__bert_py',
-            'ckpt': '#dynamic_value__bert_py/checkpoint-1200',
-            'cache_dir': 'cache',
+            'absa_home': '/output/run/', # This param will updated dynamically in bert.py
+            'output_dir': '/output/run/', # This param will updated dynamically in bert.py
+            'ckpt': '/checkpoint-1200', # This param will updated dynamically in bert.py
             'max_seq_length': 128,
         },
         'fast': {'epoch': 1000, 'loss': 'ova'}, # ova use independent binary classifiers for each label for multi-label classification
@@ -96,11 +97,18 @@ settings = {
                 'verbose': True,
                 },
         },
-    'test': {'h_ratio': 1.0},
+    'test': {'h_ratio': 0.0},
     'eval': {
-        'metrics': ['P', 'recall', 'ndcg_cut', 'map_cut', 'success'],
-        'topkstr': [1, 5, 10, 100], #range(1, 100, 10),
+        'for': ['sentiment_analysis', 'aspect_detection'],
         'syn': False, #synonyms be added to evaluation
+        'aspect_detection': {
+            'metrics': ['P', 'recall', 'ndcg_cut', 'map_cut', 'success'],
+            'topkstr': [1, 5, 10, 100], #range(1, 100, 10),
+        }, 
+        'sentiment_analysis': {
+            'metrics': ['recall'],
+            'topkstr': [1],
+        }
     },
 }
 
