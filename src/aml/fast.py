@@ -7,7 +7,7 @@ import pandas as pd
 import fasttext
 import gensim
 
-from .mdl import AbstractAspectModel, AspectPairType, BatchPairsType
+from .mdl import AbstractAspectModel, AspectPairType, BatchPairsType, flatten
 from cmn.review import Review
 
 # Utility functions
@@ -92,3 +92,20 @@ class Fast(AbstractAspectModel):
             aw_prob[a] = {k: v for k, v in sorted(aw_prob[a].items(), key=lambda item: item[1], reverse=True)}
 
         return aw_prob
+    
+    def merge_aspects_words(self, r_pred_aspects, nwords):
+        # Since predicted aspects are distributions over words, we need to flatten them into list of words.
+        # Given a and b are two aspects, we do prob(a) * prob(a_w) for all w \in a and prob(b) * prob(b_w) for all w \in b
+        # Then sort.
+        result = []
+        subr_pred_aspects = r_pred_aspects[0]
+        pred_aspects_prob = r_pred_aspects[1]
+        subr_pred_aspects_words = []
+
+        for i, a in enumerate(subr_pred_aspects):
+            a_p = pred_aspects_prob[i]
+            subr_pred_aspects_words.append([(w, a_p * w_p) for w, w_p in self.get_aspect_words(a, nwords)])
+
+        result.append(sorted(flatten(subr_pred_aspects_words), reverse=True, key=lambda t: t[1]))
+
+        return result
