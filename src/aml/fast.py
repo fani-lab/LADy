@@ -70,7 +70,10 @@ class Fast(AbstractAspectModel):
         return reviews_, dict
     
     def get_aspect_words(self, aspect, nwords):
-        return self.aspect_word_prob[aspect].items()[:nwords]
+        words_prob = []
+        for wp in sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]:
+            words_prob.append(wp)
+        return words_prob
 
     def generate_aspect_words(self):
         aw_prob = dict()
