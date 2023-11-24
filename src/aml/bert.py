@@ -203,7 +203,7 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
             for y in x:
                 aspects = result.aspects[index]
 
-                if len(aspects) == 0:
+                if aspects and len(aspects) == 0:
                     continue
 
                 for z in aspects:
