@@ -222,3 +222,6 @@ class BERT(AbstractAspectModel, AbstractSentimentModel):
         _, sentiment_pairs = self.get_pairs_and_test(reviews_test, h_ratio, doctype, output)
 
         return sentiment_pairs
+
+    def train_sentiment(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output) -> None:
+        self.train(reviews_train, reviews_valid, settings, doctype, no_extremes, output)

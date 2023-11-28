@@ -105,7 +105,7 @@ def split(nsample, output):
     with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
-def train(args, am, train, valid, f, output):
+def train(args, am, train, valid, f, output, capability: ModelCapability):
     print(f'\n2. Aspect model training for {am.name()} ...')
     print('#' * 50)
     try:
@@ -114,7 +114,7 @@ def train(args, am, train, valid, f, output):
     except (FileNotFoundError, EOFError) as _:
         print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
-        am.train(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
+        get_model_train_method(am, capability)(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
 
         # from aml.mdl import AbstractAspectModel
         print('2.2. Quality of aspects ...')
@@ -142,6 +142,14 @@ def get_model_infer_method(am: Union[AbstractSentimentModel, AbstractAspectModel
         return am.infer_batch
     elif isinstance(am, AbstractSentimentModel) and model_capability == 'sentiment_analysis':
         return am.infer_batch_sentiment
+    
+    raise Exception(f'Not handled model: {am.name()}')
+
+def get_model_train_method(am: Union[AbstractSentimentModel, AbstractAspectModel], model_capability: ModelCapability):
+    if isinstance(am, AbstractAspectModel) and model_capability == 'aspect_detection':
+        return am.train
+    elif isinstance(am, AbstractSentimentModel) and model_capability == 'sentiment_analysis':
+        return am.train_sentiment
     
     raise Exception(f'Not handled model: {am.name()}')
 
@@ -248,14 +256,16 @@ def main(args):
     output = f'{output}/{am.name()}/'
 
     if 'train' in params.settings['cmd']:
-        for f in splits['folds'].keys():
-            t_s = time.time()
-            reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
-            reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
-            train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output)
-            print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
+        for capability in train_for:
+            for f in splits['folds'].keys():
+                t_s = time.time()
+                reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
+                reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
+                train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability)
+                print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
 
     eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
+    train_for: ModelCapabilities = set(params.settings['train']['for']).intersection(am.capabilities) #type: ignore
 
     # testing
     if 'test' in params.settings['cmd']:
