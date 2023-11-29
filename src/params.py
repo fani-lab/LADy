@@ -22,7 +22,7 @@ settings = {
         'batch': True,
         },
     'train': {
-        'for': ['aspect_detectoin', 'sentiment_analysis'],
+        'for': ['aspect_detection', 'sentiment_analysis'],
         'ratio': 0.85, # 1 - ratio goes to test. To train on entire dataset: 0.999 and 'nfolds': 0
         'nfolds': 5, # on the train, nfold x-valid, 0: no x-valid only test and train, 1: test, 1-fold
         'langaug_semsim': 0.5, # backtranslated review is in training if its semantic similarity with original review is >= this value
