@@ -14,7 +14,7 @@ settings = {
         # list of nllb language keys to augment via backtranslation from https://github.com/facebookresearch/flores/tree/main/flores200#languages-in-flores-200
         # pes_Arab (Farsi), 'zho_Hans' for Chinese (Simplified), deu_Latn (Germany), spa_Latn (Spanish), arb_Arab (Modern Standard Arabic), fra_Latn (French), ...
         'nllb': 'facebook/nllb-200-distilled-600M',
-        'max_l': 1024,
+        'max_l': 1500,
         #https://discuss.pytorch.org/t/using-torch-data-prallel-invalid-device-string/166233
         #gpu card indexes #"cuda:1" if torch.cuda.is_available() else "cpu"
         #cuda:1,2 cannot be used
