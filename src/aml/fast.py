@@ -1,9 +1,7 @@
 import copy
 import pickle
-import re
+import re, numpy as np, pandas as pd, random
 from typing import List
-import numpy as np
-import pandas as pd
 import fasttext
 import gensim
 
@@ -23,6 +21,7 @@ def add_label_sentiment(r):
     for i, s in enumerate(r_.sentences):
         for _, _, sentiment in r.aos[i]:
             s.append("__label__" + sentiment)
+    return r_
 
 def add_label(r, label_type):
     if label_type == 'aspect': return add_label_aspect(r)
@@ -34,8 +33,10 @@ def review_formatted_file(path, corpus):
 
 
 class Fast(AbstractAspectModel, AbstractSentimentModel):
+    capabilities = ['aspect_detection', 'sentiment_analysis']
+    
     def __init__(self, naspects, nwords): 
-        super().__init__(naspects, nwords)
+        super().__init__(naspects=naspects, nwords=nwords, capabilities=self.capabilities)
         self.aspect_word_prob = None
 
     def load(self, path):
@@ -80,11 +81,7 @@ class Fast(AbstractAspectModel, AbstractSentimentModel):
         return reviews_, dict
     
     def get_aspect_words(self, aspect, nwords):
-        words_prob = []
-        print(sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords])
-        for wp in sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]:
-            words_prob.append(wp)
-        return words_prob
+        return sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]
 
     def generate_aspect_words(self):
         aw_prob = dict()
@@ -125,14 +122,14 @@ class Fast(AbstractAspectModel, AbstractSentimentModel):
         return result
     
     def train_sentiment(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
-        corpus, self.dict = self.preprocess(doctype, reviews_train, no_extremes)
+        corpus, self.dict = self.preprocess(doctype, reviews_train, no_extremes, label_type='sentiment')
         review_formatted_file(f'{output}model.train', corpus)
-        self.mdl = fasttext.train_supervised(f'{output}model.train', **settings, label_type='sentiment')
+        self.mdl = fasttext.train_supervised(f'{output}model.train', **settings)
         self.aspect_word_prob = self.generate_aspect_words()
 
         self.dict.save(f'{output}model.dict')
         self.mdl.save_model(f'{output}model')
-        pd.to_pickle(self.aspect_word_prob, f'{output}model_sword_prob.pkl')
+        pd.to_pickle(self.aspect_word_prob, f'{output}model_aspword_prob.pkl')
         # do we need cas and perplexity?
 
     def infer_sentiment(self, review: Review, doctype: str):
