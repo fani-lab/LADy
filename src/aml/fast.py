@@ -7,7 +7,7 @@ import pandas as pd
 import fasttext
 import gensim
 
-from .mdl import AbstractAspectModel, AspectPairType, BatchPairsType, flatten
+from .mdl import AbstractAspectModel, AbstractSentimentModel, flatten
 from cmn.review import Review
 
 # Utility functions
@@ -29,7 +29,7 @@ def review_formatted_file(path, corpus):
         for r in corpus: f.write(' '.join(r) + '\n')
 
 
-class Fast(AbstractAspectModel):
+class Fast(AbstractAspectModel, AbstractSentimentModel):
     def __init__(self, naspects, nwords): 
         super().__init__(naspects, nwords)
         self.aspect_word_prob = None
