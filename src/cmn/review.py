@@ -186,8 +186,10 @@ class Review(object):
         reviews_txt = [r.get_txt() for r in reviews]
         translated_txt = translator(reviews_txt)
         back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
-
         for i, r in enumerate(reviews):
+            if len(translated_txt[i]['translation_text'].strip()) == 0:
+                translated_txt[i]['translation_text'] = reviews_txt[i]
+                back_translated_txt[i]['translation_text'] = reviews_txt[i]
             translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt)
             translated_obj.aos, _ = r.semalign(translated_obj)
 
