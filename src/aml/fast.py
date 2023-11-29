@@ -25,7 +25,7 @@ def add_label_sentiment(r):
             s.append("__label__" + sentiment)
 
 def add_label(r, label_type):
-    if label_type == 'aspect': return add_label(r)
+    if label_type == 'aspect': return add_label_aspect(r)
     elif label_type == 'sentiment': return add_label_sentiment(r)
 
 def review_formatted_file(path, corpus):
@@ -81,6 +81,7 @@ class Fast(AbstractAspectModel, AbstractSentimentModel):
     
     def get_aspect_words(self, aspect, nwords):
         words_prob = []
+        print(sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords])
         for wp in sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]:
             words_prob.append(wp)
         return words_prob
