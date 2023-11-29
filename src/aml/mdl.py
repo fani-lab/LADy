@@ -37,19 +37,12 @@ class _AbstractReviewAnalysisModel:
 
     def name(self) -> str: return self.__class__.__name__.lower()
     def load(self, path): pass
-    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output) -> None:
-        corpus, self.dict = _AbstractReviewAnalysisModel.preprocess(doctype, reviews_train, no_extremes)
-        self.dict.save(f'{output}model.dict')
-        pd.to_pickle(self.cas, f'{output}model.perf.cas')
-        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
 
     def quality(self, metric: Metrics):
         result = QualityType(coherence=f'{np.mean(self.cas)}\u00B1{np.std(self.cas)}', perplexity=self.perplexity)
         return result[metric]
         # elif metric is "perplexity":
         #     return
-
-    def infer(self, review: Review, doctype: str) -> List[List[AspectPairType]]: pass # type: ignore
 
     @staticmethod
     def preprocess(doctype, reviews, settings=None):
@@ -86,6 +79,7 @@ class AbstractAspectModel(_AbstractReviewAnalysisModel):
         self.naspects = naspects
         self.nwords = nwords
 
+    def infer(self, review: Review, doctype: str) -> List[List[AspectPairType]]: pass # type: ignore
     def infer_batch(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str) -> BatchPairsType:
         pairs: BatchPairsType = []
 
@@ -102,6 +96,12 @@ class AbstractAspectModel(_AbstractReviewAnalysisModel):
             pairs.extend(list(zip(r_aspect_ids, self.merge_aspects_words(r_pred_aspects, self.nwords))))
 
         return pairs
+
+    def train(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output) -> None:
+        corpus, self.dict = _AbstractReviewAnalysisModel.preprocess(doctype, reviews_train, no_extremes)
+        self.dict.save(f'{output}model.dict')
+        pd.to_pickle(self.cas, f'{output}model.perf.cas')
+        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
 
     def get_aspects_words(self, nwords): pass
     def get_aspect_words(self, aspect_id: Aspect, nwords: int) -> List[AspectPairType]: pass # type: ignore
@@ -125,6 +125,13 @@ class AbstractSentimentModel(_AbstractReviewAnalysisModel):
         self.naspects = naspects
         self.nwords = nwords
 
+    def train_sentiment(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output) -> None:
+        corpus, self.dict = _AbstractReviewAnalysisModel.preprocess(doctype, reviews_train, no_extremes)
+        self.dict.save(f'{output}model.dict')
+        pd.to_pickle(self.cas, f'{output}model.perf.cas')
+        pd.to_pickle(self.perplexity, f'{output}model.perf.perplexity')
+
+    def infer_sentiment(self, review: Review, doctype: str) -> List[List[AspectPairType]]: pass # type: ignore
     def infer_batch_sentiment(self, reviews_test: List[Review], h_ratio: int, doctype: str, output: str) -> BatchPairsType:
         pairs: BatchPairsType = []
 
@@ -135,7 +142,7 @@ class AbstractSentimentModel(_AbstractReviewAnalysisModel):
             if random.random() < h_ratio: r_ = r.hide_aspects()
             else: r_ = r
 
-            r_pred_aspects = self.infer(r_, doctype)
+            r_pred_aspects = self.infer_sentiment(r_, doctype)
             # removing duplicate aspect words ==> handled in metrics()
 
             pairs.extend(list(zip(r_aspect_ids, r_pred_aspects)))
