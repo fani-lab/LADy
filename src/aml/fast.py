@@ -18,6 +18,12 @@ def add_label(r):
             for k in j: s[k] = "__label__" + s[k] if s[k].find("__label__") == -1 else s[k]
     return r_
 
+def add_label_sentiment(r):
+    r_ = copy.deepcopy(r)
+    for i, s in enumerate(r_.sentences):
+        for _, _, sentiment in r.aos[i]:
+            s.append("__label__" + sentiment)
+
 def review_formatted_file(path, corpus):
     with open(path, 'w', encoding='utf-8') as f:
         for r in corpus: f.write(' '.join(r) + '\n')
