@@ -255,6 +255,9 @@ def main(args):
 
     output = f'{output}/{am.name()}/'
 
+    eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
+    train_for: ModelCapabilities = set(params.settings['train']['for']).intersection(am.capabilities) #type: ignore
+
     if 'train' in params.settings['cmd']:
         for capability in train_for:
             for f in splits['folds'].keys():
@@ -263,9 +266,6 @@ def main(args):
                 reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
                 train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability)
                 print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
-
-    eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
-    train_for: ModelCapabilities = set(params.settings['train']['for']).intersection(am.capabilities) #type: ignore
 
     # testing
     if 'test' in params.settings['cmd']:
