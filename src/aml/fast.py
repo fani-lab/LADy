@@ -137,5 +137,5 @@ class Fast(AbstractAspectModel, AbstractSentimentModel):
         review_, _ = super().preprocess(doctype, [review])
         for r in review_:
             pred = self.mdl.predict(" ".join(r)) # default k=1
-            review_s_prob.append((pred[0][0], pred[1][0]))
+            review_s_prob.append([(pred[0][0], pred[1][0])])
         return review_s_prob
