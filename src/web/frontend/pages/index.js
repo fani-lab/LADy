@@ -1,8 +1,9 @@
 import Head from "next/head";
+import React from "react"
 import { Inter } from "@next/font/google";
-import { Box, Center, Container, HStack, Heading } from "@chakra-ui/layout";
+import { Center, Container, HStack, Heading } from "@chakra-ui/layout";
 import { Textarea } from "@chakra-ui/textarea";
-import { InfoOutlineIcon, RepeatIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import { RepeatIcon } from "@chakra-ui/icons";
 
 import Footer from "../Components/Footer";
 import { useState, useEffect } from "react";
@@ -13,14 +14,34 @@ import {
   FormControl,
   FormLabel,
   Spinner,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   useToast,
 } from "@chakra-ui/react";
 const inter = Inter({ subsets: ["latin"] });
+
+const Languages = [
+  [''        , "None"],
+  ['pes-Arab', 'Persian'],
+  ['zho_Hans', "Chinese"],
+  ['deu_Latn', 'German'],
+  ['arb_Arab', 'Arabic'],
+  ['fra_Latn', 'French'],
+  ['spa_Latn', 'Spanish']
+]
+
+const ASPECT_MODELS = [
+  'bert',
+  'btm',
+  'ctm',
+  'random',
+  'lda'
+]
+
+const API_LINKS = {
+  'staging': 'http://localhost:5000',
+  'production': 'https://lady.onrender.com'
+}
+
+const ENV = 'staging'
 
 //use state to store textarea value
 export default function Home() {
@@ -34,13 +55,9 @@ export default function Home() {
 
   const [data, setData] = useState("");
   const [isLoad, setIsLoading] = useState(true);
-  let testing = true;
-  let apilink;
-  if (testing === true) {
-    apilink = "http://localhost:5000";
-  } else {
-    apilink = "https://lady.onrender.com";
-  }
+
+  let apilink = API_LINKS[ENV];
+
   useEffect(() => {
     const fetchData = async () => {
       // get the data from the api
@@ -66,7 +83,7 @@ export default function Home() {
     setformval(json[0]);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = React.useCallback(async (e) => {
     e.preventDefault();
     setIsLoading(!isLoad);
 
@@ -93,27 +110,25 @@ export default function Home() {
         position: "top",
       });
     }
+
     setData(json);
-  };
+  }, [isLoad, selectedLang, selectedModel, naspects]);
+
   let handleInputChange = (e) => {
     let inputValue = e.target.value;
     setformval(inputValue);
   };
-  const isError = formval === "";
 
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+  const isError = React.useMemo(() => formval === "", [formval]);
 
-  values.sort(function (a, b) {
-    return b - a;
-  });
+  const values = React.useMemo(() => Object.entries(data).sort(([, a], [, b]) => b - a), [data]);
 
-  const output = {
-    labels,
+  const output = React.useMemo(() => ({
+    labels: values.map(([label]) => label),
     datasets: [
       {
         label: "Score",
-        data: values,
+        data: values.map(([, value]) => value),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "#38B2AC",
       } /*
@@ -124,7 +139,8 @@ export default function Home() {
         backgroundColor: "rgba(53, 162, 235, 0.5)",
       },*/,
     ],
-  };
+  }), [values]);
+
   return (
     <>
       <Head>
@@ -161,11 +177,7 @@ export default function Home() {
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
               >
-                <option value="lda">LDA</option>
-                <option value="btm">BTM</option>
-                <option value="ctm">CTM</option>
-
-                <option value="random">Random</option>
+                {ASPECT_MODELS.map(am => <option key={am} style={{textTransform: "capitalize"}} value={am}>{am}</option>)}
               </Select>
               <FormLabel>Language </FormLabel>
               <Select
@@ -174,17 +186,12 @@ export default function Home() {
                 value={selectedLang}
                 onChange={(e) => setSelectedLang(e.target.value)}
               >
-                <option value="">None</option>
-                <option value="pes_Arab">Persian</option>
-                <option value="zho_Hans">Chinese</option>
-                <option value="deu_Latn">German</option>
-                <option value="arb_Arab">Arabic</option>
-                <option value="fra_Latn">French</option>
-                <option value="spa_Latn">Spanish</option>
+                {Languages.map(([val, label]) => <option key={val} value={val}>{label}</option>)}
               </Select>
 
-              <FormLabel>Number of aspects</FormLabel>
-              <NumberInput
+              {/* <FormLabel>Number of aspects</FormLabel> */}
+
+              {/* <NumberInput
                 borderColor={"teal"}
                 value={naspects}
                 onChange={(value) => setnaspects(value)}
@@ -198,7 +205,8 @@ export default function Home() {
                   <NumberIncrementStepper />
                   <NumberDecrementStepper />
                 </NumberInputStepper>
-              </NumberInput>
+              </NumberInput> */}
+
             </HStack>
             <Textarea
               mb="5"
@@ -220,7 +228,7 @@ export default function Home() {
           <Footer />
         </Container>
       ) : (
-        <Center h="100vh">
+        <Center h="100vd">
           <Spinner />
         </Center>
       )}

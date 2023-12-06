@@ -19,6 +19,7 @@ from aml.btm import Btm
 from aml.ctm import Ctm
 from aml.lda import Lda
 from aml.rnd import Rnd
+from aml.bert import BERT
 
 
 __dirname = os.path.dirname(__file__)
@@ -50,6 +51,7 @@ def api():
     am = None
 
     if model == 'lda': am = Lda(naspects, nwords)
+    if model == 'bert': am = BERT(naspects, nwords)
     if model == 'btm': am = Btm(naspects, nwords)
     if model == 'rnd': am = Rnd(naspects, nwords)
     if model == 'ctm': am = Ctm(naspects, nwords, contextual_size = 768, nsamples =10)
@@ -72,7 +74,7 @@ def api():
     # print("back",backtranslated_review )
     # print("sem", semantic_similarity )
 
-    r_pred_aspects = am.infer_batch(reviews_test=[r], h_ratio=0.0, doctype='snt')[0][1][:naspects]
+    r_pred_aspects = am.infer_batch(reviews_test=[r], h_ratio=0.0, doctype='snt', output=f'{path}/f0')[0][1][:naspects]
     resultdict = dict((x, str(y)) for x, y in r_pred_aspects)
     print('result',resultdict)
     return jsonify(resultdict)
