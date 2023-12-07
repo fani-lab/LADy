@@ -14,15 +14,26 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@next/font": "13.3.0",
+    "axios": "^1.6.2",
+    "chart.js": "^4.4.1",
     "csv-loader": "^3.0.5",
     "csvtojson": "^2.0.10",
+    "fp-ts": "^2.16.1",
     "framer-motion": "^10.12.2",
     "next": "13.3.0",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
-    "faker": "^5.5.3"
+    "@types/node": "20.10.3",
+    "@types/react": "^18.2.42",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "faker": "^5.5.3",
+    "typescript": "^5.3.3"
   }
 }

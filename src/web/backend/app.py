@@ -2,13 +2,12 @@
 import random
 import csv
 from flask_cors import CORS
-from flask import request, jsonify, make_response
+from flask import request, jsonify
 from flask import Flask
 
 import sys
 import os
 import argparse
-import torch
 
 # needs to be before importing Review and Lda
 sys.path.append(os.path.abspath(os.path.join(
@@ -21,6 +20,7 @@ from aml.lda import Lda
 from aml.rnd import Rnd
 from aml.bert import BERT
 
+model_names = ['lda', 'bert', 'btm', 'rnd', 'ctm']
 
 __dirname = os.path.dirname(__file__)
 
@@ -91,6 +91,22 @@ def get_random_row_from_csv():
     except FileNotFoundError:
         return jsonify({'error': '[Server]: reviews.csv not found'}), 500
 
+
+@app.route('/get_models', methods=['GET'])
+def get_models():
+    path = os.path.join(__dirname, 'models')
+    models = os.listdir(path)
+    result = {}
+    
+    for lang in models:
+        model_path = os.path.join(path, lang)
+        models = os.listdir(model_path)
+        lang_ = lang.split('.')[-1] if '.' in lang else 'eng'
+
+        result[lang_] = list(filter(lambda x: x in model_names, models))
+        
+    return jsonify(result)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

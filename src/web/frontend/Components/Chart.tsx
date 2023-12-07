@@ -7,8 +7,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+
 import { Bar } from "react-chartjs-2";
-import React, { useState, useEffect } from "react";
+import React from "react";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -19,7 +21,7 @@ ChartJS.register(
 );
 
 export const options = {
-  indexAxis: "y",
+  indexAxis: "y" as const,
   elements: {
     bar: {
       borderWidth: 2,
@@ -28,7 +30,7 @@ export const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: "right",
+      position: "right" as const,
     },
     title: {
       display: true,
@@ -37,9 +39,7 @@ export const options = {
   },
 };
 
-export default function Example(props) {
-  console.log("output", props.output);
-  // setChartData(props.output);
-
-  return <Bar options={options} data={props.output} />;
-}
+export const Chart = (props: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  output: any;
+}) => <Bar options={options} data={props.output} />;
