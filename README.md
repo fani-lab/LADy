@@ -290,15 +290,15 @@ We strongly encourage and welcome pull requests from contributors. If you plan t
 
 ```
 @inproceedings{DBLP:conf/cikm/HemmatizadehWYF23,
-author    = {Farinam Hemmatizadeh and Chrsitine Wong and Alice Yu and Hossein Fani},
-title     = {Latent Aspect Detection via Backtranslation Augmentation},
-booktitle = {Proceedings of the 32nd {ACM} International Conference on Information {\&} Knowledge Management, University of Birmingham and Eastside Rooms, UK, October 21-25, 2023},
-pages     = {},
-publisher = {{ACM}},
-year      = {2023},
-url       = {},
-doi       = {10.1145/3583780.3615205},
-biburl    = {},
-bibsource = {dblp computer science bibliography, https://dblp.org}
+  author       = {Farinam Hemmatizadeh and Christine Wong and Alice Yu and Hossein Fani},
+  title        = {Latent Aspect Detection via Backtranslation Augmentation},
+  booktitle    = {Proceedings of the 32nd {ACM} International Conference on Information and Knowledge Management, {CIKM} 2023, Birmingham, United Kingdom, October 21-25, 2023},
+  pages        = {3943--3947},
+  publisher    = {{ACM}},
+  year         = {2023},
+  url          = {https://doi.org/10.1145/3583780.3615205},
+  doi          = {10.1145/3583780.3615205},
+  biburl       = {https://dblp.org/rec/conf/cikm/HemmatizadehWYF23.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 ```
