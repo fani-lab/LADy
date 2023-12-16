@@ -15,9 +15,7 @@
 - [4. Experiment](#4-experiment)
 - [5. License](#5-license)
 - [6. Acknowledgments](#6-acknowledgments)
-- [7. Awards](#7-awards)
-- [8. Contribution](#8-contribution)
-- [9. Citation](#9-citation)
+- [7. Contribution](#7-contribution)
 
 </td>
 <td>
@@ -276,29 +274,6 @@ Farinam Hemmatizadeh<sup>1,3</sup>, Christine Wong<sup>1, 4</sup>, Alice Yu<sup>
 In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
 
 
-## 7. Awards
 
-> [`CAD$150, Silver Medalist, UWill Discover 2023`](https://www.uwindsor.ca/uwilldiscover/312/uwill-discover-awards) 👉 [`slides`](./misc/UWillDiscover23.pdf), [`presentation`](https://youtu.be/XNRcD6WFr6Q?si=bVOmsLxmELa-ideq&t=499)
-> <p align="center"><img src='./misc/cs_demo_day_23april23.png' width="350" ></p>
-> <p align="center">From Left: Soroush, Atefeh, Christine, Farinam, Mohammad</p>
-
-
-## 8. Contributing
+## 7. Contributing
 We strongly encourage and welcome pull requests from contributors. If you plan to make substantial modifications, we kindly request that you first open an issue to initiate a discussion. This will allow us to have a clear understanding of the modifications you intend to make and ensure a smooth collaboration process.
-
-## 9. Citation
-
-```
-@inproceedings{DBLP:conf/cikm/HemmatizadehWYF23,
-  author       = {Farinam Hemmatizadeh and Christine Wong and Alice Yu and Hossein Fani},
-  title        = {Latent Aspect Detection via Backtranslation Augmentation},
-  booktitle    = {Proceedings of the 32nd {ACM} International Conference on Information and Knowledge Management, {CIKM} 2023, Birmingham, United Kingdom, October 21-25, 2023},
-  pages        = {3943--3947},
-  publisher    = {{ACM}},
-  year         = {2023},
-  url          = {https://doi.org/10.1145/3583780.3615205},
-  doi          = {10.1145/3583780.3615205},
-  biburl       = {https://dblp.org/rec/conf/cikm/HemmatizadehWYF23.bib},
-  bibsource    = {dblp computer science bibliography, https://dblp.org}
-}
-```
