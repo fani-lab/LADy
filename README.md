@@ -258,17 +258,7 @@ The table below presents the provided links to directories that hold the remaini
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
 ## 5. License
-©2023. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
-
-Farinam Hemmatizadeh<sup>1,3</sup>, Christine Wong<sup>1, 4</sup>, Alice Yu<sup>2, 5</sup>, and [Hossein Fani](https://hosseinfani.github.io/)<sup>1,6</sup>
-
-<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
-<sup><sup>2</sup>Vincent Massey Secondary School, ON, Canada.</sup>
- <br>
-<sup><sup>3</sup>[hemmatif@uwindsor.ca](mailto:hemmatif@uwindsor.ca), [f.hemmatizadeh@gmail.com](mailto:f.hemmatizadeh@gmail.com)</sup>
-<sup><sup>4</sup>[wong93@uwindsor.ca](mailto:wong93@uwindsor.ca)</sup>
-<sup><sup>5</sup>[qinfengyu123@gmail.com](mailto:qinfengyu123@gmail.com)</sup>
-<sup><sup>6</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
+©2024. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ## 6. Acknowledgments
 In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
