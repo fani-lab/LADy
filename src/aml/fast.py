@@ -1,31 +1,42 @@
 import copy
 import pickle
-import re
+import re, numpy as np, pandas as pd, random
 from typing import List
-import numpy as np
-import pandas as pd
 import fasttext
 import gensim
 
-from .mdl import AbstractAspectModel, AspectPairType, BatchPairsType, flatten
+from .mdl import AbstractAspectModel, AbstractSentimentModel, flatten
 from cmn.review import Review
 
 # Utility functions
-def add_label(r):
+def add_label_aspect(r):
     r_ = copy.deepcopy(r)
     for i, s in enumerate(r_.sentences):
         for j, _, _ in r.aos[i]: # j is the index of aspect words in sentence s
             for k in j: s[k] = "__label__" + s[k] if s[k].find("__label__") == -1 else s[k]
     return r_
 
+def add_label_sentiment(r):
+    r_ = copy.deepcopy(r)
+    for i, s in enumerate(r_.sentences):
+        for _, _, sentiment in r.aos[i]:
+            s.append("__label__" + sentiment)
+    return r_
+
+def add_label(r, label_type):
+    if label_type == 'aspect': return add_label_aspect(r)
+    elif label_type == 'sentiment': return add_label_sentiment(r)
+
 def review_formatted_file(path, corpus):
     with open(path, 'w', encoding='utf-8') as f:
         for r in corpus: f.write(' '.join(r) + '\n')
 
 
-class Fast(AbstractAspectModel):
+class Fast(AbstractAspectModel, AbstractSentimentModel):
+    capabilities = ['aspect_detection', 'sentiment_analysis']
+    
     def __init__(self, naspects, nwords): 
-        super().__init__(naspects, nwords)
+        super().__init__(naspects=naspects, nwords=nwords, capabilities=self.capabilities)
         self.aspect_word_prob = None
 
     def load(self, path):
@@ -54,14 +65,14 @@ class Fast(AbstractAspectModel):
         return self.mdl.predict(review.get_txt(), k=self.naspects)
     
     @staticmethod
-    def preprocess(doctype, reviews, settings=None):
+    def preprocess(doctype, reviews, settings=None, label_type='aspect'):
         if not AbstractAspectModel.stop_words:
             import nltk
             AbstractAspectModel.stop_words = nltk.corpus.stopwords.words('english')
     
         reviews_ = []
-        if doctype == 'rvw': reviews_ = [np.concatenate(add_label(r).sentences) for r in reviews]
-        elif doctype == 'snt': reviews_ = [s for r in reviews for s in add_label(r).sentences]
+        if doctype == 'rvw': reviews_ = [np.concatenate(add_label(r, label_type).sentences) for r in reviews]
+        elif doctype == 'snt': reviews_ = [s for r in reviews for s in add_label(r, label_type).sentences]
         reviews_ = [[word for word in doc if word not in AbstractAspectModel.stop_words and len(word) > 3 
                      and (re.match('[a-zA-Z]+', word) or re.search('__label__', word))] for doc in reviews_]
         dict = gensim.corpora.Dictionary(reviews_)
@@ -70,10 +81,7 @@ class Fast(AbstractAspectModel):
         return reviews_, dict
     
     def get_aspect_words(self, aspect, nwords):
-        words_prob = []
-        for wp in sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]:
-            words_prob.append(wp)
-        return words_prob
+        return sorted(self.aspect_word_prob[aspect].items(), key=lambda item: item[1], reverse=True)[:nwords]
 
     def generate_aspect_words(self):
         aw_prob = dict()
@@ -112,3 +120,22 @@ class Fast(AbstractAspectModel):
         result.append(sorted(flatten(subr_pred_aspects_words), reverse=True, key=lambda t: t[1]))
 
         return result
+    
+    def train_sentiment(self, reviews_train, reviews_valid, settings, doctype, no_extremes, output):
+        corpus, self.dict = self.preprocess(doctype, reviews_train, no_extremes, label_type='sentiment')
+        review_formatted_file(f'{output}model.train', corpus)
+        self.mdl = fasttext.train_supervised(f'{output}model.train', **settings)
+        self.aspect_word_prob = self.generate_aspect_words()
+
+        self.dict.save(f'{output}model.dict')
+        self.mdl.save_model(f'{output}model')
+        pd.to_pickle(self.aspect_word_prob, f'{output}model_aspword_prob.pkl')
+        # do we need cas and perplexity?
+
+    def infer_sentiment(self, review, doctype):
+        review_s_prob = []
+        review_, _ = super().preprocess(doctype, [review])
+        for r in review_:
+            pred = self.mdl.predict(" ".join(r)) # default k=1
+            review_s_prob.append([(pred[0][0], pred[1][0])])
+        return review_s_prob
