@@ -2,7 +2,7 @@
 name = "LADy"
 version = "0.1.0"
 description = "A System for Latent Aspect Detection"
-authors = ["Farinam Hematizade <you@example.com>"]
+authors = ["Farinam Hemmatizadeh <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -31,6 +31,8 @@ torch = { version = "1.13.1", source = "pytorch" }
 pampy = "^0.3.0"
 more-itertools = "^10.1.0"
 returns = "^0.22.0"
+sentencepiece = "^0.1.99"
+deep-translator = "^1.11.4"
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.22.1"
@@ -47,7 +49,7 @@ install__networkx = "pip install networkx==3.1"
 install__spacy = "python -m spacy download en_core_web_sm"
 install__stop_words = "python -m nltk.downloader stopwords"
 install__punkt = "python -m nltk.downloader punkt"
-install__octis.shell = "cd src/octis && python setup.py install"
+install__octis.shell = "cd src/octis && python3 setup.py install"
 install__web.shell = "cd src/web/frontend && npm install"
 
 post_install = [

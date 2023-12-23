@@ -29,3 +29,6 @@ contextualized_topic_models==2.5.0 #install it if you want to use ctm model in t
 pytrec-eval-terrier
 
 bert-e2e-absa @ git+https://github.com/fani-lab/BERT-E2E-ABSA.git@master
+
+sentencepiece == 0.1.99
+deep-translator == 1.11.4

@@ -298,8 +298,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
     parser.add_argument('-am', type=str.lower, default='rnd', help='aspect modeling method (eg. --am lda)')
-    parser.add_argument('-data', dest='data', type=str, help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
-    parser.add_argument('-output', dest='output', type=str, default='../output/', help='output path, e.g., -output ../output/semeval/2016.xml')
+    parser.add_argument('-data', dest='data', type=str, default='../data/raw/twitter/acl-14-short-data/toy.raw', help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    parser.add_argument('-output', dest='output', type=str, default='../output/twitter-agg', help='output path, e.g., -output ../output/semeval/2016.xml')
     parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
     args = parser.parse_args()
 

@@ -174,29 +174,54 @@ class Review(object):
     @staticmethod
     def translate_batch(reviews, tgt, settings):
         src = reviews[0].lang
-        if not Review.translator_mdl:
-            from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-            Review.translator_mdl = AutoModelForSeq2SeqLM.from_pretrained(settings['nllb'])
-            Review.translator_tokenizer = AutoTokenizer.from_pretrained(settings['nllb'])
-
-        from transformers import pipeline
-        translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
-        back_translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
-
         reviews_txt = [r.get_txt() for r in reviews]
-        translated_txt = translator(reviews_txt)
-        back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
-        for i, r in enumerate(reviews):
-            if len(translated_txt[i]['translation_text'].strip()) == 0:
-                translated_txt[i]['translation_text'] = reviews_txt[i]
-                back_translated_txt[i]['translation_text'] = reviews_txt[i]
-            translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt)
-            translated_obj.aos, _ = r.semalign(translated_obj)
 
-            back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], parent=r, lang=src)
-            back_translated_obj.aos, _ = r.semalign(back_translated_obj)
+        if settings['translator'] == 'nllb':
+            if not Review.translator_mdl:
+                from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+                Review.translator_mdl = AutoModelForSeq2SeqLM.from_pretrained(settings['nllb'])
+                Review.translator_tokenizer = AutoTokenizer.from_pretrained(settings['nllb'])
 
-            r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
+            from transformers import pipeline
+            translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=src, tgt_lang=tgt, max_length=settings['max_l'], device=settings['device'])
+            back_translator = pipeline('translation', model=Review.translator_mdl, tokenizer=Review.translator_tokenizer, src_lang=tgt, tgt_lang=src, max_length=settings['max_l'], device=settings['device'])
+
+            translated_txt = translator(reviews_txt)
+            back_translated_txt = back_translator([r_['translation_text'] for r_ in translated_txt])
+
+            for i, r in enumerate(reviews):
+                if len(translated_txt[i]['translation_text'].strip()) == 0:
+                    translated_txt[i]['translation_text'] = reviews_txt[i]
+                    back_translated_txt[i]['translation_text'] = reviews_txt[i]
+                translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i]['translation_text'].split()]], parent=r, lang=tgt)
+                translated_obj.aos, _ = r.semalign(translated_obj)
+
+                back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i]['translation_text'].split()]], parent=r, lang=src)
+                back_translated_obj.aos, _ = r.semalign(back_translated_obj)
+
+                r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
+
+        else:  # settings['translator'] == 'googletranslate':
+            from deep_translator import GoogleTranslator
+            if not Review.translator_mdl:
+                Review.translator_mdl = GoogleTranslator()
+
+            if src == 'eng_Latn':
+                src = 'en'
+
+            translated_txt = GoogleTranslator(src=src, dest=tgt).translate_batch(reviews_txt)
+            back_translated_txt = GoogleTranslator(src=tgt, dest=src).translate_batch(translated_txt)
+            for i, r in enumerate(reviews):
+                if len(translated_txt[i].strip()) == 0:
+                    translated_txt[i] = reviews_txt[i]
+                    back_translated_txt[i] = reviews_txt[i]
+                translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in translated_txt[i].split()]], parent=r, lang=tgt)
+                translated_obj.aos, _ = r.semalign(translated_obj)
+
+                back_translated_obj = Review(id=r.id, sentences=[[str(t).lower() for t in back_translated_txt[i].split()]], parent=r, lang=src)
+                back_translated_obj.aos, _ = r.semalign(back_translated_obj)
+
+                r.augs[tgt] = (translated_obj, back_translated_obj, r.semsim(back_translated_obj))
 
     @staticmethod
     def get_stats(datapath, output, cache=True, plot=True, plot_title=None):
