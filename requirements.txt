@@ -32,3 +32,5 @@ bert-e2e-absa @ git+https://github.com/fani-lab/BERT-E2E-ABSA.git@master
 
 sentencepiece == 0.1.99
 deep-translator == 1.11.4
+
+fasttext @ git+https://github.com/facebookresearch/fastText.git
