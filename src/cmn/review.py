@@ -209,8 +209,8 @@ class Review(object):
             if src == 'eng_Latn':
                 src = 'en'
 
-            translated_txt = GoogleTranslator(src=src, dest=tgt).translate_batch(reviews_txt)
-            back_translated_txt = GoogleTranslator(src=tgt, dest=src).translate_batch(translated_txt)
+            translated_txt = GoogleTranslator(source=src, target=tgt).translate_batch(reviews_txt)
+            back_translated_txt = GoogleTranslator(source=tgt, target=src).translate_batch(translated_txt)
             for i, r in enumerate(reviews):
                 if len(translated_txt[i].strip()) == 0:
                     translated_txt[i] = reviews_txt[i]
