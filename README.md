@@ -173,6 +173,9 @@ Here is the codebase folder structure:
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
 |   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling (neural)
 |   |   ├── nrl.py      -> unsupervised aspect detection based on neural topic modeling
+|   |   ├── bert.py     -> [TBD]
+|   |   ├── bertopic.py -> [TBD]
+|   |   ├── fast.py     -> [TBD]
 |   ├── params.py       -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
