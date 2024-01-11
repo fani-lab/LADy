@@ -241,6 +241,7 @@ The reviews were divided into sentences, and our experiments were conducted on e
 | semeval-14-restaurant | 2,023     | 1.8284       | 0.1831   | 0.2236 | 0.2929 | 0.3645 | 0.3724 | 0.4088  |
 | semeval-15-restaurant | 0,833     | 1.5354       | 0.2034   | 0.2312 | 0.3021 | 0.3587 | 0.3907 | 0.4128  |
 | semeval-16-restaurant | 1,234     | 1.5235       | 0.2023   | 0.2331 | 0.2991 | 0.3556 | 0.3834 | 0.4034  |
+| twitter               | 6,248     | 1.0000       | 0.0812   | 0.1040 | 0.1593 | 0.1815 | 0.1962 | 0.2171  |
 
 ### Results
 
