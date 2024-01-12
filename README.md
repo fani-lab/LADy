@@ -52,7 +52,7 @@ This command installs compatible versions of the following libraries:
 
 > [`./src/cmn`](./src/cmn): `transformers, sentence_transformers, scipy, simalign, nltk`
 
-> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus, contextualized_topic_models`
+> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus, contextualized_topic_models, fasttext`
 
 > others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
 
@@ -166,6 +166,7 @@ Here is the codebase folder structure:
 |   ├── cmn
 |   |   ├── review.py   -> class definition for review as object
 |   |   ├── semeval.py  -> overridden class for semeval reviews
+|   |   ├── twitter.py  -> overridden class for twitter reviews
 |   ├── aml
 |   |   ├── mdl.py      -> abstract aspect model to be overridden by baselines
 |   |   ├── rnd.py      -> random aspect model that randomly predicts aspects
@@ -173,9 +174,8 @@ Here is the codebase folder structure:
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
 |   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling (neural)
 |   |   ├── nrl.py      -> unsupervised aspect detection based on neural topic modeling
-|   |   ├── bert.py     -> [TBD]
-|   |   ├── bertopic.py -> [TBD]
-|   |   ├── fast.py     -> [TBD]
+|   |   ├── bert.py     -> supervised aspect detection and sentiment analysis using pre-trained language model and neural end-to-end ABSA
+|   |   ├── fast.py     -> supervised aspect detection and sentiment analysis based on text classification (multinomial logistic regression)
 |   ├── params.py       -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
@@ -220,7 +220,7 @@ We conducted a series of experiments involving backtranslation using `six` diffe
 
 ### Datasets
 
-`LADy` utilizes state-of-the-art `semeval` datasets to `augment` the english datasets with `backtranslation` via different languages and evaluate `latent aspect detection`. Specifically, training sets from `semeval-14` for restaurant and laptop reviews, as well as restaurant reviews from `semeval-15` and `semeval-16` are employed. Moreover, we have created a compact and simplified version of the original datasets, referred to as a `toy dataset`, for our experimental purposes.
+`LADy` utilizes state-of-the-art `semeval` datasets to `augment` the english datasets with `backtranslation` via different languages and evaluate `latent aspect detection`. Specifically, training sets from `semeval-14` for restaurant and laptop reviews, as well as restaurant reviews from `semeval-15` and `semeval-16` are employed. Training sets from `twitter` for reviews on celebrities, products, and companies are also employed. Moreover, we have created a compact and simplified version of the original datasets, referred to as a `toy dataset`, for our experimental purposes.
 
 | dataset               | file (.xml)                                                                                                                                                                          |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -228,6 +228,7 @@ We conducted a series of experiments involving backtranslation using `six` diffe
 | semeval-14-restaurant | [`./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml`](./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml)                                                   |
 | semeval-15-restaurant | [`./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml`](./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml) |
 | semeval-16-restaurant | [`./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                                   |
+| twitter               | [`./data/raw/twitter/acl-14-short-data/train.raw`](./data/raw/twitter/acl-14-short-data/train.raw)                                                   |
 | toy                   | [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                           |
 
 ### Statistics on original and backtranslated reviews
@@ -257,6 +258,7 @@ The table below presents the provided links to directories that hold the remaini
 | semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`]([./output/Semeval-14/Restaurants/](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2FSemEval%2D14%2FRestaurants&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412))                                                                                                                                                                                                                                    22.2 MB |
 | semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2015SB12&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    53.1 GB  |
 | semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    103 MB  |
+| twitter               | [`./output/twitter/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/ElNXWJadYT9Ar5rfwEC64eIBeNRo1ARl3VIch_c1Q1IX0w) 285 GB |
 | toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2Ftoy%2E2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412) 64.6 MB |
 
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
