@@ -136,7 +136,7 @@ This layer further includes realizations for different aspect modeling methods l
 
 > [`fastText [Joulin et al., EACL 2017]`](https://aclanthology.org/E17-2068/) in [`./src/aml/fast.py`](./src/aml/fast.py),
  
-> [`HAST [IJCAI2018]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/hast`](https://github.com/fani-lab/HAST)
+> [`HAST [IJCAI2018]`](https://www.ijcai.org/proceedings/2018/0583) in [`./src/hast`](https://github.com/fani-lab/HAST)
  
 > [`CAt [ACL2020]`](https://aclanthology.org/2020.acl-main.290/) in [`./src/cat`](https://github.com/fani-lab/cat),
 
@@ -256,12 +256,12 @@ The table below presents the provided links to directories that hold the remaini
 
 | dataset               | review files (english, chinese, farsi, arabic, french, german, spanish, and all) and results' directory                                                                                                                                                                                              |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| semeval-14-laptop     | [`./output/Semeval-14/Laptop/`]([./output/Semeval-14/Laptop/](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2FSemEval%2D14%2FLaptop&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412))                                                                                                                                                                                                                                         22.0 MB |
-| semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`]([./output/Semeval-14/Restaurants/](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2FSemEval%2D14%2FRestaurants&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412))                                                                                                                                                                                                                                    22.2 MB |
-| semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2015SB12&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    53.1 GB  |
-| semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    103 MB  |
+| semeval-14-laptop     | [`./output/Semeval-14/Laptop/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EslrIBBMup1Egk6kXVrUKhAB7TzZG9NAFx1elSPM8TtmPg?e=HgiSeH)                            45.5 GB |
+| semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EgTMVoRI9rRIno9gJL4XF7IBdYRIvBbQMO1T30or8dEOdQ?e=Xg9gsw)                            58.6 GB |
+| semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EvnMHP-M84FDl2PklilMpX8BaAwv_-tFoy6aAB-ER3QLUw?e=UVyBtF)    53.9 GB  |
+| semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EpCZ75mN_yhFrohq3lpBC9ABGu4vT1jfLKN-F-EFSmquZA?e=r5tFYG)    55.2 GB  |
 | twitter               | [`./output/twitter/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/ElNXWJadYT9Ar5rfwEC64eIBeNRo1ARl3VIch_c1Q1IX0w) 285 GB |
-| toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2Ftoy%2E2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412) 64.6 MB |
+| toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/Eg6aIaV3NzBCsZa2GIWf0cABKOaTWZr4aOGGWZMYFzVIkA?e=eDSQDi) 2.37 GB |
 
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
@@ -269,7 +269,7 @@ Due to OOV (an aspect might be in test set which is not seen in traning set duri
 ©2024. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ## 6. Acknowledgments
-In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
+In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), [`HAST`](https://github.com/lixin4ever/HAST), [`BERT-E2E-ABSA`](https://github.com/lixin4ever/BERT-E2E-ABSA), [`fastText`](https://github.com/facebookresearch/fastText), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
 
 
 
