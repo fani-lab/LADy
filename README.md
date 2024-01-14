@@ -52,7 +52,7 @@ This command installs compatible versions of the following libraries:
 
 > [`./src/cmn`](./src/cmn): `transformers, sentence_transformers, scipy, simalign, nltk`
 
-> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus, contextualized_topic_models`
+> [`./src/aml`](./src/aml): `gensim, nltk, pandas, requests, bitermplus, contextualized_topic_models, fasttext`
 
 > others: `pytrec-eval-terrier, sklearn, matplotlib, seaborn, tqdm`
 
@@ -132,9 +132,11 @@ This layer further includes realizations for different aspect modeling methods l
 
 > [`Contextual Topic Modeling [EACL2021]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/aml/ctm.py`](./src/aml/ctm.py),
 
-> [`BERT-E2E-ABSA [W-NUT@EMNLP2019]`](https://aclanthology.org/D19-5505/) in [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA)
+> [`BERT-E2E-ABSA [W-NUT@EMNLP2019]`](https://aclanthology.org/D19-5505/) in [`./src/bert-e2e-absa`](https://github.com/fani-lab/BERT-E2E-ABSA),
+
+> [`fastText [Joulin et al., EACL 2017]`](https://aclanthology.org/E17-2068/) in [`./src/aml/fast.py`](./src/aml/fast.py),
  
-> [`HAST [IJCAI2018]`](https://aclanthology.org/2021.eacl-main.143/) in [`./src/hast`](https://github.com/fani-lab/HAST)
+> [`HAST [IJCAI2018]`](https://www.ijcai.org/proceedings/2018/0583) in [`./src/hast`](https://github.com/fani-lab/HAST)
  
 > [`CAt [ACL2020]`](https://aclanthology.org/2020.acl-main.290/) in [`./src/cat`](https://github.com/fani-lab/cat),
 
@@ -152,7 +154,7 @@ Sample models trained on a `toy` dataset can be found [`./output/toy.2016SB5//{m
 
 > `-naspects`: the number of possible aspects for a review in a domain, e.g., `-naspect 5`, like in `restaurant` we may have 5 aspects including `['food', 'staff', ...]`
 
-> `-am`: the aspect modeling (detection) method, e.g., `-am lda`, including `rnd`, `lda`,`btm`, `ctm`, `nrl`, `bert`, `hast`, `cat`
+> `-am`: the aspect modeling (detection) method, e.g., `-am lda`, including `rnd`, `lda`,`btm`, `ctm`, `nrl`, `bert`, `fast`, `hast`, `cat`
 
 > `-data`: the raw review file, e.g., `-data ../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`
 
@@ -166,6 +168,7 @@ Here is the codebase folder structure:
 |   ├── cmn
 |   |   ├── review.py   -> class definition for review as object
 |   |   ├── semeval.py  -> overridden class for semeval reviews
+|   |   ├── twitter.py  -> overridden class for twitter reviews
 |   ├── aml
 |   |   ├── mdl.py      -> abstract aspect model to be overridden by baselines
 |   |   ├── rnd.py      -> random aspect model that randomly predicts aspects
@@ -173,6 +176,8 @@ Here is the codebase folder structure:
 |   |   ├── btm.py      -> unsupervised aspect detection based on biterm topic modeling
 |   |   ├── ctm.py      -> unsupervised aspect detection based on contextual topic modeling (neural)
 |   |   ├── nrl.py      -> unsupervised aspect detection based on neural topic modeling
+|   |   ├── bert.py     -> supervised aspect detection and sentiment analysis using pre-trained language model and neural end-to-end ABSA
+|   |   ├── fast.py     -> supervised aspect detection and sentiment analysis based on text classification (multinomial logistic regression)
 |   ├── params.py       -> running settings of the pipeline
 |   ├── main.py         -> main driver of the pipeline
 ```
@@ -217,7 +222,7 @@ We conducted a series of experiments involving backtranslation using `six` diffe
 
 ### Datasets
 
-`LADy` utilizes state-of-the-art `semeval` datasets to `augment` the english datasets with `backtranslation` via different languages and evaluate `latent aspect detection`. Specifically, training sets from `semeval-14` for restaurant and laptop reviews, as well as restaurant reviews from `semeval-15` and `semeval-16` are employed. Moreover, we have created a compact and simplified version of the original datasets, referred to as a `toy dataset`, for our experimental purposes.
+`LADy` utilizes state-of-the-art `semeval` datasets to `augment` the english datasets with `backtranslation` via different languages and evaluate `latent aspect detection`. Specifically, training sets from `semeval-14` for restaurant and laptop reviews, as well as restaurant reviews from `semeval-15` and `semeval-16` are employed. Training sets from `twitter` for reviews on celebrities, products, and companies are also employed. Moreover, we have created a compact and simplified version of the original datasets, referred to as a `toy dataset`, for our experimental purposes.
 
 | dataset               | file (.xml)                                                                                                                                                                          |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -225,6 +230,7 @@ We conducted a series of experiments involving backtranslation using `six` diffe
 | semeval-14-restaurant | [`./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml`](./data/raw/semeval/SemEval-14/Semeval-14-Restaurants_Train.xml)                                                   |
 | semeval-15-restaurant | [`./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml`](./data/raw/semeval/2015SB12/ABSA15_RestaurantsTrain/ABSA-15_Restaurants_Train_Final.xml) |
 | semeval-16-restaurant | [`./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                                   |
+| twitter               | [`./data/raw/twitter/acl-14-short-data/train.raw`](./data/raw/twitter/acl-14-short-data/train.raw)                                                   |
 | toy                   | [`./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml`](./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml)                                           |
 
 ### Statistics on original and backtranslated reviews
@@ -238,6 +244,7 @@ The reviews were divided into sentences, and our experiments were conducted on e
 | semeval-14-restaurant | 2,023     | 1.8284       | 0.1831   | 0.2236 | 0.2929 | 0.3645 | 0.3724 | 0.4088  |
 | semeval-15-restaurant | 0,833     | 1.5354       | 0.2034   | 0.2312 | 0.3021 | 0.3587 | 0.3907 | 0.4128  |
 | semeval-16-restaurant | 1,234     | 1.5235       | 0.2023   | 0.2331 | 0.2991 | 0.3556 | 0.3834 | 0.4034  |
+| twitter               | 6,248     | 1.0000       | 0.0812   | 0.1040 | 0.1593 | 0.1815 | 0.1962 | 0.2171  |
 
 ### Results
 
@@ -249,11 +256,12 @@ The table below presents the provided links to directories that hold the remaini
 
 | dataset               | review files (english, chinese, farsi, arabic, french, german, spanish, and all) and results' directory                                                                                                                                                                                              |
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| semeval-14-laptop     | [`./output/Semeval-14/Laptop/`]([./output/Semeval-14/Laptop/](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2FSemEval%2D14%2FLaptop&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412))                                                                                                                                                                                                                                         22.0 MB |
-| semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`]([./output/Semeval-14/Restaurants/](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2FSemEval%2D14%2FRestaurants&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412))                                                                                                                                                                                                                                    22.2 MB |
-| semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2015SB12&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    53.1 GB  |
-| semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2F2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412)    103 MB  |
-| toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/sites/cshfrg-ReviewAnalysis/Shared%20Documents/Forms/AllItems.aspx?ga=1&id=%2Fsites%2Fcshfrg%2DReviewAnalysis%2FShared%20Documents%2FLADy%2FLADy0%2E1%2E0%2E0%2Foutput%2Ftoy%2E2016SB5&viewid=4cd69493%2D951c%2D47b5%2Db34a%2Dc1cdbf3a0412) 64.6 MB |
+| semeval-14-laptop     | [`./output/Semeval-14/Laptop/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EslrIBBMup1Egk6kXVrUKhAB7TzZG9NAFx1elSPM8TtmPg?e=HgiSeH)                            45.5 GB |
+| semeval-14-restaurant | [`./output/Semeval-14/Restaurants/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EgTMVoRI9rRIno9gJL4XF7IBdYRIvBbQMO1T30or8dEOdQ?e=Xg9gsw)                            58.6 GB |
+| semeval-15-restaurant | [`./output/2015SB12/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EvnMHP-M84FDl2PklilMpX8BaAwv_-tFoy6aAB-ER3QLUw?e=UVyBtF)    53.9 GB  |
+| semeval-16-restaurant | [`./output/2016SB5/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/EpCZ75mN_yhFrohq3lpBC9ABGu4vT1jfLKN-F-EFSmquZA?e=r5tFYG)    55.2 GB  |
+| twitter               | [`./output/twitter/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/ElNXWJadYT9Ar5rfwEC64eIBeNRo1ARl3VIch_c1Q1IX0w) 285 GB |
+| toy                   | [`./output/toy.2016SB5/`](https://uwin365.sharepoint.com/:f:/s/cshfrg-ReviewAnalysis/Eg6aIaV3NzBCsZa2GIWf0cABKOaTWZr4aOGGWZMYFzVIkA?e=eDSQDi) 2.37 GB |
 
 Due to OOV (an aspect might be in test set which is not seen in traning set during model training), we may have metric@n for n >> +inf not equal to 1.
 
@@ -261,7 +269,7 @@ Due to OOV (an aspect might be in test set which is not seen in traning set duri
 ©2024. This work is licensed under a [CC BY-NC-SA 4.0](LICENSE.txt) license.
 
 ## 6. Acknowledgments
-In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
+In this work, we use [`LDA`](https://radimrehurek.com/gensim/models/ldamodel.html), [`bitermplus`](https://github.com/maximtrp/bitermplus), [`OCTIS`](https://github.com/MIND-Lab/OCTIS), [`pytrec_eval`](https://github.com/cvangysel/pytrec_eval), [`SimAlign`](https://github.com/cisnlp/simalign), [`DeCLUTR`](https://github.com/JohnGiorgi/DeCLUTR), [`No Language Left Behind (NLLB)`](https://github.com/facebookresearch/fairseq/tree/nllb), [`HAST`](https://github.com/lixin4ever/HAST), [`BERT-E2E-ABSA`](https://github.com/lixin4ever/BERT-E2E-ABSA), [`fastText`](https://github.com/facebookresearch/fastText), and other libraries and models. We extend our gratitude to the respective authors of these resources for their valuable contributions.
 
 
 
