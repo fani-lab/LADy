@@ -1,5 +1,6 @@
-name: lady
+name: LADy
 channels:
+  - VS code
   - conda-forge
   - pytorch
   - nvidia
