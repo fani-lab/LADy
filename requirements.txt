@@ -1,7 +1,7 @@
 #python==3.8
 pandas==1.4.4
 seaborn
-spacy==3.3.1
+spacy==3.7.2
 typing_extensions==4.4.0
 tqdm==4.64.1
 natsort
@@ -34,3 +34,7 @@ sentencepiece == 0.1.99
 deep-translator == 1.11.4
 
 fasttext @ git+https://github.com/facebookresearch/fastText.git
+
+pampy==0.3.0
+returns==0.22.0
+more-itertools==10.1.0
