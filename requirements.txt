@@ -34,7 +34,7 @@ sentencepiece == 0.1.99
 deep-translator == 1.11.4
 
 fasttext-wheel
-#fasttext @ git+https://github.com/facebookresearch/fastText.git
+fasttext @ git+https://github.com/facebookresearch/fastText.git
 
 pampy==0.3.0
 returns==0.21.0
