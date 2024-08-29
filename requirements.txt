@@ -36,5 +36,5 @@ deep-translator == 1.11.4
 fasttext @ git+https://github.com/facebookresearch/fastText.git
 
 pampy==0.3.0
-returns==0.22.0
+returns==0.21.0
 more-itertools==10.1.0
