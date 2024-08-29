@@ -10,7 +10,7 @@ dependencies:
   - python=3.8
   - pandas==1.4.4
   - seaborn
-  - spacy==3.3.1
+  - spacy==3.7.2
     #spacy-transformers
     #python -m spacy download en_core_web_trf
     #python -m spacy download en_core_web_sm
@@ -21,6 +21,9 @@ dependencies:
   - scikit-learn>=1.0.0
   - gensim==4.*
   - nltk==3.7
+  - pampy==0.3.0
+  - returns==0.22.0
+  - more-itertools==10.1.0
 #  - matplotlib
   - pip:
       - sentence-transformers       #for semantic similarity of backtranslated review with its original review
