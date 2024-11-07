@@ -90,7 +90,7 @@ class Review(object):
         if not self.aos: return r
         for i, aos in enumerate(self.aos):
             if self.implicit[i]:
-                r.append([(["null"], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
+                r.append([([None], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
             else:
                 r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
         return r

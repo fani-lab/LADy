@@ -114,8 +114,9 @@ settings = {
     },
     "dsg": {
         "openai_api_key": os.getenv("OPENAI_API_KEY"),
-        "model": "gpt-4o-mini",
-        "output_dir": "./data/",
+        "geminai_api_key": os.getenv("GEMINAI_API_KEY"),
+        "llama_api_key": os.getenv("LLAMA_API_KEY"),
+        "output_dir": "./dsg/data/",
         "sys_prompt_identify": "", # Will be used in the future to classify explicit/implicit aspect containing reviews
         "user_prompt_identify": "",
         "sys_prompt_label": """
@@ -137,7 +138,14 @@ settings = {
             Input: Given the review "It holds a charge for so long", in the category phone, where the sentiment is positive, generate a fitting aspect term.
             Output: battery
         """,
-        "user_prompt_label": "Given the review \"%s\", in the category %s, where the sentiment is %s, generate a fitting aspect term."
+        "user_prompt_label": "Given the review \"%s\", in the category %s, where the sentiment is %s, generate a fitting aspect term.",
+        "path": "../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml", # Last 3 params altered dynamically at runtime
+        "category": "restaurant",
+        "model": "gpt-4o-mini",
+        "eval": {
+            "embedding_model": "text-embedding-3-small", # For evaluating models against ground truth
+            "similarity_threshold": 0.7,
+        }
     }
 }
 
