@@ -20,10 +20,8 @@ def llm_experiment():
 
     for model in models:
         params["model"] = model
-        # reviews, targets = generate_dataset(params)
-        # predictions = [review["aos"][0][0][0][0] for review in reviews]
-        predictions = ['quality', 'service', 'food', 'restaurant', 'food', 'restaurant', 'food', 'wine', 'experience', 'service', 'food', 'food', 'experience', 'food', 'food', 'food', 'service', 'service']
-        targets = ['posts', 'staff', 'food', 'place', 'food', 'saul', 'duck', 'wine', 'restaurant', 'cart', 'food', 'chow', 'place', 'fish', 'service', 'food', 'service', 'waiter']
+        reviews, targets = generate_dataset(params)
+        predictions = [review["aos"][0][0][0][0] for review in reviews]
         stats = eval.eval_aspect_labels(params, predictions, targets)
 
         precision_scores.append(stats["precision"])
