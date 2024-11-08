@@ -1,16 +1,23 @@
 """Class for interfacing with a given LLM"""
+import requests
 from openai import OpenAI
 
 class LLM:
     """General class to interface with GPT, Llama, or Gemini"""
     def __init__(self, params):
         self.model_name = params["model"]
-        self.client = None
 
         if self.model_name == "gpt-4o-mini":
             self.client = OpenAI(
                 api_key=params["openai_api_key"]
             )
+        elif self.model_name == "llama":
+            pass
+        elif self.model_name == "gemini-1.5-flash":
+            self.URL = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={params['gemini_api_key']}"
+        else:
+            print(f"Error: Model {self.model_name} not supported.")
+            raise NotImplementedError
 
     def generate_completion(self, sys_prompt, usr_prompt):
         """Generates a completion given a prompt"""
@@ -18,8 +25,8 @@ class LLM:
             return self._generate_completion_openai(sys_prompt, usr_prompt)
         elif self.model_name == "llama":
             return self._generate_completion_llama(sys_prompt)
-        elif self.model_name == "gemini":
-            return self._generate_completion_gemini(sys_prompt)
+        elif self.model_name == "gemini-1.5-flash":
+            return self._generate_completion_gemini(sys_prompt + " " + usr_prompt)
         else:
             return None
     
@@ -46,4 +53,29 @@ class LLM:
     
     def _generate_completion_gemini(self, prompt):
         """Generates a completion using Gemini"""
-        raise NotImplementedError
+        
+        # Main gemini SDK requires Python 3.9+ and LADy is Python 3.8, so requests are made using HTTP
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
+
+        try:
+            response = requests.post(self.URL, headers=headers, json=payload)
+            response.raise_for_status()  # Raises an error for bad responses
+            result = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        except requests.exceptions.RequestException as e:
+            print("Error, unable to generate Gemini response:", e)
+
+        return result

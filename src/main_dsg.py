@@ -1,6 +1,5 @@
 """Runs the implicit dataset generation (DSG) pipeline."""
 import argparse
-import dotenv
 from params import settings
 from cmn import review, semeval
 from dsg import eval, filter, generate, llm
@@ -14,9 +13,6 @@ def load(params):
 def generate_dataset(params):
     """Main driver of the pipeline"""
 
-    # Load API keys
-    dotenv.load_dotenv()
-    
     # Load the AI client
     client = llm.LLM(params)
 

@@ -1,4 +1,7 @@
 import random, os, multiprocessing
+import dotenv
+
+dotenv.load_dotenv()
 
 seed = 0
 random.seed(seed)
@@ -114,7 +117,7 @@ settings = {
     },
     "dsg": {
         "openai_api_key": os.getenv("OPENAI_API_KEY"),
-        "geminai_api_key": os.getenv("GEMINAI_API_KEY"),
+        "gemini_api_key": os.getenv("GEMINI_API_KEY"),
         "llama_api_key": os.getenv("LLAMA_API_KEY"),
         "output_dir": "./dsg/data/",
         "sys_prompt_identify": "", # Will be used in the future to classify explicit/implicit aspect containing reviews
@@ -144,7 +147,7 @@ settings = {
         "model": "gpt-4o-mini",
         "eval": {
             "embedding_model": "text-embedding-3-small", # For evaluating models against ground truth
-            "similarity_threshold": 0.7,
+            "similarity_threshold": 0.5,
         }
     }
 }

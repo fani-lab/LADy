@@ -12,7 +12,7 @@ def llm_experiment():
     params["implicit"] = False # We need ground truth labels for evaluation
 
     # Test all models
-    models = ["gpt-4o-mini"]
+    models = ["gpt-4o-mini", "gemini-1.5-flash"]
     precision_scores = []
     recall_scores = []
     f1_scores = []
@@ -23,6 +23,7 @@ def llm_experiment():
         reviews, targets = generate_dataset(params)
         predictions = [review["aos"][0][0][0][0] for review in reviews]
         stats = eval.eval_aspect_labels(params, predictions, targets)
+
 
         precision_scores.append(stats["precision"])
         recall_scores.append(stats["recall"])
