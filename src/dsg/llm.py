@@ -75,7 +75,7 @@ class LLM:
             response = requests.post(self.URL, headers=headers, json=payload)
             response.raise_for_status()  # Raises an error for bad responses
             result = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+            return result
         except requests.exceptions.RequestException as e:
             print("Error, unable to generate Gemini response:", e)
-
-        return result
+            return ""
