@@ -48,7 +48,8 @@ class Review(object):
                  lempos: Optional[str] = None,
                  parent = None,
                  lang='eng_Latn',
-                 category: Optional[str] = None
+                 category: Optional[str] = None,
+                 implicit: List[bool] = []
     ):
         self.id = id
         self.sentences = sentences #list of sentences of list of tokens
@@ -58,6 +59,8 @@ class Review(object):
         self.lempos = lempos
         self.lang = lang
         self.category = category
+        if not implicit: implicit = [False] * len(self.aos)
+        self.implicit = implicit
 
         self.parent = parent
         self.augs: Augmentation = {} #distionary of translated and backtranslated augmentations of this review in object format, e.g.,
@@ -85,7 +88,11 @@ class Review(object):
     def get_aos(self) -> List[List[AspectOpinionSentiment]]:
         r = []
         if not self.aos: return r
-        for i, aos in enumerate(self.aos): r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
+        for i, aos in enumerate(self.aos):
+            if self.implicit[i]:
+                r.append([([None], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
+            else:
+                r.append([([self.sentences[i][j] for j in a], [self.sentences[i][j] for j in o], s) for (a, o, s) in aos])
         return r
 
     def get_txt(self): return '. '.join(' '.join(s) for s in self.sentences)
