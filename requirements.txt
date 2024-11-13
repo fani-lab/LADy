@@ -41,5 +41,5 @@ more-itertools==10.1.0
 
 # needed for implicit dataset generation
 openai
-google-generativeai
+pytest
 python-dotenv

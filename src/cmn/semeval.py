@@ -11,8 +11,8 @@ class SemEvalReview(Review):
     def __init__(self, id, sentences, time, author, aos): super().__init__(self, id, sentences, time, author, aos)
 
     @staticmethod
-    def load(path, latent=False):
-        if str(path).endswith('.xml'): return SemEvalReview._xmlloader(path, latent)
+    def load(path, explicit=True, implicit=False):
+        if str(path).endswith('.xml'): return SemEvalReview._xmlloader(path, explicit, implicit)
         return SemEvalReview._txtloader(input)
 
     @staticmethod
@@ -32,11 +32,11 @@ class SemEvalReview(Review):
         return reviews
 
     @staticmethod
-    def _xmlloader(path, latent=False):
+    def _xmlloader(path, explicit, implicit):
         reviews_list = []
         xtree = et.parse(path).getroot()
-        if xtree.tag == 'Reviews':   reviews = [SemEvalReview._parse(xsentence, latent) for xreview in tqdm(xtree) for xsentences in xreview for xsentence in xsentences]
-        if xtree.tag == 'sentences': reviews = [SemEvalReview._parse(xsentence, latent) for xsentence in tqdm(xtree)]
+        if xtree.tag == 'Reviews':   reviews = [SemEvalReview._parse(xsentence, explicit, implicit) for xreview in tqdm(xtree) for xsentences in xreview for xsentence in xsentences]
+        if xtree.tag == 'sentences': reviews = [SemEvalReview._parse(xsentence, explicit, implicit) for xsentence in tqdm(xtree)]
 
         return [r for r in reviews if r]
 
@@ -56,7 +56,7 @@ class SemEvalReview(Review):
         return [i for i in range(len(text_tokens), len(text_tokens) + len(aspect_tokens))]
 
     @staticmethod
-    def _parse(xsentence, latent=False):
+    def _parse(xsentence, explicit, implicit):
         id = xsentence.attrib["id"]
         aos = []; aos_cats = []
         for element in xsentence:
@@ -64,7 +64,9 @@ class SemEvalReview(Review):
             elif element.tag == 'Opinions':#semeval-15-16
                 #<Opinion target="place" category="RESTAURANT#GENERAL" polarity="positive" from="5" to="10"/>
                 for opinion in element:
-                    if not latent and opinion.attrib["target"] == 'NULL': continue
+                    # Load implicit, explicit, or both aspects
+                    if not implicit and opinion.attrib["target"] == 'NULL': continue
+                    if not explicit and opinion.attrib["target"] != 'NULL': continue
                     # we may have duplicates for the same aspect due to being in different category like in semeval 2016's <sentence id="1064477:4">
                     aspect = (opinion.attrib["target"], int(opinion.attrib["from"]), int(opinion.attrib["to"])) #('place', 5, 10)
                     # we need to map char index to token index in aspect
@@ -78,7 +80,9 @@ class SemEvalReview(Review):
             elif element.tag == 'aspectTerms':#semeval-14
                 #<aspectTerm term="table" polarity="neutral" from="5" to="10"/>
                 for opinion in element:
-                    if not latent and opinion.attrib["term"] == 'NULL': continue
+                    # Load implicit, explicit, or both aspects
+                    if not implicit and opinion.attrib["term"] == 'NULL': continue
+                    if not explicit and opinion.attrib["term"] != 'NULL': continue
                     # we may have duplicates for the same aspect due to being in different category like in semeval 2016's <sentence id="1064477:4">
                     aspect = (opinion.attrib["term"], int(opinion.attrib["from"]), int(opinion.attrib["to"])) #('place', 5, 10)
                     # we need to map char index to token index in aspect
@@ -94,10 +98,10 @@ class SemEvalReview(Review):
                     aos_cats.append(opinion.attrib["category"])
 
         # Mark all aos with implicit aspects
-        implicit = [False] * len(aos)
-        if latent:
+        implicit_arr = [False] * len(aos)
+        if implicit:
             for i, (idxlist, o, s, aspect_token) in enumerate(aos):
-                if aspect_token == 'NULL': implicit[i] = True
+                if aspect_token == 'NULL': implicit_arr[i] = True
 
         #sentence = nlp(sentence) # as it does some processing, it destroys the token idx for aspect term
         tokens = sentence.split()
@@ -106,10 +110,11 @@ class SemEvalReview(Review):
         # todo: fix 'Food-awesome.' to 'food awesome' => semeval-14-restaurant-<sentence id="1817">
         for i, (idxlist, o, s, aspect_token) in enumerate(aos):
             for j, idx in enumerate(idxlist):
-                if not implicit[i]:
+                if not implicit_arr[i]:
                     tokens[idx] = aspect_token.split()[j].replace('"', '')
                 aos[i] = (idxlist, o, s)
 
         return Review(id=id, sentences=[[str(t).lower() for t in tokens]], time=None, author=None,
                       aos=[aos], lempos=None,
-                      parent=None, lang='eng_Latn', category=aos_cats, implicit=implicit) if aos else None
+                      parent=None, lang='eng_Latn', category=aos_cats, implicit=implicit_arr) if aos else None
+
