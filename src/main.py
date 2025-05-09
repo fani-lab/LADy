@@ -4,13 +4,15 @@ from tqdm import tqdm
 import numpy as np, pandas as pd
 import pampy
 
+import hydra
+from omegaconf import DictConfig
+
 import pytrec_eval
 from nltk.corpus import wordnet as wn
 
 import params
 from cmn.review import Review
 from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability
-
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
@@ -23,7 +25,7 @@ PairType = Tuple[Aspects, PredictedAspect]
 # ---------------------------------------------------------------------------------------
 # Logics
 # ---------------------------------------------------------------------------------------
-def load(input, output, cache=True):
+def load(input, output, cfg, cache=True):
     print('\n1. Loading reviews and preprocessing ...')
     print('#' * 50)
     try:
@@ -40,25 +42,28 @@ def load(input, output, cache=True):
             elif "twitter" in input.lower():
                 from cmn.twitter import TwitterReview
                 reviews = TwitterReview.load(input)
+            elif "mams" in input.lower():
+                from cmn.mams import MAMSReview
+                reviews = MAMSReview.load(input)
             else:
                 # from cmn.mams import MAMSReview
-                print("No specific dataset ('semeval' or 'twitter') was detected in the input.")
+                print("No specific dataset ('semeval' or 'twitter' or 'mams') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
             print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
-            for lang in params.settings['prep']['langaug']:
+            for lang in cfg.prep.languag:
                 if lang:
                     print(f'\n{lang} ...')
-                    if params.settings['prep']['batch']:
+                    if cfg.prep.batch:
                         start = time.time()
-                        Review.translate_batch(reviews, lang, params.settings['prep']) #all at once, esp., when using gpu
+                        Review.translate_batch(reviews, lang, cfg.prep) #all at once, esp., when using gpu
                         end = time.time()
                         print(f'{lang} done all at once (batch). Time: {end - start}')
                     else:
-                        for r in tqdm(reviews): r.translate(lang, params.settings['prep'])
+                        for r in tqdm(reviews): r.translate(lang, cfg.prep)
 
                 # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
                 output_ = output
-                for l in params.settings['prep']['langaug']:
+                for l in cfg.prep.languag:
                     if l and l != lang:
                         output_ = output_.replace(f'{l}.', '')
                 pd.to_pickle(reviews, output_)
@@ -230,13 +235,24 @@ def agg(path, output):
 
         all_results.columns = column_names
         all_results.to_csv(f'{output}/agg.{cp}.pred.eval.mean.csv', index=False)
+        
+def parse_args():
+    parser = argparse.ArgumentParser(description='Latent Aspect Detection')
+    parser.add_argument('-am', type=str.lower, default='rnd', help='aspect modeling method (eg. --am lda)')
+    parser.add_argument('-data', dest='data', type=str, default='/Users/karanveersinghsidhu/StudyD/UOW Classes/Summer 2025 Drop Semester/Fani-Lab/LADy/data/raw/mams/TOCheck.xml', help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    parser.add_argument('-output', dest='output', type=str, default='/Users/karanveersinghsidhu/StudyD/UOW Classes/Summer 2025 Drop Semester/Fani-Lab/LADy/output/mams-agg', help='output path, e.g., -output ../output/semeval/2016.xml')
+    parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
+    return parser.parse_args()
 
-def main(args):
-    if not os.path.isdir(args.output): os.makedirs(args.output)
-    langaug_str = '.'.join([l for l in params.settings['prep']['langaug'] if l])
-    reviews = load(args.data, f'{args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'))
-    splits = split(len(reviews), args.output)
-    output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
+@hydra.main(config_path=".", config_name="config")
+def main(cfg: DictConfig):
+    args = parse_args()
+    if 'prep' in cfg.cmd:
+        if not os.path.isdir(args.output): os.makedirs(args.output)
+        langaug_str = '.'.join([l for l in cfg.prep.languag if l])
+        reviews = load(args.data, f'{args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
+        splits = split(len(reviews), args.output)
+        output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
     am = None
 
@@ -296,12 +312,5 @@ def main(args):
 # TOKENIZERS_PARALLELISM=true CUDA_VISIBLE_DEVICES=0 python -u main.py -am lda -naspect 5 -data ../data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml -output ../output/2016SB5 2>&1 | tee ../output/2016SB5/log.txt &
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Latent Aspect Detection')
-    parser.add_argument('-am', type=str.lower, default='rnd', help='aspect modeling method (eg. --am lda)')
-    parser.add_argument('-data', dest='data', type=str, default='../data/raw/twitter/acl-14-short-data/toy.raw', help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
-    parser.add_argument('-output', dest='output', type=str, default='../output/twitter-agg', help='output path, e.g., -output ../output/semeval/2016.xml')
-    parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
-    args = parser.parse_args()
-
-    main(args)
-    if 'agg' in params.settings['cmd']: agg(args.output, args.output)
+    main()
+    #if 'agg' in params.settings['cmd']: agg(args.output, args.output)
