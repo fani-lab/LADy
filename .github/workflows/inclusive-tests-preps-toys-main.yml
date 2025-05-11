@@ -1,0 +1,47 @@
+name: inclusive-tests-preps-toys-main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-prep-configs:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - config: '+id: 000 cmd=prep args.data =./data/mams/test.xml args.output =./output/mams-agg'
+          - config: '+id: 001 cmd=prep args.data =./data/raw/twitter/acl-14-short-data/toy.raw args.output =./output/twitter-agg'
+          - config: '+id: 002 cmd=prep args.data =./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml args.output =./output/semeval-agg'
+
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.8'
+          environment-file: environment.yml
+          activate-environment: lady-env
+
+      - name: Install pip requirements
+        run: |
+          source $CONDA/bin/activate lady-env
+          pip install -r requirements.txt
+
+      - name: Run prep with Hydra config
+        run: |
+          source $CONDA/bin/activate lady-env
+          python main.py cmd=prep ${{ matrix.hydra_config }}
+        working-directory: ./src

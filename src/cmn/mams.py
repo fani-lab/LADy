@@ -8,7 +8,7 @@ class MAMSReview(Review):
     def __init__(self, id, sentences, time, author, aos): super().__init__(self, id, sentences, time, author, aos)
 
     @staticmethod
-    def load(path, explicit=False, implicit=True): return MAMSReview._xmlloader(path, explicit, implicit)
+    def load(path, explicit=True, implicit=False): return MAMSReview._xmlloader(path, explicit, implicit)
     
     @staticmethod
     def _xmlloader(path, explicit, implicit):

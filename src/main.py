@@ -49,7 +49,7 @@ def load(input, output, cfg, cache=True):
                 # from cmn.mams import MAMSReview
                 print("No specific dataset ('semeval' or 'twitter' or 'mams') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
-            print(f'\n1.2. Augmentation via backtranslation by {params.settings["prep"]["langaug"]} {"in batches" if params.settings["prep"] else ""}...')
+            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.languag} {"in batches" if params.settings["prep"] else ""}...')
             for lang in cfg.prep.languag:
                 if lang:
                     print(f'\n{lang} ...')
@@ -239,8 +239,8 @@ def agg(path, output):
 def parse_args():
     parser = argparse.ArgumentParser(description='Latent Aspect Detection')
     parser.add_argument('-am', type=str.lower, default='rnd', help='aspect modeling method (eg. --am lda)')
-    parser.add_argument('-data', dest='data', type=str, default='./data/raw/twitter/acl-14-short-data/toy.raw', help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
-    parser.add_argument('-output', dest='output', type=str, default='./output/twitter-agg', help='output path, e.g., -output ../output/semeval/2016.xml')
+    parser.add_argument('-data', dest='data', type=str, default='./data/raw/mams/test.xml', help='raw dataset file path, e.g., -data ..data/raw/semeval/2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml')
+    parser.add_argument('-output', dest='output', type=str, default='./output/mams-agg', help='output path, e.g., -output ../output/semeval/2016.xml')
     parser.add_argument('-naspects', dest='naspects', type=int, default=25, help='user-defined number of aspects, e.g., -naspect 25')
     return parser.parse_args()
 
@@ -248,60 +248,61 @@ def parse_args():
 def main(cfg: DictConfig):
     args = parse_args()
     if 'prep' in cfg.cmd:
-        if not os.path.isdir(args.output): os.makedirs(args.output)
+        if not os.path.isdir(cfg.args.output): os.makedirs(cfg.args.output)
         langaug_str = '.'.join([l for l in cfg.prep.languag if l])
-        reviews = load(args.data, f'{args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
-        splits = split(len(reviews), args.output)
-        output = f'{args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
+        reviews = load(cfg.args.data, f'{cfg.args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
+        splits = split(len(reviews), cfg.args.output)
+        output = f'{cfg.args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
 
-    am = None
+    if any(x in cfg.cmd for x in ['train', 'test', 'eval']):
+        am = None
 
-    if not os.path.isdir(output): os.makedirs(output)
-    if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords']) 
-    if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
-    if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
-    if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
-    if 'bert' == args.am: from aml.bert import BERT; am = BERT(args.naspects, params.settings['train']['nwords'])
-    if 'fast' == args.am: from aml.fast import Fast; am = Fast(args.naspects, params.settings['train']['nwords'])
-    if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
-    if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+        if not os.path.isdir(output): os.makedirs(output)
+        if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords']) 
+        if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
+        if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
+        if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
+        if 'bert' == args.am: from aml.bert import BERT; am = BERT(args.naspects, params.settings['train']['nwords'])
+        if 'fast' == args.am: from aml.fast import Fast; am = Fast(args.naspects, params.settings['train']['nwords'])
+        if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+        if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
 
-    if(am is None): raise Exception('Model not found!')
+        if(am is None): raise Exception('Model not found!')
 
-    output = f'{output}/{am.name()}/'
+        output = f'{output}/{am.name()}/'
 
-    eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
-    train_for: ModelCapabilities = set(params.settings['train']['for']).intersection(am.capabilities) #type: ignore
+        eval_for: ModelCapabilities = set(params.settings['eval']['for']).intersection(am.capabilities) #type: ignore
+        train_for: ModelCapabilities = set(params.settings['train']['for']).intersection(am.capabilities) #type: ignore
 
-    if 'train' in params.settings['cmd']:
-        for capability in train_for:
-            for f in splits['folds'].keys():
-                t_s = time.time()
-                reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
-                reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
-                train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability)
-                print(f'Trained time elapsed including language augs {params.settings["prep"]["langaug"]}: {time.time() - t_s}')
+        if 'train' in cfg.cmd:
+            for capability in train_for:
+                for f in splits['folds'].keys():
+                    t_s = time.time()
+                    reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
+                    reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
+                    train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability)
+                    print(f'Trained time elapsed including language augs {cfg.prep.languag}: {time.time() - t_s}')
 
-    # testing
-    if 'test' in params.settings['cmd']:
-        for capability in eval_for:
-            for f in splits['folds'].keys():
-                test(am, np.array(reviews)[splits['test']].tolist(), f, output, capability)
+        # testing
+        if 'test' in cfg.cmd:
+            for capability in eval_for:
+                for f in splits['folds'].keys():
+                    test(am, np.array(reviews)[splits['test']].tolist(), f, output, capability)
 
-    # evaluating
-    if 'eval' in params.settings['cmd']:
-        for capability in eval_for:
-            print(f'Evaluating for {am.name} on {capability}')
+        # evaluating
+        if 'eval' in cfg.cmd:
+            for capability in eval_for:
+                print(f'Evaluating for {am.name} on {capability}')
 
-            cp_name = get_capability_short_name(capability)
+                cp_name = get_capability_short_name(capability)
 
-            df_f_means = pd.DataFrame()
-            for f in splits['folds'].keys():
-                input = f'{output}f{f}.model.{cp_name}.pred.{params.settings["test"]["h_ratio"]}'
-                df_mean = evaluate(input, f'{input}.{cp_name}.eval.mean.csv', capability)
-                df_f_means = pd.concat([df_f_means, df_mean], axis=1)
-            df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.{cp_name}.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
+                df_f_means = pd.DataFrame()
+                for f in splits['folds'].keys():
+                    input = f'{output}f{f}.model.{cp_name}.pred.{params.settings["test"]["h_ratio"]}'
+                    df_mean = evaluate(input, f'{input}.{cp_name}.eval.mean.csv', capability)
+                    df_f_means = pd.concat([df_f_means, df_mean], axis=1)
+                df_f_means.mean(axis=1).to_frame('mean').to_csv(f'{output}model.{cp_name}.pred.eval.mean.{params.settings["test"]["h_ratio"]}.csv')
 
 # {CUDA_VISIBLE_DEVICES=0,1} won't work https://discuss.pytorch.org/t/using-torch-data-prallel-invalid-device-string/166233
 # TOKENIZERS_PARALLELISM=true
@@ -313,4 +314,4 @@ def main(cfg: DictConfig):
 
 if __name__ == '__main__':
     main()
-    #if 'agg' in params.settings['cmd']: agg(args.output, args.output)
+    #if 'agg' in params.settings['cmd']: agg(cfg.args.output, cfg.args.output)
