@@ -3,7 +3,7 @@ pandas==1.4.4
 seaborn
 spacy==3.7.2
 typing_extensions==4.4.0
-tqdm>=4.66.1
+tqdm==4.66.1
 natsort
 scikit-learn>=1.0.0
 nltk==3.7
