@@ -12,3 +12,16 @@ prep:
   max_l: 1500
   device: ${oc.env:CUDA_VISIBLE_DEVICES, "cpu"} # Use CUDA if available, esle CPU
   batch: true
+
+args: # required for 'prep' step
+  data: 
+    #./data/raw/twitter/acl-14-short-data/toy.raw
+    ./data/raw/mams/test.xml
+    #./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml
+  
+  output: 
+    #./output/twitter-agg
+    ./output/mams-agg
+    #./output/semeval-agg
+
+
