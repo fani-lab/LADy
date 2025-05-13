@@ -28,17 +28,13 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Install conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: '3.8'
-          environment-file: environment.yml
-          activate-environment: lady-env
-
-      - name: Install pip requirements
+      
+      - name: Install dependencies
         run: |
-          source $CONDA/bin/activate lady-env
           pip install -r requirements.txt
+        
+      - name: Clean up previous outputs
+        run: rm -rf output/
 
       - name: Run prep with Hydra config
         run: |
