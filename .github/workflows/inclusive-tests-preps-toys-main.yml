@@ -38,5 +38,5 @@ jobs:
 
       - name: Run prep with Hydra config
         run: |
-          python main.py cmd=prep ${{ matrix.hydra_config }}
+          python main.py ${{ matrix.hydra_config }}
         working-directory: ./src
