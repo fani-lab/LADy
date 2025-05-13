@@ -38,6 +38,5 @@ jobs:
 
       - name: Run prep with Hydra config
         run: |
-          source $CONDA/bin/activate lady-env
           python main.py cmd=prep ${{ matrix.hydra_config }}
         working-directory: ./src
