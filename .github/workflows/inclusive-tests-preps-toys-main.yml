@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - config: '+id: 000 cmd=prep args.data =../data/raw/mams/test.xml args.output =./output/mams-agg'
-          - config: '+id: 001 cmd=prep args.data =../data/raw/twitter/acl-14-short-data/toy.raw args.output =./output/twitter-agg'
-          - config: '+id: 002 cmd=prep args.data =../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml args.output =./output/semeval-agg'
+          - config: '+id=000 cmd=prep args.data=../data/raw/mams/test.xml args.output=./output/mams-agg "prep.langaug=['']"'
+          - config: '+id=001 cmd=prep args.data=../data/raw/twitter/acl-14-short-data/toy.raw args.output=./output/twitter-agg "prep.langaug=['']"'
+          - config: '+id=002 cmd=prep args.data=../data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml args.output=./output/semeval-agg "prep.langaug=['']"'
 
       fail-fast: false
 

@@ -12,7 +12,8 @@ from nltk.corpus import wordnet as wn
 
 import params
 from cmn.review import Review
-from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability
+## As requirement.txt is not installing these models for now, therefore this line is commented out
+from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability # 
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
@@ -49,8 +50,8 @@ def load(input, output, cfg, cache=True):
                 # from cmn.mams import MAMSReview
                 print("No specific dataset ('semeval' or 'twitter' or 'mams') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
-            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.languag} {"in batches" if params.settings["prep"] else ""}...')
-            for lang in cfg.prep.languag:
+            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.langaug} {"in batches" if params.settings["prep"] else ""}...')
+            for lang in cfg.prep.langaug:
                 if lang:
                     print(f'\n{lang} ...')
                     if cfg.prep.batch:
@@ -61,9 +62,9 @@ def load(input, output, cfg, cache=True):
                     else:
                         for r in tqdm(reviews): r.translate(lang, cfg.prep)
 
-                # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
+                # to save a file per langauge. I know, it has a minor logical bug as the save file include more langauges!
                 output_ = output
-                for l in cfg.prep.languag:
+                for l in cfg.prep.langaug:
                     if l and l != lang:
                         output_ = output_.replace(f'{l}.', '')
                 pd.to_pickle(reviews, output_)
@@ -246,10 +247,10 @@ def parse_args():
 
 @hydra.main(version_base=None, config_path=".", config_name="config")
 def main(cfg: DictConfig):
-    args = parse_args()
+    # args = parse_args()
     if 'prep' in cfg.cmd:
         if not os.path.isdir(cfg.args.output): os.makedirs(cfg.args.output)
-        langaug_str = '.'.join([l for l in cfg.prep.languag if l])
+        langaug_str = '.'.join([l for l in cfg.prep.langaug if l])
         reviews = load(cfg.args.data, f'{cfg.args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
         splits = split(len(reviews), cfg.args.output)
         output = f'{cfg.args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
