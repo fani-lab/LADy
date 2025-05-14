@@ -23,5 +23,11 @@ args: # required for 'prep' step
     #./output/twitter-agg
     ../output/mams-agg
     #./output/semeval-agg
+  
+  naspects:
+    25  # Default Value
+  
+  am:
+    rnd # Default Value
 
 
