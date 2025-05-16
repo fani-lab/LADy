@@ -30,14 +30,8 @@
 
 
 ## 1. Setup
-`LADy` has been developed on `Python 3.8` and can be installed by `conda` or `pip`, `docker`:
+`LADy` has been developed on `Python 3.8` and can be installed by `pip`, `docker`:
 
-```bash
-git clone --recursive https://github.com/fani-lab/LADy.git
-cd LADy
-conda env create -f environment.yml
-conda activate lady
-```
 
 ```bash
 git clone --recursive https://github.com/fani-lab/LADy.git

@@ -6,7 +6,7 @@ cmd:
 
 prep:
   doctype: snt  # 'rvw' for single review, but 'snt' for segmented subreviews
-  languag: ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
+  langaug: ['', 'pes_Arab', 'zho_Hans', 'deu_Latn', 'arb_Arab', 'fra_Latn', 'spa_Latn']
   translator: nllb
   nllb: facebook/nllb-200-distilled-600M
   max_l: 1500
@@ -16,12 +16,18 @@ prep:
 args: # required for 'prep' step
   data: 
     #./data/raw/twitter/acl-14-short-data/toy.raw
-    ./data/raw/mams/test.xml
+    ../data/raw/mams/test.xml
     #./data/raw/semeval/toy.2016SB5/ABSA16_Restaurants_Train_SB1_v2.xml
   
   output: 
     #./output/twitter-agg
-    ./output/mams-agg
+    ../output/mams-agg
     #./output/semeval-agg
+  
+  naspects:
+    25  # Default Value
+  
+  am:
+    rnd # Default Value
 
 

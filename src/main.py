@@ -12,7 +12,8 @@ from nltk.corpus import wordnet as wn
 
 import params
 from cmn.review import Review
-from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability
+## As requirement.txt is not installing these models for now, therefore this line is commented out
+from aml.mdl import AbstractAspectModel, AbstractSentimentModel, ModelCapabilities, ModelCapability # 
 # ---------------------------------------------------------------------------------------
 # Typings
 # ---------------------------------------------------------------------------------------
@@ -49,8 +50,8 @@ def load(input, output, cfg, cache=True):
                 # from cmn.mams import MAMSReview
                 print("No specific dataset ('semeval' or 'twitter' or 'mams') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
-            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.languag} {"in batches" if params.settings["prep"] else ""}...')
-            for lang in cfg.prep.languag:
+            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.langaug} {"in batches" if params.settings["prep"] else ""}...')
+            for lang in cfg.prep.langaug:
                 if lang:
                     print(f'\n{lang} ...')
                     if cfg.prep.batch:
@@ -61,9 +62,9 @@ def load(input, output, cfg, cache=True):
                     else:
                         for r in tqdm(reviews): r.translate(lang, cfg.prep)
 
-                # to save a file per language. I know, it has a minor logical bug as the save file include more languages!
+                # to save a file per langauge. I know, it has a minor logical bug as the save file include more langauges!
                 output_ = output
-                for l in cfg.prep.languag:
+                for l in cfg.prep.langaug:
                     if l and l != lang:
                         output_ = output_.replace(f'{l}.', '')
                 pd.to_pickle(reviews, output_)
@@ -110,14 +111,14 @@ def split(nsample, output):
     with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
-def train(args, am, train, valid, f, output, capability: ModelCapability):
+def train(am, train, valid, f, output, capability: ModelCapability, cfg):
     print(f'\n2. Aspect model training for {am.name()} ...')
     print('#' * 50)
     try:
         print(f'2.1. Loading saved aspect model from {output}/f{f}. ...')
         am.load(f'{output}/f{f}.')
     except (FileNotFoundError, EOFError) as _:
-        print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
+        print(f'2.1. Loading saved aspect model failed! Training {am.name()} for {cfg.args.naspects} of aspects. See {output}/f{f}.model.train.log for training logs ...')
         if not os.path.isdir(output): os.makedirs(output)
         get_model_train_method(am, capability)(train, valid, params.settings['train'][am.name()], params.settings['prep']['doctype'], params.settings['train']['no_extremes'], f'{output}/f{f}.')
 
@@ -246,26 +247,26 @@ def parse_args():
 
 @hydra.main(version_base=None, config_path=".", config_name="config")
 def main(cfg: DictConfig):
-    args = parse_args()
+    # args = parse_args()
     if 'prep' in cfg.cmd:
         if not os.path.isdir(cfg.args.output): os.makedirs(cfg.args.output)
-        langaug_str = '.'.join([l for l in cfg.prep.languag if l])
+        langaug_str = '.'.join([l for l in cfg.prep.langaug if l])
         reviews = load(cfg.args.data, f'{cfg.args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
         splits = split(len(reviews), cfg.args.output)
-        output = f'{cfg.args.output}/{args.naspects}.{langaug_str}'.rstrip('.')
+        output = f'{cfg.args.output}/{cfg.args.naspects}.{langaug_str}'.rstrip('.')
 
     if any(x in cfg.cmd for x in ['train', 'test', 'eval']):
         am = None
 
         if not os.path.isdir(output): os.makedirs(output)
-        if 'rnd' == args.am: from aml.rnd import Rnd; am = Rnd(args.naspects, params.settings['train']['nwords']) 
-        if 'lda' == args.am: from aml.lda import Lda; am = Lda(args.naspects, params.settings['train']['nwords'])
-        if 'btm' == args.am: from aml.btm import Btm; am = Btm(args.naspects, params.settings['train']['nwords'])
-        if 'ctm' == args.am: from aml.ctm import Ctm; am = Ctm(args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
-        if 'bert' == args.am: from aml.bert import BERT; am = BERT(args.naspects, params.settings['train']['nwords'])
-        if 'fast' == args.am: from aml.fast import Fast; am = Fast(args.naspects, params.settings['train']['nwords'])
-        if 'octis.ctm' == args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
-        if 'octis.neurallda' == args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+        if 'rnd' == cfg.args.am: from aml.rnd import Rnd; am = Rnd(cfg.args.naspects, params.settings['train']['nwords']) 
+        if 'lda' == cfg.args.am: from aml.lda import Lda; am = Lda(cfg.args.naspects, params.settings['train']['nwords'])
+        if 'btm' == cfg.args.am: from aml.btm import Btm; am = Btm(cfg.args.naspects, params.settings['train']['nwords'])
+        if 'ctm' == cfg.args.am: from aml.ctm import Ctm; am = Ctm(cfg.args.naspects, params.settings['train']['nwords'], params.settings['train']['ctm']['contextual_size'], params.settings['train']['ctm']['num_samples'])
+        if 'bert' == cfg.args.am: from aml.bert import BERT; am = BERT(cfg.args.naspects, params.settings['train']['nwords'])
+        if 'fast' == cfg.args.am: from aml.fast import Fast; am = Fast(cfg.args.naspects, params.settings['train']['nwords'])
+        if 'octis.ctm' == cfg.args.am: from octis.models.CTM import CTM; from aml.nrl import Nrl; am = Nrl(CTM(), cfg.args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
+        if 'octis.neurallda' == cfg.args.am: from octis.models.NeuralLDA import NeuralLDA; from aml.nrl import Nrl; am = Nrl(NeuralLDA(), cfg.args.naspects, params.settings['train']['nwords'], params.settings['train']['quality'])
 
 
         if(am is None): raise Exception('Model not found!')
@@ -281,7 +282,7 @@ def main(cfg: DictConfig):
                     t_s = time.time()
                     reviews_train = np.array(reviews)[splits['folds'][f]['train']].tolist()
                     reviews_train.extend([r_.augs[lang][1] for r_ in reviews_train for lang in params.settings['prep']['langaug'] if lang and r_.augs[lang][2] >= params.settings['train']['langaug_semsim']])
-                    train(args, am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability)
+                    train(am, reviews_train, np.array(reviews)[splits['folds'][f]['valid']].tolist(), f, output, capability, cfg)
                     print(f'Trained time elapsed including language augs {cfg.prep.languag}: {time.time() - t_s}')
 
         # testing
