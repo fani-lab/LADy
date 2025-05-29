@@ -50,28 +50,29 @@ def load(input, output, cfg, cache=True):
                 # from cmn.mams import MAMSReview
                 print("No specific dataset ('semeval' or 'twitter' or 'mams') was detected in the input.")
             print(f'(#reviews: {len(reviews)})')
-            print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.langaug} {"in batches" if params.settings["prep"] else ""}...')
-            for lang in cfg.prep.langaug:
-                if lang:
-                    print(f'\n{lang} ...')
-                    if cfg.prep.batch:
-                        start = time.time()
-                        Review.translate_batch(reviews, lang, cfg.prep) #all at once, esp., when using gpu
-                        end = time.time()
-                        print(f'{lang} done all at once (batch). Time: {end - start}')
-                    else:
-                        for r in tqdm(reviews): r.translate(lang, cfg.prep)
+            if(len(reviews) != 0):
+                print(f'\n1.2. Augmentation via backtranslation by {cfg.prep.langaug} {"in batches" if params.settings["prep"] else ""}...')
+                for lang in cfg.prep.langaug:
+                    if lang:
+                        print(f'\n{lang} ...')
+                        if cfg.prep.batch:
+                            start = time.time()
+                            Review.translate_batch(reviews, lang, cfg.prep) #all at once, esp., when using gpu
+                            end = time.time()
+                            print(f'{lang} done all at once (batch). Time: {end - start}')
+                        else:
+                            for r in tqdm(reviews): r.translate(lang, cfg.prep)
 
-                # to save a file per langauge. I know, it has a minor logical bug as the save file include more langauges!
-                output_ = output
-                for l in cfg.prep.langaug:
-                    if l and l != lang:
-                        output_ = output_.replace(f'{l}.', '')
-                pd.to_pickle(reviews, output_)
+                    # to save a file per langauge. I know, it has a minor logical bug as the save file include more langauges!
+                    output_ = output
+                    for l in cfg.prep.langaug:
+                        if l and l != lang:
+                            output_ = output_.replace(f'{l}.', '')
+                    pd.to_pickle(reviews, output_)
 
-            print(f'\n1.3. Saving processed pickle file {output}...')
-            pd.to_pickle(reviews, output)
-            return reviews
+                print(f'\n1.3. Saving processed pickle file {output}...')
+                pd.to_pickle(reviews, output)
+                return reviews
         except Exception as error:
             print(f'Error...{error}')
             raise error
@@ -252,8 +253,14 @@ def main(cfg: DictConfig):
         if not os.path.isdir(cfg.args.output): os.makedirs(cfg.args.output)
         langaug_str = '.'.join([l for l in cfg.prep.langaug if l])
         reviews = load(cfg.args.data, f'{cfg.args.output}/reviews.{langaug_str}.pkl'.replace('..pkl', '.pkl'), cfg)
-        splits = split(len(reviews), cfg.args.output)
+        if(reviews != None):
+            if(len(reviews) > 2):
+                splits = split(len(reviews), cfg.args.output)
         output = f'{cfg.args.output}/{cfg.args.naspects}.{langaug_str}'.rstrip('.')
+    
+    if 'llmargs' in cfg.cmd:
+        from llm.aspect_extraction_pipeline import mainllm
+        reviews = mainllm(cfg, reviews)
 
     if any(x in cfg.cmd for x in ['train', 'test', 'eval']):
         am = None
