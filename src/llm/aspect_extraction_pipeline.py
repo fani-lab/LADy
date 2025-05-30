@@ -46,6 +46,7 @@ class LLMReviewProcessor:
         enhanced_reviews = []
         for i, r in enumerate(tqdm(reviews)):
             sample_review = vars(r)
+            if sample_review.get('implicit', [False])[0] is not True: continue
             print(f"_____Review {i}____")
             print(sample_review)
 
@@ -66,7 +67,11 @@ class LLMReviewProcessor:
             for json_str in matches:
                 try:
                     aspect_data = json.loads(json_str)
-                    aspect_term = aspect_data.get("aspect", "").strip().lower()
+                    aspect = aspect_data.get("aspect", "")
+                    if isinstance(aspect, list) and aspect:
+                        aspect = aspect[0]  # or join if multiple items are expected
+                    aspect_term = aspect.strip().lower()
+                    
                     if not aspect_term or aspect_term in seen_aspects:
                         continue
                     seen_aspects.add(aspect_term)
@@ -90,8 +95,12 @@ class LLMReviewProcessor:
             updated_review.aspects = all_aspects
             enhanced_reviews.append(updated_review)
 
-        self.save_to_pickle(enhanced_reviews)
-        return enhanced_reviews
+        if(len(enhanced_reviews) > 0):
+            self.save_to_pickle(enhanced_reviews)
+            return enhanced_reviews
+        else:
+            print("No Implicit Review to be Processed ")
+            return None
     
     def save_to_pickle(self, reviews):
         output_path = self.cfg.llmargs.output
