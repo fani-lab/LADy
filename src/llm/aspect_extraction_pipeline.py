@@ -37,8 +37,7 @@ class LLMReviewProcessor:
         tokens = [token.lower().strip(string.punctuation) for token in sentence_tokens]
 
         for i in range(len(tokens) - len(aspect_tokens) + 1):
-            if tokens[i:i + len(aspect_tokens)] == aspect_tokens:
-                return list(range(i, i + len(aspect_tokens)))
+            if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
 
         return -1  
     
@@ -46,16 +45,18 @@ class LLMReviewProcessor:
         enhanced_reviews = []
         for i, r in enumerate(tqdm(reviews)):
             sample_review = vars(r)
-            if sample_review.get('implicit', [False])[0] is not True: continue
-            print(f"_____Review {i}____")
-            print(sample_review)
-
+            
+            if sample_review.get('implicit', [False])[0] is not True: 
+                continue
+            # print(f"_____Review {i}____")
+            # print(sample_review)
+            
             prompt = self.prompt_builder.build_prompt(sample_review)
             response = self.llm_handler.get_response(prompt)
             matches = re.findall(r'\{.*?\}', response, re.DOTALL)
 
-            if not matches:
-                print("No JSON object found in response")
+            if not matches: 
+                print("No JSON object found in response") 
                 continue
 
             all_aspects = []
@@ -68,18 +69,15 @@ class LLMReviewProcessor:
                 try:
                     aspect_data = json.loads(json_str)
                     aspect = aspect_data.get("aspect", "")
-                    if isinstance(aspect, list) and aspect:
-                        aspect = aspect[0]  # or join if multiple items are expected
+                    if isinstance(aspect, list) and aspect: aspect = aspect[0]  # or join if multiple items are expected
                     aspect_term = aspect.strip().lower()
                     
-                    if not aspect_term or aspect_term in seen_aspects:
-                        continue
+                    if not aspect_term or aspect_term in seen_aspects: continue
                     seen_aspects.add(aspect_term)
                     aspect_indices = self.find_aspect_indices(aspect_term, tokens)
                     updated_aos.append((aspect_indices if aspect_indices != -1 else [-1], [], sentiment))
                     all_aspects.append(aspect_term)
-                except json.JSONDecodeError:
-                    print("Failed to parse JSON:", json_str)
+                except json.JSONDecodeError: print("Failed to parse JSON:", json_str)
 
             updated_review = Review(
                 id=sample_review["id"],
@@ -106,8 +104,7 @@ class LLMReviewProcessor:
         output_path = self.cfg.llmargs.output
         output_dir = os.path.dirname(output_path)
 
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(output_dir): os.makedirs(output_dir)
 
         filename = os.path.basename(self.cfg.args.data)
         print(f'\nSaving processed Review.pickle file {output_dir}/{filename}...')
@@ -119,8 +116,7 @@ def mainllm(cfg: DictConfig, reviews: list):
     processor = LLMReviewProcessor(cfg)
     return processor.process_reviews(reviews)
 
-if __name__ == "__main__":
-    mainllm()
+
     
 
     
