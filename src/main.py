@@ -39,7 +39,7 @@ def load(input, output, cfg, cache=True):
             print('1.1. Loading existing processed pickle file failed! Loading raw reviews ...')
             if "semeval" in input.lower():
                 from cmn.semeval import SemEvalReview
-                reviews = SemEvalReview.load(input)
+                reviews = SemEvalReview.load(input, explicit= True, implicit=True)
             elif "twitter" in input.lower():
                 from cmn.twitter import TwitterReview
                 reviews = TwitterReview.load(input)
