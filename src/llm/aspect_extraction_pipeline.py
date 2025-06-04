@@ -39,18 +39,15 @@ class LLMReviewProcessor:
         for i in range(len(tokens) - len(aspect_tokens) + 1):
             if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
 
+
         return -1  
     
     def process_reviews(self, reviews: list):
         enhanced_reviews = []
         for i, r in enumerate(tqdm(reviews)):
-            sample_review = vars(r)
-            
-            if sample_review.get('implicit', [False])[0] is not True: 
-                continue
-            # print(f"_____Review {i}____")
-            # print(sample_review)
-            
+            sample_review = vars(r)        
+            if sample_review.get('implicit', [False])[0] is not True: continue
+
             prompt = self.prompt_builder.build_prompt(sample_review)
             response = self.llm_handler.get_response(prompt)
             matches = re.findall(r'\{.*?\}', response, re.DOTALL)
@@ -73,6 +70,7 @@ class LLMReviewProcessor:
                     aspect_term = aspect.strip().lower()
                     
                     if not aspect_term or aspect_term in seen_aspects: continue
+
                     seen_aspects.add(aspect_term)
                     aspect_indices = self.find_aspect_indices(aspect_term, tokens)
                     updated_aos.append((aspect_indices if aspect_indices != -1 else [-1], [], sentiment))
@@ -99,6 +97,7 @@ class LLMReviewProcessor:
         else:
             print("No Implicit Review to be Processed ")
             return None
+
     
     def save_to_pickle(self, reviews):
         output_path = self.cfg.llmargs.output
@@ -115,7 +114,6 @@ class LLMReviewProcessor:
 def mainllm(cfg: DictConfig, reviews: list):
     processor = LLMReviewProcessor(cfg)
     return processor.process_reviews(reviews)
-
 
     
 
