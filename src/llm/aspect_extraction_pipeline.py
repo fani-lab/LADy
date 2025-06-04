@@ -17,7 +17,7 @@ class LLMReviewProcessor:
     def __init__(self, cfg: DictConfig):
         self.cfg = cfg
         self.llm_handler = self._init_llm_handler()
-        self.prompt_builder = PromptBuilder()
+        self.prompt_builder = PromptBuilder(top_k=cfg.llmargs.top_k_aspects)
 
     def _init_llm_handler(self):
         config = LLMconfig(
@@ -39,7 +39,6 @@ class LLMReviewProcessor:
         for i in range(len(tokens) - len(aspect_tokens) + 1):
             if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
 
-
         return -1  
     
     def process_reviews(self, reviews: list):
@@ -49,13 +48,32 @@ class LLMReviewProcessor:
             if sample_review.get('implicit', [False])[0] is not True: continue
 
             prompt = self.prompt_builder.build_prompt(sample_review)
-            response = self.llm_handler.get_response(prompt)
-            matches = re.findall(r'\{.*?\}', response, re.DOTALL)
+            
+            max_retries = 5
+            valid_json_found = False
+            matches = []
+            
+            for attempt in range(max_retries):
+                response = self.llm_handler.get_response(prompt)
+                matches = re.findall(r'\{.*?\}', response, re.DOTALL)
+
+                for json_str in matches:
+                    try:
+                        aspect_data = json.loads(json_str)
+                        if "aspect" in aspect_data and aspect_data["aspect"]:
+                            valid_json_found = True
+                            break
+                    except json.JSONDecodeError:
+                        continue
+
+                if valid_json_found:
+                    break
+                else:
+                    print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
 
             if not matches: 
                 print("No JSON object found in response") 
                 continue
-
             all_aspects = []
             seen_aspects = set()
             tokens = [word.strip().lower() for sentences in sample_review["sentences"] for word in sentences]

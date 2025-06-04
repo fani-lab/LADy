@@ -39,5 +39,4 @@ llmargs:
   temperature: 0.5
   max_tokens: 1024
   output: ../output/AspectAdded/semeval-agg/aspectAdded.pkl
-
-
+  top_k_aspects: 1
