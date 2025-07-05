@@ -261,6 +261,9 @@ def main(cfg: DictConfig):
     if 'llmargs' in cfg.cmd:
         from llm.aspect_extraction_pipeline import mainllm
         reviews = mainllm(cfg, reviews)
+    if 'modelEval' in cfg.cmd:
+        from llm.aspect_extraction_pipeline import llmEval
+        llmEval(cfg, reviews)
 
     if any(x in cfg.cmd for x in ['train', 'test', 'eval']):
         am = None
