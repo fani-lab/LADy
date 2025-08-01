@@ -38,6 +38,7 @@ class LLMReviewProcessor:
         tokens = [token.lower().strip(string.punctuation) for token in sentence_tokens]
         for i in range(len(tokens) - len(aspect_tokens) + 1):
             if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
+
         return -1  
     
     def process_reviews(self, reviews: list):
@@ -62,10 +63,12 @@ class LLMReviewProcessor:
                         if "aspect" in aspect_data and aspect_data["aspect"]:
                             valid_json_found = True
                             break
+
                     except json.JSONDecodeError: continue
 
                 if valid_json_found: break
                 else: print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
+
 
             if not matches: 
                 print("No JSON object found in response") 
