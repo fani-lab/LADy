@@ -36,10 +36,8 @@ class LLMReviewProcessor:
     def find_aspect_indices(aspect: str, sentence_tokens) :
         aspect_tokens = aspect.lower().split()
         tokens = [token.lower().strip(string.punctuation) for token in sentence_tokens]
-
         for i in range(len(tokens) - len(aspect_tokens) + 1):
             if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
-
         return -1  
     
     def process_reviews(self, reviews: list):
@@ -64,13 +62,10 @@ class LLMReviewProcessor:
                         if "aspect" in aspect_data and aspect_data["aspect"]:
                             valid_json_found = True
                             break
-                    except json.JSONDecodeError:
-                        continue
+                    except json.JSONDecodeError: continue
 
-                if valid_json_found:
-                    break
-                else:
-                    print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
+                if valid_json_found: break
+                else: print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
 
             if not matches: 
                 print("No JSON object found in response") 
@@ -207,13 +202,18 @@ class LLMReviewProcessor:
         
    
     def _parse_llm_answer(self, response: str) -> str:
-        match = re.search(r'"?Answer"?\s*:\s*"?(Yes|No)"?', response, re.IGNORECASE)
-        return match.group(1).capitalize() if match else "Invalid"
-
+        match = re.findall(r'Answer\s*:\s*({\s*"Answer"\s*:\s*"(Yes|No)"\s*})', response, re.IGNORECASE)
+        if match:
+            last_json_str = match[-1][0]  # Full JSON string
+            try:
+                answer_dict = json.loads(last_json_str)
+                return answer_dict.get("Answer", "Invalid").capitalize()
+            except json.JSONDecodeError: return "Invalid"
+        return "Invalid"
+    
     def _get_wrong_aspect(self, reviews, exclude_index):
         other_reviews = [r for idx, r in enumerate(reviews) if idx != exclude_index and hasattr(r, 'aspects') and r.aspects]
-        if not other_reviews:
-            return None
+        if not other_reviews: return None
         return random.choice(random.choice(other_reviews).aspects)
 
     def extract_aspects_from_aos(self, review):
@@ -227,8 +227,7 @@ class LLMReviewProcessor:
                         aspect_term = ' '.join(flat_tokens[i] for i in indices if i < len(flat_tokens))
                         if aspect_term.strip():
                             aspects.append(aspect_term.strip().lower())
-                    except IndexError:
-                        continue
+                    except IndexError: continue
         return aspects
 
 # Entry function
@@ -240,8 +239,7 @@ def llmEval(cfg: DictConfig, reviews: list):
     processor = LLMReviewProcessor(cfg)
     
     bolVal = processor.evaluate_llm_trustworthiness(reviews)
-    if(bolVal):
-        processor.accuracy_Evaluator()
+    if(bolVal): processor.accuracy_Evaluator()
     
 
 
