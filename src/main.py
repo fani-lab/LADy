@@ -69,9 +69,17 @@ def load(input, output, cfg, cache=True):
                         if l and l != lang:
                             output_ = output_.replace(f'{l}.', '')
                     pd.to_pickle(reviews, output_)
-
+        ### New Code added by Me(Karan)
+                # Extract full raw file name (e.g., "semeval_2014_restaurants.txt")
+                raw_filename = os.path.basename(input)
+                # Construct final output file name
+                processed_filename = f"{raw_filename.replace('.', '_')}_processed.pkl"
+                output_path = os.path.join(os.path.dirname(output), processed_filename)
+        ### Till This Block. Didn't Removed any line of Code. Just added Logic to safe file according to Source File name
+        ### Not Fully Functional but Works 
                 print(f'\n1.3. Saving processed pickle file {output}...')
-                pd.to_pickle(reviews, output)
+        ### For Line Below, intead of output variable, I am using  output_path varible, so as to save pickle file as Source files name
+                pd.to_pickle(reviews, output_path)
                 return reviews
         except Exception as error:
             print(f'Error...{error}')
@@ -261,6 +269,9 @@ def main(cfg: DictConfig):
     if 'llmargs' in cfg.cmd:
         from llm.aspect_extraction_pipeline import mainllm
         reviews = mainllm(cfg, reviews)
+    if 'modelEval' in cfg.cmd:
+        from llm.aspect_extraction_pipeline import llmEval
+        llmEval(cfg, reviews)
 
     if any(x in cfg.cmd for x in ['train', 'test', 'eval']):
         am = None

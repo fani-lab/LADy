@@ -4,6 +4,7 @@ default:
 cmd:
   - prep
   - llmargs
+  - modelEval
 
 prep:
   doctype: snt  # 'rvw' for single review, but 'snt' for segmented subreviews
@@ -34,9 +35,12 @@ args: # required for 'prep' step
 llmargs:
   use_api: true
   api_key: lm-studio
-  api_base: http://localhost:1234/v1
+  api_base: http://10.60.33.10:8000/v1 #http://localhost:1234/v1
   model_name: deepseek-r1-distill-qwen-32b
   temperature: 0.5
   max_tokens: 1024
   output: ../output/AspectAdded/semeval-agg/aspectAdded.pkl
   top_k_aspects: 1
+  outputEval: ../output/modelEval/
+
+

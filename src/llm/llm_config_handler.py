@@ -19,16 +19,14 @@ class LLMconfig:
 
 class LLMHandler:
    
-    
     def __init__(self, config):
         self.config = config
         self.generator = None
         
         if self.config.use_api:
             openai.api_key = self.config.api_key
-            if self.config.api_base:
-                openai.api_base = self.config.api_base
-        else:
+            if self.config.api_base: openai.api_base = self.config.api_base
+        else:   # Not Using Model Locally in The code Yet # So this part of Code is not being used
             self.tokenizer = AutoTokenizer.from_pretrained(self.config.local_model_path)
             self.model = AutoModelForCausalLM.from_pretrained(self.config.local_model_path)
             self.generator = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer)
@@ -53,9 +51,7 @@ class LLMHandler:
             else:
                 #result = self.generator(prompt, max_length=max_tokens + len(prompt.split()), do_sample=True)
                 max_len = min(self.config.max_tokens + len(prompt.split()), 1024)
-
                 result = self.generator(prompt, max_length=max_len, truncation=True, do_sample=True)
-
                 return result[0]['generated_text'].strip()
             
         except Exception as e:

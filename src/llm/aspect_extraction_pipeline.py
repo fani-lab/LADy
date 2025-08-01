@@ -1,7 +1,7 @@
 from llm.llm_config_handler import LLMconfig, LLMHandler
 from cmn.review import Review  
 from llm.prompt_builder import PromptBuilder
-
+from llm.trustworthiness_check import TrustWorthiness_PromptBuilder, model_Evaluator
 from tqdm import tqdm
 import json
 import re
@@ -9,6 +9,7 @@ from omegaconf import DictConfig
 import pandas as pd
 import os
 import string
+import random
 
 
 
@@ -35,7 +36,6 @@ class LLMReviewProcessor:
     def find_aspect_indices(aspect: str, sentence_tokens) :
         aspect_tokens = aspect.lower().split()
         tokens = [token.lower().strip(string.punctuation) for token in sentence_tokens]
-
         for i in range(len(tokens) - len(aspect_tokens) + 1):
             if tokens[i:i + len(aspect_tokens)] == aspect_tokens: return list(range(i, i + len(aspect_tokens)))
 
@@ -63,13 +63,12 @@ class LLMReviewProcessor:
                         if "aspect" in aspect_data and aspect_data["aspect"]:
                             valid_json_found = True
                             break
-                    except json.JSONDecodeError:
-                        continue
 
-                if valid_json_found:
-                    break
-                else:
-                    print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
+                    except json.JSONDecodeError: continue
+
+                if valid_json_found: break
+                else: print(f"Invalid or no valid JSON with 'aspect' found. Attempt {attempt + 1} of {max_retries}")
+
 
             if not matches: 
                 print("No JSON object found in response") 
@@ -127,11 +126,128 @@ class LLMReviewProcessor:
         print(f'\nSaving processed Review.pickle file {output_dir}/{filename}...')
         pd.to_pickle(reviews, os.path.join(output_dir, filename))
 
+# Model Evalution Code
+
+    
+    def evaluate_llm_trustworthiness(self, reviews: list):
+        prompt_builder = TrustWorthiness_PromptBuilder()
+        results = []
+
+        for i, review in enumerate(tqdm(reviews)):
+            print(vars(review))
+            if not hasattr(review, 'aspects') or not review.aspects:
+                review.aspects = self.extract_aspects_from_aos(review)
+                print(review.aspects)
+                print()
+                if not review.aspects: continue
+
+            review_text = ' '.join(review.sentences[0])
+            review_dict = vars(review)
+
+            # Correct aspect
+            correct_aspect = random.choice(review.aspects)
+            correct_prompt = prompt_builder.build_prompt(review_dict, correct_aspect)
+            correct_response = self.llm_handler.get_response(correct_prompt)
+            correct_pred = self._parse_llm_answer(correct_response)
+
+            results.append({
+                "review_id": review.id,
+                "review_text": review_text,
+                "aspect": correct_aspect,
+                "expected_answer": "Yes",
+                "model_prediction": correct_pred,
+                "is_correct": correct_pred == "Yes"
+            })
+
+            #  Incorrect aspect
+            wrong_aspect = self._get_wrong_aspect(reviews, i)
+            if not wrong_aspect:
+                continue
+
+            wrong_prompt = prompt_builder.build_prompt(review_dict, wrong_aspect)
+            wrong_response = self.llm_handler.get_response(wrong_prompt)
+            wrong_pred = self._parse_llm_answer(wrong_response)
+
+            results.append({
+                "review_id": review.id,
+                "review_text": review_text,
+                "aspect": wrong_aspect,
+                "expected_answer": "No",
+                "model_prediction": wrong_pred,
+                "is_correct": wrong_pred == "No"
+            })
+
+        self.save_to_excel(results)
+        return True
+       
+        
+    def accuracy_Evaluator(self):
+        path = self.cfg.llmargs.outputEval
+        model_eval = model_Evaluator()
+        
+        if os.path.exists(path) and os.path.isdir(path):
+            model_eval.evaluator(path)
+        else:
+            print("The specified path does not exist or is not a directory.")
+    
+    def save_to_excel(self, results):
+        output_path = self.cfg.llmargs.outputEval
+        output_dir = os.path.dirname(output_path)
+
+        if not os.path.exists(output_dir): os.makedirs(output_dir)
+
+        base_name = os.path.splitext(os.path.basename(self.cfg.args.data))[0]
+        filename = f"{base_name}_trustworthiness_eval.xlsx"
+
+        df = pd.DataFrame(results)
+        df.to_excel(os.path.join(output_dir, filename), index=False)
+        print(f'\Saved processed Evaluation  file {output_dir}/{filename}...')
+        
+   
+    def _parse_llm_answer(self, response: str) -> str:
+        match = re.findall(r'Answer\s*:\s*({\s*"Answer"\s*:\s*"(Yes|No)"\s*})', response, re.IGNORECASE)
+        if match:
+            last_json_str = match[-1][0]  # Full JSON string
+            try:
+                answer_dict = json.loads(last_json_str)
+                return answer_dict.get("Answer", "Invalid").capitalize()
+            except json.JSONDecodeError: return "Invalid"
+        return "Invalid"
+    
+    def _get_wrong_aspect(self, reviews, exclude_index):
+        other_reviews = [r for idx, r in enumerate(reviews) if idx != exclude_index and hasattr(r, 'aspects') and r.aspects]
+        if not other_reviews: return None
+        return random.choice(random.choice(other_reviews).aspects)
+
+    def extract_aspects_from_aos(self, review):
+        aspects = []
+        for ao_list in review.aos:
+            for aspect_info in ao_list:
+                indices = aspect_info[0]  # aspect token indices
+                if indices and indices[0] != -1:
+                    flat_tokens = [word for sent in review.sentences for word in sent]
+                    try:
+                        aspect_term = ' '.join(flat_tokens[i] for i in indices if i < len(flat_tokens))
+                        if aspect_term.strip():
+                            aspects.append(aspect_term.strip().lower())
+                    except IndexError: continue
+        return aspects
 
 # Entry function
 def mainllm(cfg: DictConfig, reviews: list):
     processor = LLMReviewProcessor(cfg)
     return processor.process_reviews(reviews)
+
+def llmEval(cfg: DictConfig, reviews: list):
+    processor = LLMReviewProcessor(cfg)
+    
+    bolVal = processor.evaluate_llm_trustworthiness(reviews)
+    if(bolVal): processor.accuracy_Evaluator()
+    
+
+
+    
+
 
     
 
